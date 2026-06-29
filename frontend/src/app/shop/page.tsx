@@ -161,8 +161,8 @@ function FadeSection({ children, className = "" }: { children: React.ReactNode; 
 
 export default function ShopLandingPage() {
   return (
-    <div className="text-[#1E3A1E] bg-[#F4F6F3] overflow-x-hidden">
-      {/* ══ HERO CON SCROLL-MORPH-HERO INTEGRADO (100svh) ═══════════════════ */}
+    <div className="text-[#1E3A1E] bg-[#F4F6F3] overflow-x-hidden max-w-[100vw]">
+      {/* ══ HERO CON SCROLL-MORPH-HERO INTEGRADO ═══════════════════ */}
       <section className="relative w-full h-[100svh] min-h-[600px] sm:min-h-[700px] overflow-hidden">
         <ScrollMorphHero />
         <div
@@ -225,7 +225,6 @@ export default function ShopLandingPage() {
 
           {/* Image collage */}
           <div className="relative h-[340px] sm:h-[480px] lg:h-[520px] w-full mt-6 lg:mt-0">
-            {/* Main image */}
             <div
               className="absolute top-0 left-0 right-6 sm:right-8 bottom-12 sm:bottom-16 rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl"
               style={{ border: "3px solid rgba(58,95,38,0.18)" }}
@@ -242,7 +241,6 @@ export default function ShopLandingPage() {
                 </p>
               </div>
             </div>
-            {/* Accent image */}
             <div
               className="absolute bottom-0 right-0 w-28 h-28 sm:w-44 sm:h-44 rounded-xl sm:rounded-2xl overflow-hidden shadow-xl"
               style={{ border: "3px solid #FBBF24" }}
@@ -253,7 +251,6 @@ export default function ShopLandingPage() {
                 className="w-full h-full object-cover"
               />
             </div>
-            {/* Floating badge */}
             <div
               className="absolute top-4 right-10 sm:top-6 sm:right-12 rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-3 shadow-xl backdrop-blur-md"
               style={{
@@ -272,8 +269,7 @@ export default function ShopLandingPage() {
       <section
         className="py-16 sm:py-28 px-4"
         style={{
-          background:
-            "linear-gradient(to bottom, #F4F6F3, #EBF0E8)",
+          background: "linear-gradient(to bottom, #F4F6F3, #EBF0E8)",
         }}
       >
         <div className="max-w-6xl mx-auto">
@@ -289,9 +285,7 @@ export default function ShopLandingPage() {
             </p>
           </FadeSection>
 
-          {/* Steps — horizontal timeline */}
           <div className="relative">
-            {/* Connector line */}
             <div
               className="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] h-px"
               style={{
@@ -311,11 +305,10 @@ export default function ShopLandingPage() {
                   viewport={{ once: true, margin: "-60px" }}
                   className="flex flex-col items-center text-center space-y-3 sm:space-y-4 group"
                 >
-                  {/* Circle */}
                   <div
                     className="relative z-10 h-16 w-16 sm:h-20 sm:w-20 rounded-2xl flex items-center justify-center text-xl sm:text-2xl font-black text-white transition-transform duration-300 group-hover:-translate-y-2"
                     style={{
-                      background: `linear-gradient(135deg, #1E3A1E 0%, #2d5720 100%)`,
+                      background: "linear-gradient(135deg, #1E3A1E 0%, #2d5720 100%)",
                       border: `2.5px solid ${item.color}`,
                       boxShadow: `0 8px 24px rgba(30,58,30,0.18), 0 0 0 4px ${item.color}1a`,
                     }}
@@ -339,7 +332,6 @@ export default function ShopLandingPage() {
         }}
       >
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-center gap-12 lg:gap-16">
-          {/* Text */}
           <FadeSection className="space-y-5 sm:space-y-7">
             <span
               className="inline-flex items-center gap-2 rounded-full border border-[#FBBF24]/25 bg-[#3A5F26]/30 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.3em] text-[#FBBF24]"
@@ -368,7 +360,6 @@ export default function ShopLandingPage() {
             </div>
           </FadeSection>
 
-          {/* Stacked cards */}
           <FadeSection className="relative flex items-center justify-center min-h-[240px] sm:min-h-[280px] w-full mt-8 lg:mt-0 overflow-visible">
             <DisplayCards cards={NEWS_CARDS} />
           </FadeSection>
@@ -408,7 +399,6 @@ export default function ShopLandingPage() {
                     boxShadow: "0 2px 12px rgba(30,58,30,0.04)",
                   }}
                 >
-                  {/* Accent corner */}
                   <div
                     className="absolute top-0 right-0 w-24 h-24 rounded-bl-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                     style={{ background: `${item.accent}09` }}
@@ -427,7 +417,6 @@ export default function ShopLandingPage() {
                   <h3 className="text-sm sm:text-[15px] font-black text-[#1E3A1E] mb-2">{item.title}</h3>
                   <p className="text-[12px] sm:text-[13px] text-gray-500 leading-relaxed">{item.desc}</p>
 
-                  {/* Bottom accent line */}
                   <div
                     className="absolute bottom-0 left-0 h-0.5 w-0 group-hover:w-full transition-all duration-500 rounded-full"
                     style={{ background: item.accent }}
@@ -449,7 +438,6 @@ export default function ShopLandingPage() {
               boxShadow: "0 24px 80px rgba(19,38,19,0.25)",
             }}
           >
-            {/* Decorative blobs */}
             <div
               className="pointer-events-none absolute -top-20 -left-20 w-64 h-64 rounded-full opacity-20"
               style={{ background: "radial-gradient(circle, #FBBF24, transparent)" }}
@@ -458,7 +446,6 @@ export default function ShopLandingPage() {
               className="pointer-events-none absolute -bottom-20 -right-20 w-80 h-80 rounded-full opacity-10"
               style={{ background: "radial-gradient(circle, #3A5F26, transparent)" }}
             />
-            {/* Bottom border accent */}
             <div
               className="absolute bottom-0 left-0 right-0 h-1 rounded-b-3xl"
               style={{ background: "linear-gradient(to right, transparent, #FBBF24, transparent)" }}
@@ -481,7 +468,7 @@ export default function ShopLandingPage() {
 
               <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                 <Link
-                  href="/dashboard"
+                  href="/register"
                   className="group inline-flex items-center gap-2 rounded-xl px-6 sm:px-8 py-3 sm:py-3.5 text-xs sm:text-sm font-bold text-[#1E3A1E] transition-all duration-200 active:scale-95"
                   style={{
                     background: "#FBBF24",
@@ -500,7 +487,7 @@ export default function ShopLandingPage() {
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
                 <Link
-                  href="/dashboard"
+                  href="/login"
                   className="inline-flex items-center rounded-xl border-2 border-white/20 px-6 sm:px-8 py-3 sm:py-3.5 text-xs sm:text-sm font-bold text-white backdrop-blur-sm transition-all duration-200 hover:border-white/40 hover:bg-white/5 active:scale-95"
                 >
                   Iniciar Sesión
@@ -512,5 +499,4 @@ export default function ShopLandingPage() {
       </section>
     </div>
   );
-}
 }
