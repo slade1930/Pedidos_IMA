@@ -56,16 +56,17 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
 def setup_middlewares(app: FastAPI) -> None:
 
-    # CORS - Permitir Vercel y desarrollo local
+    # CORS - Permitir todos los subdominios de Vercel
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
             "http://localhost:3000",
             "http://localhost:3001",
             "http://localhost:5173",
-            "https://pedidos-ima.vercel.app",     # 👈 Tu dominio de Vercel
-            "https://pedidos-ima.vercel.app/",    # 👈 Con slash
-            "https://*.vercel.app",               # 👈 Cualquier subdominio de Vercel
+            "https://pedidos-ima.vercel.app",
+            "https://pedidos-kzu9vw5an-ima-panama.vercel.app",  # 👈 Preview deploy
+            "https://*.vercel.app",      # 👈 Cualquier subdominio de Vercel
+            "https://*.vercel.com",
         ],
         allow_credentials=True,
         allow_methods=["*"],
