@@ -70,40 +70,7 @@ function getCategoryGradient(category: string): { from: string; to: string } {
   }
 }
 
-function getFallbackImage(category: string, id: string): string {
-  const images: Record<string, string[]> = {
-    vegetables: [
-      "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&w=500&q=80",
-    ],
-    fruits: [
-      "https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1519996521430-02b798c1d881?auto=format&fit=crop&w=500&q=80",
-    ],
-    grains: [
-      "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&w=500&q=80",
-    ],
-    meats: [
-      "https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=500&q=80",
-    ],
-    dairy: [
-      "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=500&q=80",
-    ],
-    other: [
-      "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=500&q=80",
-    ],
-  };
-
-  const list = images[category] || images["other"];
-  const index = id ? id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % list.length : 0;
-  return list[index];
-}
-
-// 👈 FUNCIÓN PARA CONSTRUIR URL COMPLETA DE IMAGEN
+// ✅ CORREGIDO: Solo usa la imagen del backend, sin fallback aleatorio
 function getImageUrl(product: Product): string {
   if (product.image_url) {
     if (product.image_url.startsWith("http")) {
@@ -111,7 +78,7 @@ function getImageUrl(product: Product): string {
     }
     return `${API_URL}${product.image_url}`;
   }
-  return getFallbackImage(product.category, product.id);
+  return ""; // Sin imagen
 }
 
 // ─── SKELETON EN CUADRÍCULA ────────────────────────────────
@@ -198,7 +165,7 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map((product) => {
             const { from, to } = getCategoryGradient(product.category);
-            const imageUrl = getImageUrl(product); // 👈 Usar la función corregida
+            const imageUrl = getImageUrl(product);
 
             return (
               <div key={product.id} className="group relative w-full transition-all duration-500">
@@ -222,15 +189,20 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                   <div>
                     {/* Contenedor de Imagen de Producto */}
                     <div className="relative w-full aspect-[16/10] bg-slate-50 dark:bg-slate-900 rounded-xl overflow-hidden mb-3 border border-slate-100 dark:border-slate-850">
-                      <img 
-                        src={imageUrl} 
-                        alt={product.name} 
-                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = getFallbackImage(product.category, product.id);
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-80" />
+                      {imageUrl ? (
+                        <img 
+                          src={imageUrl} 
+                          alt={product.name} 
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+                          <svg className="w-12 h-12 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+                          </svg>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-80 pointer-events-none" />
 
                       {/* Badge inactivo overlay */}
                       {!product.is_active && (
