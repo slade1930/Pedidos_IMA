@@ -8,20 +8,33 @@ import axios, {
 
 import { tokenStorage } from "@/lib/auth/token";
 
-// ─── CONFIGURACIÓN BASE ───────────────────────────────────
+// ======================================================
+// CONFIGURACIÓN BASE
+// ======================================================
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
 const API_VERSION = "/api/v1";
+
+// ===== DEBUG =====
+console.log("====================================");
+console.log("NEXT_PUBLIC_API_URL:", process.env.NEXT_PUBLIC_API_URL);
+console.log("API_URL:", API_URL);
+console.log("BASE URL:", `${API_URL}${API_VERSION}`);
+console.log("====================================");
 
 export const apiClient = axios.create({
   baseURL: `${API_URL}${API_VERSION}`,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 15000,
 });
 
-// ─── TIPOS ────────────────────────────────────────────────
+// ======================================================
+// TIPOS
+// ======================================================
 
 interface BackendError {
   success: boolean;
@@ -30,27 +43,31 @@ interface BackendError {
   code?: string;
 }
 
-// ─── UTILITARIO DE ERRORES ────────────────────────────────
+// ======================================================
+// FORMATEADOR DE ERRORES
+// ======================================================
 
 function getErrorMessage(data: unknown): string {
   if (!data) return "Error de conexión";
 
   const d = data as Record<string, unknown>;
 
-  // Error de validación de FastAPI: { detail: [{ loc, msg, type }] }
   if (d.detail && Array.isArray(d.detail)) {
-    const details = d.detail as Array<{ loc: (string | number)[]; msg: string }>;
-    return details.map((e) => `${e.loc.join(".")}: ${e.msg}`).join(". ");
+    const details = d.detail as Array<{
+      loc: (string | number)[];
+      msg: string;
+    }>;
+
+    return details
+      .map((e) => `${e.loc.join(".")}: ${e.msg}`)
+      .join(". ");
   }
 
-  // Error con message string
-  if (d.message && typeof d.message === "string") return d.message;
+  if (typeof d.message === "string") return d.message;
 
-  // Error con detail string
-  if (d.detail && typeof d.detail === "string") return d.detail;
+  if (typeof d.detail === "string") return d.detail;
 
-  // Error con detail objeto (ej: PDA) — tomar message del objeto
-  if (d.detail && typeof d.detail === "object") {
+  if (typeof d.detail === "object" && d.detail !== null) {
     const obj = d.detail as Record<string, unknown>;
     return (obj.message as string) || "Error de conexión";
   }
@@ -58,11 +75,20 @@ function getErrorMessage(data: unknown): string {
   return "Error de conexión";
 }
 
-// ─── INTERCEPTOR DE REQUEST ───────────────────────────────
+// ======================================================
+// REQUEST INTERCEPTOR
+// ======================================================
 
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const publicRoutes = ["/auth/login", "/auth/refresh", "/users/register"];
+    console.log("➡️ REQUEST");
+    console.log(config.method?.toUpperCase(), config.baseURL + config.url);
+
+    const publicRoutes = [
+      "/auth/login",
+      "/auth/refresh",
+      "/users/register",
+    ];
 
     const isPublicRoute = publicRoutes.some((route) =>
       config.url?.includes(route)
@@ -70,32 +96,36 @@ apiClient.interceptors.request.use(
 
     if (!isPublicRoute) {
       const token = tokenStorage.getAccessToken();
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
 
-    // Si los datos son FormData, eliminar Content-Type para que axios lo configure automáticamente
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];
     }
 
     return config;
   },
-  (error: AxiosError) => {
-    return Promise.reject(error);
-  }
+  (error: AxiosError) => Promise.reject(error)
 );
 
-// ─── INTERCEPTOR DE RESPONSE ──────────────────────────────
+// ======================================================
+// REFRESH TOKEN
+// ======================================================
 
 let isRefreshing = false;
+
 let failedQueue: Array<{
   resolve: (token: string) => void;
   reject: (error: AxiosError) => void;
 }> = [];
 
-function processQueue(error: AxiosError | null, token: string | null): void {
+function processQueue(
+  error: AxiosError | null,
+  token: string | null
+): void {
   failedQueue.forEach((request) => {
     if (error || !token) {
       request.reject(error!);
@@ -103,31 +133,53 @@ function processQueue(error: AxiosError | null, token: string | null): void {
       request.resolve(token);
     }
   });
+
   failedQueue = [];
 }
 
+// ======================================================
+// RESPONSE INTERCEPTOR
+// ======================================================
+
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
-    // 👈 Si es blob, devolver sin modificar
-    if (response.config.responseType === "blob" || response.data instanceof Blob) {
+    console.log("✅ RESPONSE");
+    console.log(response.status, response.config.url);
+
+    if (
+      response.config.responseType === "blob" ||
+      response.data instanceof Blob
+    ) {
       return response;
     }
-    
+
     const payload = response.data;
+
     if (
       payload &&
       typeof payload === "object" &&
       "success" in payload &&
       "data" in payload
     ) {
-      return { ...response, data: payload.data };
+      return {
+        ...response,
+        data: payload.data,
+      };
     }
+
     return response;
   },
+
   async (error: AxiosError<BackendError>) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & {
-      _retry?: boolean;
-    };
+    console.error("❌ AXIOS ERROR");
+    console.error("URL:", error.config?.baseURL + error.config?.url);
+    console.error("STATUS:", error.response?.status);
+    console.error("DATA:", error.response?.data);
+
+    const originalRequest =
+      error.config as InternalAxiosRequestConfig & {
+        _retry?: boolean;
+      };
 
     if (
       error.response?.status === 401 &&
@@ -142,7 +194,7 @@ apiClient.interceptors.response.use(
       }
 
       if (isRefreshing) {
-        return new Promise<string>((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           failedQueue.push({
             resolve: (token: string) => {
               originalRequest.headers.Authorization = `Bearer ${token}`;
@@ -157,18 +209,21 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const response = await axios.post<{ success: boolean; data: { access_token: string } }>(
+        const response = await axios.post(
           `${API_URL}${API_VERSION}/auth/refresh`,
-          { refresh_token: refreshToken },
-          { headers: { "Content-Type": "application/json" } }
+          {
+            refresh_token: refreshToken,
+          }
         );
 
-        const payload = response.data;
-        const newAccessToken = payload.data.access_token;
+        const newAccessToken = response.data.data.access_token;
+
         tokenStorage.setAccessToken(newAccessToken);
 
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
         processQueue(null, newAccessToken);
+
+        originalRequest.headers.Authorization =
+          `Bearer ${newAccessToken}`;
 
         return apiClient(originalRequest);
       } catch (refreshError) {
@@ -180,19 +235,15 @@ apiClient.interceptors.response.use(
       }
     }
 
-    // Obtener el detail original
-    const responseData = error.response?.data as Record<string, unknown> | undefined;
-    const detail = responseData?.detail;
+    const responseData =
+      error.response?.data as Record<string, unknown> | undefined;
 
-    // Formatear error
-    const formattedError = {
+    return Promise.reject({
       status: error.response?.status ?? 0,
       message: getErrorMessage(responseData),
-      detail: detail,
+      detail: responseData?.detail,
       originalError: error,
-    };
-
-    return Promise.reject(formattedError);
+    });
   }
 );
 
