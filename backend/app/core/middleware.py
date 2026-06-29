@@ -13,7 +13,6 @@ from starlette.responses import Response
 from app.core.config import settings
 
 
-# Logging Middleware
 class LoggingMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next) -> Response:
@@ -57,10 +56,17 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
 def setup_middlewares(app: FastAPI) -> None:
 
-    # CORS
+    # CORS - Permitir Vercel y desarrollo local
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.ALLOWED_ORIGINS,
+        allow_origins=[
+            "http://localhost:3000",
+            "http://localhost:3001",
+            "http://localhost:5173",
+            "https://pedidos-ima.vercel.app",     # 👈 Tu dominio de Vercel
+            "https://pedidos-ima.vercel.app/",    # 👈 Con slash
+            "https://*.vercel.app",               # 👈 Cualquier subdominio de Vercel
+        ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
