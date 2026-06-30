@@ -8,6 +8,7 @@ from app.core.database import engine, Base
 from app.core.middleware import setup_middlewares
 from app.api.router import api_router
 from app.utils.logger import setup_logger, log
+from app.core.cloudinary_config import init_cloudinary  # 👈 NUEVO
 import os
 from pathlib import Path
 
@@ -19,7 +20,14 @@ async def lifespan(app: FastAPI):
     setup_logger()
     log.info("🚀 Iniciando IMA System API...")
     
-    # 👈 Crear directorios necesarios
+    # Inicializar Cloudinary
+    try:
+        init_cloudinary()
+        log.info("☁️  Cloudinary configurado")
+    except Exception as e:
+        log.warning(f"⚠️  Cloudinary no configurado: {e}")
+    
+    # Crear directorios necesarios
     Path("static/images/fairs").mkdir(parents=True, exist_ok=True)
     log.info("📁 Directorios estáticos creados")
 
