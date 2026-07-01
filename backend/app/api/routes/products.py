@@ -23,8 +23,8 @@ router = APIRouter(prefix="/products", tags=["Products"])
 async def get_all_products(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
-    search: str = Query(None),           # 👈 NUEVO: búsqueda por nombre/SKU
-    category: str = Query(None),         # 👈 NUEVO: filtro por categoría
+    search: str = Query(None),
+    category: str = Query(None),
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
@@ -49,13 +49,13 @@ async def get_public_products(
 ):
     """Endpoint público para que los clientes vean productos disponibles"""
     service = ProductService(db)
-    
-    if fair_id and category:
-        products = await service.get_by_category(category, fair_id)
-    elif fair_id:
-        products = await service.get_by_fair(fair_id)
-    else:
-        products = await service.get_all(limit=50)
+    products = await service.get_all(
+        skip=0, 
+        limit=100, 
+        search=search, 
+        category=category,
+        fair_id=fair_id
+    )
     
     return ResponseSchema(
         data=[ProductResponseSchema.model_validate(p) for p in products]
