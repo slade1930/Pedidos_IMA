@@ -22,7 +22,7 @@ router = APIRouter(prefix="/inventory", tags=["Inventory"])
 @router.get("/", response_model=PaginatedResponseSchema[InventoryResponseSchema])
 async def get_all_inventory(
     skip: int = Query(0, ge=0),
-    limit: int = Query(10, ge=1, le=100),
+    limit: int = Query(100, ge=1, le=200),
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
@@ -30,7 +30,21 @@ async def get_all_inventory(
     items = await service.get_all(skip=skip, limit=limit)
     total = await service.get_total_count()
     return PaginatedResponseSchema(
-        data=[InventoryResponseSchema.model_validate(i) for i in items],
+        data=[
+            InventoryResponseSchema(
+                id=i.id,
+                product_id=i.product_id,
+                product_name=i.product.name if i.product else None,  # 👈 NUEVO
+                fair_id=i.fair_id,
+                total_stock=i.total_stock,
+                reserved_stock=i.reserved_stock,
+                delivered_stock=i.delivered_stock,
+                available_stock=i.available_stock,
+                is_available=i.is_available,
+                notes=i.notes,
+            )
+            for i in items
+        ],
         total=total,
         page=(skip // limit) + 1 if limit > 0 else 1,
         limit=limit,
