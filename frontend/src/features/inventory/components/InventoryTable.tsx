@@ -8,7 +8,7 @@ import type { InventoryItem } from "@/features/inventory/types/inventory.types";
 
 // ─── CONSTANTES ────────────────────────────────────────────
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 100;
 
 // ─── PROPS ─────────────────────────────────────────────────
 
