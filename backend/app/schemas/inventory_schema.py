@@ -1,3 +1,4 @@
+# app/schemas/inventory_schema.py
 from typing import Optional
 import uuid
 
@@ -42,6 +43,8 @@ class InventoryResponseSchema(BaseModel):
     id: uuid.UUID
 
     product_id: uuid.UUID
+
+    product_name: Optional[str] = None  # 👈 NUEVO
 
     fair_id: uuid.UUID
 
