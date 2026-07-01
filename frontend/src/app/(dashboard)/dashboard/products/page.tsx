@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ProductGrid } from "@/features/products/components/ProductGrid";
 import { ProductForm } from "@/features/products/components/ProductForm";
 import { productService } from "@/features/products/services/product.service";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { Product, CreateProductPayload, UpdateProductPayload } from "@/features/products/types/product.types";
 
 // ─── TIPOS LOCALES ────────────────────────────────────────
@@ -27,28 +28,18 @@ const CATEGORY_OPTIONS = [
 
 // ─── COMPONENTE ────────────────────────────────────────────
 
-/**
- * Página de Gestión de Productos
- * 
- * Ruta: /dashboard/products
- * Layout: (dashboard) → ProtectedLayout
- */
 export default function ProductsPage() {
   const queryClient = useQueryClient();
 
   const [modalMode, setModalMode] = useState<ModalMode>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<Product | null>(null);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [serverError, setServerError] = useState<string | null>(null);
 
-  const [searchInput, setSearchInput] = useState("");
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearch(searchInput);
-  };
+  // Búsqueda en tiempo real con debounce (espera 300ms)
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   // ─── MUTACIÓN: CREAR ────────────────────────────────
   const createMutation = useMutation({
@@ -153,27 +144,25 @@ export default function ProductsPage() {
         </button>
       </div>
 
-      {/* Controles de Búsqueda y Filtro */}
+      {/* Búsqueda en tiempo real + Filtro por categoría */}
       <div className="flex flex-col sm:flex-row gap-4">
-        {/* Buscador */}
-        <form onSubmit={handleSearchSubmit} className="flex-1">
-          <div className="relative group">
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-500 group-focus-within:text-[#3D5A1E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-            </svg>
-            <input 
-              type="text" 
-              value={searchInput} 
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Buscar por nombre o SKU..."
-              className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-11 pr-4 py-3 text-sm shadow-sm placeholder-[#4A3728]/40 dark:placeholder-slate-650 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300" 
-            />
-          </div>
-        </form>
+        {/* Buscador (tiempo real con debounce) */}
+        <div className="relative group flex-1">
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-500 group-focus-within:text-[#3D5A1E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <input 
+            type="text" 
+            value={searchInput} 
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Buscar por nombre o SKU..."
+            className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-11 pr-4 py-3 text-sm shadow-sm placeholder-[#4A3728]/40 dark:placeholder-slate-650 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300" 
+          />
+        </div>
 
-        {/* 👈 Selector de Categoría */}
+        {/* Selector de Categoría */}
         <div className="relative group sm:w-64">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-550 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
           <select
@@ -190,9 +179,9 @@ export default function ProductsPage() {
         </div>
       </div>
 
-      {/* Grid de Productos */}
+      {/* Grid de Productos con paginación */}
       <ProductGrid 
-        search={search} 
+        search={debouncedSearch} 
         categoryFilter={categoryFilter} 
         onEdit={openEditModal} 
         onDelete={setDeleteConfirm} 
