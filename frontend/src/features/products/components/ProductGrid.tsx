@@ -70,7 +70,6 @@ function getCategoryGradient(category: string): { from: string; to: string } {
   }
 }
 
-// ✅ CORREGIDO: Solo usa la imagen del backend, sin fallback aleatorio
 function getImageUrl(product: Product): string {
   if (product.image_url) {
     if (product.image_url.startsWith("http")) {
@@ -78,7 +77,7 @@ function getImageUrl(product: Product): string {
     }
     return `${API_URL}${product.image_url}`;
   }
-  return ""; // Sin imagen
+  return "";
 }
 
 // ─── SKELETON EN CUADRÍCULA ────────────────────────────────
@@ -126,8 +125,17 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
   const { data, isPending, isError, error, isFetching } = useProducts(filters);
 
   const products = Array.isArray(data) ? data : data?.data ?? [];
-  const totalPages = !Array.isArray(data) ? data?.pages ?? 1 : 1;
   const totalItems = !Array.isArray(data) ? data?.total ?? products.length : products.length;
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
+
+  // Resetear skip cuando cambian los filtros
+  const handlePrevious = () => {
+    setSkip((p) => Math.max(0, p - PAGE_SIZE));
+  };
+
+  const handleNext = () => {
+    setSkip((p) => p + PAGE_SIZE);
+  };
 
   return (
     <div className="space-y-6 w-full">
@@ -169,25 +177,18 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
 
             return (
               <div key={product.id} className="group relative w-full transition-all duration-500">
-                {/* Paneles Skew de Fondo */}
                 <span
                   className="absolute top-0 left-[15px] w-[calc(100%-30px)] h-full rounded-2xl transform skew-x-[4deg] transition-all duration-500 group-hover:skew-x-0 group-hover:left-0 group-hover:w-full"
-                  style={{
-                    background: `linear-gradient(315deg, ${from}, ${to})`,
-                  }}
+                  style={{ background: `linear-gradient(315deg, ${from}, ${to})` }}
                 />
                 <span
                   className="absolute top-0 left-[15px] w-[calc(100%-30px)] h-full rounded-2xl transform skew-x-[4deg] blur-[15px] opacity-50 transition-all duration-500 group-hover:skew-x-0 group-hover:left-0 group-hover:w-full"
-                  style={{
-                    background: `linear-gradient(315deg, ${from}, ${to})`,
-                  }}
+                  style={{ background: `linear-gradient(315deg, ${from}, ${to})` }}
                 />
 
-                {/* Contenedor principal de la tarjeta de producto */}
                 <div className="relative z-20 w-full p-4 bg-white/95 dark:bg-slate-950/85 backdrop-blur-xl border border-slate-200/50 dark:border-slate-850/85 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.015)] transition-all duration-500 group-hover:bg-white/100 group-hover:dark:bg-slate-950/95 group-hover:border-transparent group-hover:translate-y-[-4px] flex flex-col justify-between h-full min-h-[410px]">
                   
                   <div>
-                    {/* Contenedor de Imagen de Producto */}
                     <div className="relative w-full aspect-[16/10] bg-slate-50 dark:bg-slate-900 rounded-xl overflow-hidden mb-3 border border-slate-100 dark:border-slate-850">
                       {imageUrl ? (
                         <img 
@@ -203,8 +204,6 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                         </div>
                       )}
                       <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-80 pointer-events-none" />
-
-                      {/* Badge inactivo overlay */}
                       {!product.is_active && (
                         <div className="absolute top-2.5 right-2.5 z-30">
                           <span className="flex-shrink-0 inline-flex items-center rounded-full bg-rose-500/10 backdrop-blur-md text-rose-600 border border-rose-500/30 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide">
@@ -214,7 +213,6 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                       )}
                     </div>
 
-                    {/* Información Básica */}
                     <div className="space-y-1">
                       <h4 className="text-sm font-extrabold text-slate-900 dark:text-white truncate group-hover:text-indigo-650 dark:group-hover:text-indigo-400 transition-colors">
                         {product.name}
@@ -224,7 +222,6 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                       </p>
                     </div>
 
-                    {/* Chips de Detalles */}
                     <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
                       <span className="inline-flex items-center rounded-full bg-[#E8DDD0]/15 dark:bg-slate-900/50 text-[#4A3728] dark:text-slate-350 border border-[#E8DDD0]/35 dark:border-slate-800/80 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
                         <span className="w-1 h-1 rounded-full bg-[#5C8A3C] mr-1 shrink-0" />
@@ -237,7 +234,6 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                   </div>
 
                   <div>
-                    {/* Fila de precio */}
                     <div className="mt-4 flex items-baseline justify-between border-t border-slate-100 dark:border-slate-900/50 pt-2.5">
                       <span className="text-lg font-black text-[#4A3728] dark:text-white">
                         {formatPrice(product.price)}
@@ -247,17 +243,16 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                       </span>
                     </div>
 
-                    {/* Acciones */}
                     <div className="mt-3 flex items-center gap-2 pt-3 border-t border-slate-150/80 dark:border-slate-900/50">
                       <button 
                         onClick={() => onEdit?.(product)}
-                        className="flex-1 rounded-xl bg-white/40 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 px-2 py-2 text-xs font-bold text-indigo-650 dark:text-indigo-450 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 hover:border-indigo-300 dark:hover:border-indigo-900 active:scale-95 transition-all duration-200 text-center"
+                        className="flex-1 rounded-xl bg-white/40 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 px-2 py-2 text-xs font-bold text-indigo-650 dark:text-indigo-450 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 hover:border-indigo-300 dark:hover:border-indigo-900 active:scale-95 transition-all duration-200 text-center cursor-pointer"
                       >
                         Editar
                       </button>
                       <button 
                         onClick={() => onDelete?.(product)}
-                        className="flex-1 rounded-xl bg-white/40 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 px-2 py-2 text-xs font-bold text-rose-600 dark:text-rose-455 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-300 dark:hover:border-rose-900 active:scale-95 transition-all duration-200 text-center"
+                        className="flex-1 rounded-xl bg-white/40 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 px-2 py-2 text-xs font-bold text-rose-600 dark:text-rose-455 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-300 dark:hover:border-rose-900 active:scale-95 transition-all duration-200 text-center cursor-pointer"
                       >
                         Eliminar
                       </button>
@@ -272,8 +267,8 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
       )}
 
       {/* Paginación */}
-      {!isPending && !isError && products.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4.5 border border-slate-200/40 dark:border-slate-800/40 bg-white/60 dark:bg-slate-950/40 backdrop-blur-md rounded-2xl shadow-inner mt-8">
+      {!isPending && !isError && totalItems > PAGE_SIZE && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border border-slate-200/40 dark:border-slate-800/40 bg-white/60 dark:bg-slate-950/40 backdrop-blur-md rounded-2xl shadow-inner mt-8">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
             Mostrando{" "}
             <span className="font-extrabold text-slate-800 dark:text-white">{skip + 1}</span>
@@ -285,17 +280,17 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
 
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => setSkip((p) => Math.max(0, p - PAGE_SIZE))}
+              onClick={handlePrevious}
               disabled={skip <= 0 || isFetching}
-              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-40 disabled:hover:bg-white/85 transition-all duration-200 shadow-sm"
+              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-40 transition-all duration-200 shadow-sm cursor-pointer"
             >
               Anterior
             </button>
             <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Página {page} de {totalPages}</span>
             <button 
-              onClick={() => setSkip((p) => Math.min((totalPages - 1) * PAGE_SIZE, p + PAGE_SIZE))}
-              disabled={skip >= (totalPages - 1) * PAGE_SIZE || isFetching}
-              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-40 disabled:hover:bg-white/85 transition-all duration-200 shadow-sm"
+              onClick={handleNext}
+              disabled={skip + PAGE_SIZE >= totalItems || isFetching}
+              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-40 transition-all duration-200 shadow-sm cursor-pointer"
             >
               Siguiente
             </button>
