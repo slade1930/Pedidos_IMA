@@ -23,12 +23,14 @@ router = APIRouter(prefix="/products", tags=["Products"])
 async def get_all_products(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
+    search: str = Query(None),           # 👈 NUEVO: búsqueda por nombre/SKU
+    category: str = Query(None),         # 👈 NUEVO: filtro por categoría
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
     service = ProductService(db)
-    products = await service.get_all(skip=skip, limit=limit)
-    total = await service.get_total_count()
+    products = await service.get_all(skip=skip, limit=limit, search=search, category=category)
+    total = await service.get_total_count(search=search, category=category)
     return PaginatedResponseSchema(
         data=[ProductResponseSchema.model_validate(p) for p in products],
         total=total,
