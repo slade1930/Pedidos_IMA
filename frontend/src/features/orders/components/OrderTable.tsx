@@ -8,7 +8,7 @@ import type { Order, OrderStatus } from "@/features/orders/types/order.types";
 
 // ─── CONSTANTES ────────────────────────────────────────────
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 100;
 
 // ─── PROPS ─────────────────────────────────────────────────
 
