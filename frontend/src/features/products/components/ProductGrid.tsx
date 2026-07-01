@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import type { Product } from "@/features/products/types/product.types";
 
@@ -122,13 +122,17 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
     ...(categoryFilter && categoryFilter !== "" && { category: categoryFilter }),
   };
 
+  // Resetear página al cambiar filtros
+  useEffect(() => {
+    setSkip(0);
+  }, [search, categoryFilter]);
+
   const { data, isPending, isError, error, isFetching } = useProducts(filters);
 
   const products = Array.isArray(data) ? data : data?.data ?? [];
   const totalItems = !Array.isArray(data) ? data?.total ?? products.length : products.length;
   const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
 
-  // Resetear skip cuando cambian los filtros
   const handlePrevious = () => {
     setSkip((p) => Math.max(0, p - PAGE_SIZE));
   };
@@ -266,8 +270,8 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
         </div>
       )}
 
-      {/* Paginación */}
-      {!isPending && !isError && totalItems > PAGE_SIZE && (
+      {/* Paginación - Siempre visible si hay productos */}
+      {!isPending && !isError && products.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border border-slate-200/40 dark:border-slate-800/40 bg-white/60 dark:bg-slate-950/40 backdrop-blur-md rounded-2xl shadow-inner mt-8">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
             Mostrando{" "}
