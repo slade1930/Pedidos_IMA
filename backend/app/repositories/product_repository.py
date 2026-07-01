@@ -26,13 +26,16 @@ class ProductRepository(BaseRepository[Product]):
         self,
         skip: int = 0,
         limit: int = 10,
-        search: str = None,       # 👈 NUEVO
-        category: str = None,     # 👈 NUEVO
+        search: str = None,
+        category: str = None,
+        fair_id: uuid.UUID = None,
     ) -> list[Product]:
         
         query = select(Product).where(Product.is_active.is_(True))
         
-        # Filtro de búsqueda (nombre o SKU)
+        if fair_id:
+            query = query.where(Product.fair_id == fair_id)
+        
         if search:
             query = query.where(
                 or_(
@@ -41,7 +44,6 @@ class ProductRepository(BaseRepository[Product]):
                 )
             )
         
-        # Filtro por categoría
         if category:
             query = query.where(Product.category == category)
         
@@ -52,8 +54,8 @@ class ProductRepository(BaseRepository[Product]):
 
     async def get_total_count(
         self,
-        search: str = None,       # 👈 NUEVO
-        category: str = None,     # 👈 NUEVO
+        search: str = None,
+        category: str = None,
     ) -> int:
         
         query = select(func.count()).select_from(Product).where(Product.is_active.is_(True))
