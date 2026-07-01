@@ -3,7 +3,7 @@ import base64
 import uuid
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-import cloudinary.uploader  # 👈 NUEVO
+import cloudinary.uploader
 from app.repositories.product_repository import ProductRepository
 from app.repositories.fair_repository import FairRepository
 from app.models.product_model import Product
@@ -17,11 +17,11 @@ class ProductService:
         self.product_repo = ProductRepository(db)
         self.fair_repo = FairRepository(db)
 
-    async def get_all(self, skip: int = 0, limit: int = 10) -> list[Product]:
-        return await self.product_repo.get_all(skip, limit)
+    async def get_all(self, skip: int = 0, limit: int = 10, search: str = None, category: str = None) -> list[Product]:
+        return await self.product_repo.get_all(skip, limit, search=search, category=category)
 
-    async def get_total_count(self) -> int:
-        return await self.product_repo.get_total_count()
+    async def get_total_count(self, search: str = None, category: str = None) -> int:
+        return await self.product_repo.get_total_count(search=search, category=category)
 
     async def create(self, data: ProductCreateSchema) -> Product:
         # Verificar que la feria existe
