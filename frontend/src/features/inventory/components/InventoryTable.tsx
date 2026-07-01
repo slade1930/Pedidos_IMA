@@ -91,7 +91,7 @@ export function InventoryTable({
       {/* Encabezado de Columnas (Modo Desktop) */}
       {!isPending && !isError && items.length > 0 && (
         <div className="hidden sm:grid grid-cols-[2.2fr_1fr_1fr_1fr_1.2fr_1.5fr_1.8fr] gap-4 px-6 py-3 text-[10px] font-black uppercase tracking-wider text-[#4A3728]/60 dark:text-slate-500">
-          <div className="pl-3">Producto / Referencia</div>
+          <div className="pl-3">Producto</div>
           <div>Total</div>
           <div>Reservado</div>
           <div>Entregado</div>
@@ -144,17 +144,19 @@ export function InventoryTable({
               key={item.id} 
               className="relative overflow-hidden bg-white/90 dark:bg-slate-950/70 p-4.5 sm:p-0 sm:px-6 sm:py-4.5 rounded-2xl border border-slate-200/50 dark:border-slate-850 hover:border-[#3D5A1E]/30 dark:hover:border-[#5C8A3C]/40 hover:shadow-[0_8px_25px_rgba(74,55,40,0.02)] hover:scale-[1.008] hover:-translate-y-0.5 transition-all duration-300 flex flex-col sm:grid sm:grid-cols-[2.2fr_1fr_1fr_1fr_1.2fr_1.5fr_1.8fr] gap-4 items-center"
             >
-              {/* Barra indicadora luminosa lateral (Toque Exótico) */}
+              {/* Barra indicadora luminosa lateral */}
               <div className={`absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl ${indicatorColor}`} />
 
-              {/* Columna 1: ID de Producto */}
+              {/* 👈 Columna 1: NOMBRE DEL PRODUCTO */}
               <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2 pl-2 sm:pl-0">
                 <span className="sm:hidden text-[10px] font-bold uppercase tracking-wider text-slate-400">Producto</span>
-                <div className="font-mono text-[10px] bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800 px-2.5 py-1 rounded-lg text-slate-600 dark:text-slate-400 shadow-inner flex items-center gap-1.5 w-fit">
-                  <svg className="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <div className="flex items-center gap-2 min-w-0">
+                  <svg className="w-3.5 h-3.5 text-[#5C8A3C] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
-                  {item.product_id}
+                  <span className="text-sm font-bold text-slate-800 dark:text-white truncate">
+                    {item.product_name || "Sin nombre"}
+                  </span>
                 </div>
               </div>
 
@@ -207,7 +209,7 @@ export function InventoryTable({
               <div className="w-full sm:w-auto flex items-center justify-end border-t sm:border-t-0 border-slate-100 dark:border-slate-900/50 pt-3 sm:pt-0 pl-2 sm:pl-0">
                 <button 
                   onClick={() => onUpdateStock?.(item)}
-                  className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-slate-800 px-3.5 py-2 text-xs font-bold text-[#3D5A1E] dark:text-[#5C8A3C] hover:bg-[#3D5A1E]/8 hover:border-[#3D5A1E]/30 active:scale-95 transition-all duration-200 text-center"
+                  className="w-full sm:w-auto rounded-xl border border-slate-200 dark:border-slate-800 px-3.5 py-2 text-xs font-bold text-[#3D5A1E] dark:text-[#5C8A3C] hover:bg-[#3D5A1E]/8 hover:border-[#3D5A1E]/30 active:scale-95 transition-all duration-200 text-center cursor-pointer"
                 >
                   Actualizar Stock
                 </button>
@@ -234,7 +236,7 @@ export function InventoryTable({
             <button 
               onClick={() => setSkip((p) => Math.max(0, p - PAGE_SIZE))}
               disabled={skip <= 0 || isFetching}
-              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-[#E8DDD0]/15 hover:bg-[#E8DDD0]/25 disabled:opacity-40 disabled:hover:bg-white/85 transition-all duration-200 shadow-sm"
+              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-[#E8DDD0]/15 hover:bg-[#E8DDD0]/25 disabled:opacity-40 disabled:hover:bg-white/85 transition-all duration-200 shadow-sm cursor-pointer"
             >
               Anterior
             </button>
@@ -242,7 +244,7 @@ export function InventoryTable({
             <button 
               onClick={() => setSkip((p) => Math.min((totalPages - 1) * PAGE_SIZE, p + PAGE_SIZE))}
               disabled={skip >= (totalPages - 1) * PAGE_SIZE || isFetching}
-              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-[#E8DDD0]/15 hover:bg-[#E8DDD0]/25 disabled:opacity-40 disabled:hover:bg-white/85 transition-all duration-200 shadow-sm"
+              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-[#E8DDD0]/15 hover:bg-[#E8DDD0]/25 disabled:opacity-40 disabled:hover:bg-white/85 transition-all duration-200 shadow-sm cursor-pointer"
             >
               Siguiente
             </button>
