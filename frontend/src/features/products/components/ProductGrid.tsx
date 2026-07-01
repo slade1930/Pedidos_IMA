@@ -8,7 +8,7 @@ import type { Product } from "@/features/products/types/product.types";
 
 // ─── CONSTANTES ────────────────────────────────────────────
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 100;
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // ─── PROPS ─────────────────────────────────────────────────
