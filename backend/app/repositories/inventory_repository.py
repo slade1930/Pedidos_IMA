@@ -4,6 +4,7 @@ from typing import Optional
 import uuid
 
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.base_repository import BaseRepository
@@ -18,12 +19,13 @@ class InventoryRepository(BaseRepository[Inventory]):
     async def get_all(
         self,
         skip: int = 0,
-        limit: int = 10,
+        limit: int = 100,
     ) -> list[Inventory]:
 
         result = await self.db.execute(
             select(Inventory)
             .where(Inventory.is_active.is_(True))
+            .options(selectinload(Inventory.product))  # 👈 Cargar relación producto
             .order_by(Inventory.created_at.desc())
             .offset(skip)
             .limit(limit)
