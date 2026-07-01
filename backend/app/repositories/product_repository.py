@@ -5,6 +5,7 @@ import uuid
 from sqlalchemy import (
     select,
     func,
+    or_,
 )
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,23 +26,50 @@ class ProductRepository(BaseRepository[Product]):
         self,
         skip: int = 0,
         limit: int = 10,
+        search: str = None,       # 👈 NUEVO
+        category: str = None,     # 👈 NUEVO
     ) -> list[Product]:
+        
+        query = select(Product).where(Product.is_active.is_(True))
+        
+        # Filtro de búsqueda (nombre o SKU)
+        if search:
+            query = query.where(
+                or_(
+                    Product.name.ilike(f"%{search}%"),
+                    Product.sku.ilike(f"%{search}%"),
+                )
+            )
+        
+        # Filtro por categoría
+        if category:
+            query = query.where(Product.category == category)
+        
+        query = query.order_by(Product.name.asc()).offset(skip).limit(limit)
 
-        result = await self.db.execute(
-            select(Product)
-            .where(Product.is_active.is_(True))
-            .order_by(Product.name.asc())
-            .offset(skip)
-            .limit(limit)
-        )
-
+        result = await self.db.execute(query)
         return list(result.scalars().all())
 
-    async def get_total_count(self) -> int:
-
-        result = await self.db.execute(
-            select(func.count()).select_from(Product).where(Product.is_active.is_(True))
-        )
+    async def get_total_count(
+        self,
+        search: str = None,       # 👈 NUEVO
+        category: str = None,     # 👈 NUEVO
+    ) -> int:
+        
+        query = select(func.count()).select_from(Product).where(Product.is_active.is_(True))
+        
+        if search:
+            query = query.where(
+                or_(
+                    Product.name.ilike(f"%{search}%"),
+                    Product.sku.ilike(f"%{search}%"),
+                )
+            )
+        
+        if category:
+            query = query.where(Product.category == category)
+        
+        result = await self.db.execute(query)
         return result.scalar() or 0
 
     async def get_by_fair(
