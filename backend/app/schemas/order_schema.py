@@ -44,8 +44,8 @@ class OrderCreateSchema(BaseModel):
         if not items:
             raise ValueError("El pedido debe tener al menos un producto")
 
-        if len(items) > 10:
-            raise ValueError("Máximo 10 productos por pedido")
+        if len(items) > 100:
+            raise ValueError("Máximo 100 productos por pedido")
 
         product_ids = [item.product_id for item in items]
 
