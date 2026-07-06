@@ -45,6 +45,6 @@ class FairStatus(str, Enum):
 
 # Configuración global
 class SystemLimits:
-    MAX_PRODUCTS_PER_ORDER = 10
+    MAX_PRODUCTS_PER_ORDER = 100
     MAX_ORDERS_PER_USER_PER_FAIR = 1
     QR_EXPIRY_MINUTES = 60
