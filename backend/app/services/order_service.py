@@ -78,12 +78,9 @@ class OrderService:
                     },
                 )
 
-        # ─── Verificar si usuario ya tiene pedido en esta feria ──
-        if await self.order_repo.user_has_order_in_fair(user_id, data.fair_id):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Ya tienes un pedido registrado en esta feria",
-            )
+        # ❌ ELIMINADO: Validación "un pedido por feria"
+        # Ahora los usuarios pueden comprar múltiples veces en la misma feria
+        # siempre que hayan pasado los 8 días de PDA
 
         # ─── Validar productos y calcular total ──────────
         total = 0.0
@@ -210,7 +207,6 @@ class OrderService:
     async def get_by_fair(self, fair_id: uuid.UUID) -> list[Order]:
         return await self.order_repo.get_by_fair(fair_id)
 
-    # 👈 NUEVO MÉTODO: Para el reporte de órdenes
     async def get_all_for_report(self) -> list[Order]:
         """Obtiene todas las órdenes con datos de usuario, items y feria para reportes"""
         return await self.order_repo.get_all_with_users()
