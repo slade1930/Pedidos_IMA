@@ -1,3 +1,5 @@
+// src/features/shop/components/OrderList.tsx
+
 "use client";
 
 import { useState } from "react";
@@ -22,6 +24,10 @@ import {
 // ─── UTILITARIOS ───────────────────────────────────────────
 
 function formatPrice(price: number): string {
+  // Validar que el valor sea un número válido
+  if (isNaN(price) || price === null || price === undefined) {
+    return "$0.00";
+  }
   return new Intl.NumberFormat("es-PA", {
     style: "currency",
     currency: "USD",
@@ -38,7 +44,7 @@ function formatDate(dateString: string): string {
       hour: "2-digit",
       minute: "2-digit",
     });
-  } catch (e) {
+  } catch {
     return "Reciente";
   }
 }
@@ -72,7 +78,6 @@ function getStatusLabel(status: OrderStatus): string {
 function ListSkeleton() {
   return (
     <div className="space-y-4">
-      {/* Estilos locales para shimmer */}
       <style>{`
         @keyframes skeleton-shimmer {
           0% { background-position: -200% 0; }
@@ -137,10 +142,10 @@ export function OrderList() {
 
   const orderList = Array.isArray(orders) ? orders : [];
 
-  // Cálculos estadísticos rápidos para añadir valor al diseño
+  // Cálculos estadísticos - Convertir a Number para evitar NaN
   const totalSpent = orderList
     .filter(o => o.status !== "cancelled" && o.status !== "expired")
-    .reduce((sum, o) => sum + (o.total_amount || 0), 0);
+    .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
   const pendingPickups = orderList.filter(o => o.status === "ready").length;
   const activeOrders = orderList.filter(o => o.status === "pending" || o.status === "confirmed").length;
 
@@ -240,7 +245,7 @@ export function OrderList() {
         </div>
       </div>
 
-      {/* SELECTOR DE FILTRO REDISEÑADO */}
+      {/* SELECTOR DE FILTRO */}
       <div className="flex items-center justify-between border-b border-gray-100 pb-3 mt-4">
         <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-[#3A5F26]">
           <Filter size={14} />
@@ -308,18 +313,15 @@ export function OrderList() {
                       ? "border-emerald-300 bg-gradient-to-r from-emerald-50/20 to-white" 
                       : "bg-white border-gray-150 hover:border-[#3A5F26]/30"
                   }`}>
-                    {/* Indicador de Hover lateral */}
                     <div className={`absolute left-0 top-0 bottom-0 w-1.5 transition-colors ${
                       isReady ? "bg-emerald-500" : "bg-transparent group-hover:bg-[#FBBF24]"
                     }`} />
 
                     <div className="p-5 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      {/* Enlace principal */}
                       <Link
                         href={`/shop/orders/${order.id}`}
                         className="flex items-start gap-4 flex-grow min-w-0"
                       >
-                        {/* Icono de Pedido */}
                         <div className={`h-11 w-11 rounded-2xl border flex items-center justify-center flex-shrink-0 transition-all ${
                           isReady 
                             ? "bg-emerald-100 border-emerald-200 text-emerald-700" 
@@ -347,18 +349,16 @@ export function OrderList() {
                         </div>
                       </Link>
 
-                      {/* Métricas y Badge */}
                       <div className="flex items-center justify-between sm:justify-end gap-5 border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-50">
                         <div className="text-left sm:text-right">
                           <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest block">Monto Total</span>
                           <span className="text-base font-black text-gray-900 font-mono tracking-tight flex items-center gap-0.5 mt-0.5">
                             <Coins size={12} className="text-gray-400" />
-                            {formatPrice(order.total_amount)}
+                            {formatPrice(Number(order.total_amount))}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-3">
-                          {/* Botón Factura Rápida (para pedidos confirmados/entregados) */}
                           {["confirmed", "delivered", "ready"].includes(order.status) && (
                             <a
                               href={`${apiUrl}/api/v1/orders/${order.id}/invoice`}
@@ -371,12 +371,10 @@ export function OrderList() {
                             </a>
                           )}
 
-                          {/* Badge de Estado */}
                           <span className={`inline-flex rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest leading-none ${getStatusBadgeClass(order.status)}`}>
                             {getStatusLabel(order.status)}
                           </span>
                           
-                          {/* Chevron de navegación */}
                           <Link href={`/shop/orders/${order.id}`} className="flex-shrink-0">
                             <ChevronRight 
                               size={16} 
