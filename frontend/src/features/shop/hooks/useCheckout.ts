@@ -31,8 +31,18 @@ export function useCheckout() {
 
   const mutation = useMutation({
     mutationFn: async (data: CheckoutData): Promise<Order> => {
+      // Validar que se haya seleccionado una feria
+      if (!fairId) {
+        throw new Error("No se ha seleccionado una feria. Selecciona una feria para continuar.");
+      }
+
+      // Validar que el carrito tenga productos
+      if (items.length === 0) {
+        throw new Error("El carrito está vacío. Agrega productos antes de confirmar.");
+      }
+
       const payload: CreateOrderPayload = {
-        fair_id: fairId || "",
+        fair_id: fairId,
         payment_method: data.payment_method,
         items: items.map((item) => ({
           product_id: item.product_id,
@@ -54,7 +64,7 @@ export function useCheckout() {
   const error = mutation.error as any;
   const checkoutError: CheckoutError | null = error
     ? {
-        message: error.message || "Error",
+        message: error.message || "Error al procesar el pedido",
         status: error.status,
         isPdaRestriction: error.status === 400 && error.detail?.days_remaining !== undefined,
         pda: error.detail?.days_remaining !== undefined ? (error.detail as PdaRestriction) : undefined,
