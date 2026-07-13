@@ -18,6 +18,7 @@ interface ProductGridProps {
   onDelete?: (product: Product) => void;
   search?: string;
   categoryFilter?: string;
+  fairFilter?: string;  // 👈 NUEVO
 }
 
 // ─── UTILITARIOS DE DISEÑO ─────────────────────────────────
@@ -111,7 +112,7 @@ function GridSkeleton() {
 
 // ─── COMPONENTE PRINCIPAL ──────────────────────────────────
 
-export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: ProductGridProps) {
+export function ProductGrid({ onEdit, onDelete, search, categoryFilter, fairFilter }: ProductGridProps) {
   const [skip, setSkip] = useState(0);
   const page = Math.floor(skip / PAGE_SIZE) + 1;
 
@@ -120,12 +121,13 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
     limit: PAGE_SIZE,
     ...(search && { search }),
     ...(categoryFilter && categoryFilter !== "" && { category: categoryFilter }),
+    ...(fairFilter && { fair_id: fairFilter }),  // 👈 NUEVO
   };
 
   // Resetear página al cambiar filtros
   useEffect(() => {
     setSkip(0);
-  }, [search, categoryFilter]);
+  }, [search, categoryFilter, fairFilter]);  // 👈 fairFilter agregado
 
   const { data, isPending, isError, error, isFetching } = useProducts(filters);
 
@@ -270,7 +272,7 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
         </div>
       )}
 
-      {/* Paginación - Siempre visible si hay productos */}
+      {/* Paginación */}
       {!isPending && !isError && products.length > 0 && (
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border border-slate-200/40 dark:border-slate-800/40 bg-white/60 dark:bg-slate-950/40 backdrop-blur-md rounded-2xl shadow-inner mt-8">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
