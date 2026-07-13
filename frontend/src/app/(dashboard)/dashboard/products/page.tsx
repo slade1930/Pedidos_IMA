@@ -8,6 +8,7 @@ import { ProductGrid } from "@/features/products/components/ProductGrid";
 import { ProductForm } from "@/features/products/components/ProductForm";
 import { productService } from "@/features/products/services/product.service";
 import { useDebounce } from "@/hooks/useDebounce";
+import { useFairs } from "@/features/fairs/hooks/useFairs";
 import type { Product, CreateProductPayload, UpdateProductPayload } from "@/features/products/types/product.types";
 
 // ─── TIPOS LOCALES ────────────────────────────────────────
@@ -36,10 +37,14 @@ export default function ProductsPage() {
   const [deleteConfirm, setDeleteConfirm] = useState<Product | null>(null);
   const [searchInput, setSearchInput] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [fairFilter, setFairFilter] = useState<string>("");  // 👈 NUEVO
   const [serverError, setServerError] = useState<string | null>(null);
 
-  // Búsqueda en tiempo real con debounce (espera 300ms)
   const debouncedSearch = useDebounce(searchInput, 300);
+
+  // 👈 Cargar ferias para el selector
+  const { data: fairsData } = useFairs({ limit: 100 });
+  const fairs = Array.isArray(fairsData) ? fairsData : fairsData?.data ?? [];
 
   // ─── MUTACIÓN: CREAR ────────────────────────────────
   const createMutation = useMutation({
@@ -144,9 +149,27 @@ export default function ProductsPage() {
         </button>
       </div>
 
-      {/* Búsqueda en tiempo real + Filtro por categoría */}
+      {/* Filtros: Feria + Búsqueda + Categoría */}
       <div className="flex flex-col sm:flex-row gap-4">
-        {/* Buscador (tiempo real con debounce) */}
+        {/* 👈 Selector de Feria */}
+        <div className="relative group sm:w-56">
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-550 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+          </svg>
+          <select
+            value={fairFilter}
+            onChange={(e) => setFairFilter(e.target.value)}
+            className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-11 pr-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300 appearance-none cursor-pointer"
+          >
+            <option value="">Todas las ferias</option>
+            {fairs.map((fair: { id: string; name: string }) => (
+              <option key={fair.id} value={fair.id}>{fair.name}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Buscador */}
         <div className="relative group flex-1">
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-500 group-focus-within:text-[#3D5A1E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -161,7 +184,7 @@ export default function ProductsPage() {
         </div>
 
         {/* Selector de Categoría */}
-        <div className="relative group sm:w-64">
+        <div className="relative group sm:w-56">
           <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-550 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
@@ -171,18 +194,17 @@ export default function ProductsPage() {
             className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-11 pr-4 py-3 text-sm shadow-sm focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300 appearance-none cursor-pointer"
           >
             {CATEGORY_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Grid de Productos con paginación */}
+      {/* Grid de Productos con filtro de feria */}
       <ProductGrid 
         search={debouncedSearch} 
-        categoryFilter={categoryFilter} 
+        categoryFilter={categoryFilter}
+        fairFilter={fairFilter}  // 👈 NUEVO
         onEdit={openEditModal} 
         onDelete={setDeleteConfirm} 
       />
