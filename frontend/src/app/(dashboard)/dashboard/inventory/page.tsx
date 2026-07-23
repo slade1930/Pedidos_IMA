@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,6 +12,7 @@ import { StockUpdateForm } from "@/features/inventory/components/StockUpdateForm
 import { inventoryService } from "@/features/inventory/services/inventory.service";
 import { useFairs } from "@/features/fairs/hooks/useFairs";
 import { useProducts } from "@/features/products/hooks/useProducts";
+import { useDebounce } from "@/hooks/useDebounce";
 import type { InventoryItem, CreateInventoryPayload, UpdateStockPayload } from "@/features/inventory/types/inventory.types";
 
 // ─── SCHEMA ────────────────────────────────────────────────
@@ -31,26 +32,25 @@ export default function InventoryPage() {
   const queryClient = useQueryClient();
 
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [lowStockFilter, setLowStockFilter] = useState(false);
-  const [selectedFairId, setSelectedFairId] = useState<string>("");
+  const [fairFilter, setFairFilter] = useState<string>("");
   const [serverError, setServerError] = useState<string | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  const [searchInput, setSearchInput] = useState("");
+  // Búsqueda en tiempo real con debounce
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   // Ferias para selectores
   const { data: fairsData } = useFairs({ limit: 100 });
   const fairs = Array.isArray(fairsData) ? fairsData : fairsData?.data ?? [];
 
-  // Productos (todos, sin filtro)
-  const { data: productsData } = useProducts({ limit: 100 });
+  // 👈 Productos filtrados por feria seleccionada
+  const { data: productsData } = useProducts({
+    limit: 100,
+    ...(fairFilter && { fair_id: fairFilter }),
+  });
   const products = Array.isArray(productsData) ? productsData : productsData?.data ?? [];
-
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearch(searchInput);
-  };
 
   // ─── FORM CREAR ─────────────────────────────────────
   const {
@@ -58,16 +58,27 @@ export default function InventoryPage() {
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors: formErrors },
   } = useForm<CreateInventoryFormValues>({
     resolver: zodResolver(createInventorySchema),
     defaultValues: {
       product_id: "",
-      fair_id: "",
+      fair_id: fairFilter || "",
       total_stock: 0,
       notes: "",
     },
   });
+
+  // Actualizar fair_id en el form cuando cambia el filtro
+  const watchedFairId = watch("fair_id");
+
+  // 👈 Productos del formulario filtrados por la feria seleccionada en el form
+  const { data: formProductsData } = useProducts({
+    limit: 100,
+    ...(watchedFairId && { fair_id: watchedFairId }),
+  });
+  const formProducts = Array.isArray(formProductsData) ? formProductsData : formProductsData?.data ?? [];
 
   // ─── MUTACIÓN: CREAR ────────────────────────────────
   const createMutation = useMutation({
@@ -129,11 +140,10 @@ export default function InventoryPage() {
 
   return (
     <div className="space-y-6 relative">
-      {/* Luces de fondo ambientadas */}
       <div className="absolute top-[-80px] right-[-80px] -z-10 h-[300px] w-[300px] rounded-full bg-[#5C8A3C]/5 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[200px] left-[-80px] -z-10 h-[300px] w-[300px] rounded-full bg-[#E8DDD0]/20 dark:bg-slate-900/30 blur-[120px] pointer-events-none" />
 
-      {/* Cabecera de Página */}
+      {/* Cabecera */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-black tracking-tight text-[#4A3728] dark:text-white leading-none">
@@ -145,7 +155,7 @@ export default function InventoryPage() {
         </div>
         <button 
           onClick={() => { setServerError(null); reset(); setShowCreateModal(true); }}
-          className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] px-5 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.18)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+          className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] px-5 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.18)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer"
         >
           <svg className="h-5 w-5 mr-2 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -154,30 +164,14 @@ export default function InventoryPage() {
         </button>
       </div>
 
-      {/* Barra de Filtros */}
+      {/* Filtros: Feria + Búsqueda + Stock Bajo */}
       <div className="flex flex-col sm:flex-row gap-4">
-        {/* Buscador */}
-        <form onSubmit={handleSearchSubmit} className="flex-1">
-          <div className="relative group">
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-            </svg>
-            <input 
-              type="text" 
-              value={searchInput} 
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Buscar por producto..."
-              className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-11 pr-4 py-3 text-sm shadow-sm placeholder-[#4A3728]/40 dark:placeholder-slate-650 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300" 
-            />
-          </div>
-        </form>
-
-        {/* Selector de Ferias */}
-        <div className="relative min-w-[200px]">
+        {/* Selector de Feria */}
+        <div className="relative sm:w-56">
           <select 
-            value={selectedFairId} 
-            onChange={(e) => setSelectedFairId(e.target.value)}
-            className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-4 pr-10 py-3 text-sm shadow-sm focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300 appearance-none"
+            value={fairFilter} 
+            onChange={(e) => setFairFilter(e.target.value)}
+            className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-4 pr-10 py-3 text-sm shadow-sm focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300 appearance-none cursor-pointer"
           >
             <option value="">Todas las ferias</option>
             {fairs.map((fair: { id: string; name: string }) => (
@@ -191,8 +185,22 @@ export default function InventoryPage() {
           </div>
         </div>
 
-        {/* Switch Toggle Stock Bajo */}
-        <label className="flex items-center gap-3 rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 px-4 py-2.5 text-sm shadow-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850 transition-all duration-300 group selection:bg-transparent">
+        {/* Buscador en tiempo real */}
+        <div className="relative group flex-1">
+          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-500 group-focus-within:text-[#3D5A1E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <input 
+            type="text" 
+            value={searchInput} 
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Buscar por producto o SKU..."
+            className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-11 pr-4 py-3 text-sm shadow-sm placeholder-[#4A3728]/40 dark:placeholder-slate-650 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300" 
+          />
+        </div>
+
+        {/* Toggle Stock Bajo */}
+        <label className="flex items-center gap-3 rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 px-4 py-2.5 text-sm shadow-sm cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-850 transition-all duration-300 group">
           <div className="relative">
             <input 
               type="checkbox" 
@@ -208,11 +216,11 @@ export default function InventoryPage() {
         </label>
       </div>
 
-      {/* Tabla de Inventario segmentada */}
+      {/* Tabla de Inventario */}
       <InventoryTable
-        search={search}
+        search={debouncedSearch}
         lowStockFilter={lowStockFilter || undefined}
-        locationFilter={selectedFairId || undefined}
+        locationFilter={fairFilter || undefined}
         onUpdateStock={openUpdateModal}
       />
 
@@ -223,7 +231,7 @@ export default function InventoryPage() {
           <div className="relative bg-white dark:bg-slate-950 rounded-3xl border border-[#E8DDD0]/30 dark:border-slate-900/60 shadow-[0_24px_60px_rgba(0,0,0,0.12)] w-full max-w-md max-h-[90vh] overflow-y-auto p-6 md:p-8 animate-in fade-in zoom-in-95 duration-200">
             <button 
               onClick={() => setShowCreateModal(false)}
-              className="absolute top-5 right-5 p-1.5 rounded-xl text-slate-400 hover:text-slate-655 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors" 
+              className="absolute top-5 right-5 p-1.5 rounded-xl text-slate-400 hover:text-slate-655 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors cursor-pointer" 
               aria-label="Cerrar"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -275,22 +283,22 @@ export default function InventoryPage() {
                 {formErrors.fair_id && <p className="text-xs text-rose-500 mt-1.5 font-medium flex items-center gap-1.5 animate-pulse"><span className="w-1.5 h-1.5 rounded-full bg-rose-500" />{formErrors.fair_id.message}</p>}
               </div>
 
-              {/* Producto */}
+              {/* 👈 Producto - Filtrado por feria seleccionada */}
               <div className="space-y-1.5 relative group">
                 <label htmlFor="product_id" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
-                  Producto
+                  Producto {watchedFairId ? "(de esta feria)" : "(selecciona feria primero)"}
                 </label>
                 <div className="relative">
                   <select 
                     id="product_id" 
-                    disabled={createMutation.isPending}
+                    disabled={createMutation.isPending || !watchedFairId}
                     className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
                       formErrors.product_id ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-500 focus:ring-rose-500/10" : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
                     }`}
                     {...register("product_id")}
                   >
-                    <option value="">Selecciona un producto</option>
-                    {products.map((p: { id: string; name: string; category: string }) => (
+                    <option value="">{watchedFairId ? "Selecciona un producto" : "Selecciona una feria primero"}</option>
+                    {formProducts.map((p: { id: string; name: string; category: string }) => (
                       <option key={p.id} value={p.id}>{p.name} ({p.category})</option>
                     ))}
                   </select>
@@ -342,14 +350,14 @@ export default function InventoryPage() {
                   type="button" 
                   onClick={() => setShowCreateModal(false)} 
                   disabled={createMutation.isPending}
-                  className="rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-3 text-sm font-semibold text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/50 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+                  className="rounded-xl border border-slate-200 dark:border-slate-800 px-5 py-3 text-sm font-semibold text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/50 hover:text-slate-900 dark:hover:text-white disabled:opacity-50 hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button 
                   type="submit" 
                   disabled={createMutation.isPending}
-                  className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.15)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 group"
+                  className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.15)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 group cursor-pointer"
                 >
                   <span className="relative z-10 flex items-center justify-center gap-2">
                     {createMutation.isPending ? "Creando..." : "Crear Inventario"}
@@ -369,7 +377,7 @@ export default function InventoryPage() {
           <div className="relative bg-white dark:bg-slate-950 rounded-3xl border border-[#E8DDD0]/30 dark:border-slate-900/60 shadow-[0_24px_60px_rgba(0,0,0,0.12)] w-full max-w-md max-h-[90vh] overflow-y-auto p-0 animate-in fade-in zoom-in-95 duration-200">
             <button 
               onClick={closeModal}
-              className="absolute top-5 right-5 z-40 p-1.5 rounded-xl text-slate-400 hover:text-slate-655 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors" 
+              className="absolute top-5 right-5 z-40 p-1.5 rounded-xl text-slate-400 hover:text-slate-655 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors cursor-pointer" 
               aria-label="Cerrar"
             >
               <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
