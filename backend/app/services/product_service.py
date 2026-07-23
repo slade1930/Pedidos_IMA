@@ -1,4 +1,5 @@
 # app/services/product_service.py
+
 import base64
 import uuid
 from fastapi import HTTPException, status
@@ -17,11 +18,37 @@ class ProductService:
         self.product_repo = ProductRepository(db)
         self.fair_repo = FairRepository(db)
 
-    async def get_all(self, skip: int = 0, limit: int = 10, search: str = None, category: str = None, fair_id: uuid.UUID = None) -> list[Product]:
-        return await self.product_repo.get_all(skip, limit, search=search, category=category, fair_id=fair_id)
+    async def get_all(
+        self, 
+        skip: int = 0, 
+        limit: int = 10, 
+        search: str = None, 
+        category: str = None, 
+        fair_id: uuid.UUID = None,
+        is_active: bool = True,
+    ) -> list[Product]:
+        return await self.product_repo.get_all(
+            skip=skip, 
+            limit=limit, 
+            search=search, 
+            category=category, 
+            fair_id=fair_id,
+            is_active=is_active
+        )
 
-    async def get_total_count(self, search: str = None, category: str = None) -> int:
-        return await self.product_repo.get_total_count(search=search, category=category)
+    async def get_total_count(
+        self, 
+        search: str = None, 
+        category: str = None,
+        fair_id: uuid.UUID = None,
+        is_active: bool = True,
+    ) -> int:
+        return await self.product_repo.get_total_count(
+            search=search, 
+            category=category,
+            fair_id=fair_id,
+            is_active=is_active
+        )
 
     async def create(self, data: ProductCreateSchema) -> Product:
         fair = await self.fair_repo.get_by_id(data.fair_id)
