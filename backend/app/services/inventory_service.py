@@ -17,11 +17,27 @@ class InventoryService:
         self.db = db
         self.inventory_repo = InventoryRepository(db)
 
-    async def get_all(self, skip: int = 0, limit: int = 10) -> list[Inventory]:
-        return await self.inventory_repo.get_all(skip, limit)
+    async def get_all(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: str = None,
+        fair_id: uuid.UUID = None,
+        low_stock: bool = False,
+    ) -> list[Inventory]:
+        return await self.inventory_repo.get_all(
+            skip=skip, limit=limit, search=search, fair_id=fair_id, low_stock=low_stock
+        )
 
-    async def get_total_count(self) -> int:
-        return await self.inventory_repo.get_total_count()
+    async def get_total_count(
+        self,
+        search: str = None,
+        fair_id: uuid.UUID = None,
+        low_stock: bool = False,
+    ) -> int:
+        return await self.inventory_repo.get_total_count(
+            search=search, fair_id=fair_id, low_stock=low_stock
+        )
 
     async def create(self, data: InventoryCreateSchema) -> Inventory:
         existing = await self.inventory_repo.get_by_product_and_fair(
@@ -53,7 +69,6 @@ class InventoryService:
             inventory_id, data.model_dump(exclude_none=True)
         )
 
-        # Notificar si stock bajo
         if updated.available_stock <= 10:
             await NotificationService.notify_low_stock(
                 product_name=str(updated.product_id),
