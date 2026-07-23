@@ -1,4 +1,5 @@
 # app/repositories/product_repository.py
+
 from typing import Optional
 import uuid
 
@@ -29,9 +30,10 @@ class ProductRepository(BaseRepository[Product]):
         search: str = None,
         category: str = None,
         fair_id: uuid.UUID = None,
+        is_active: bool = True,
     ) -> list[Product]:
         
-        query = select(Product).where(Product.is_active.is_(True))
+        query = select(Product).where(Product.is_active.is_(is_active))
         
         if fair_id:
             query = query.where(Product.fair_id == fair_id)
@@ -56,9 +58,14 @@ class ProductRepository(BaseRepository[Product]):
         self,
         search: str = None,
         category: str = None,
+        fair_id: uuid.UUID = None,
+        is_active: bool = True,
     ) -> int:
         
-        query = select(func.count()).select_from(Product).where(Product.is_active.is_(True))
+        query = select(func.count()).select_from(Product).where(Product.is_active.is_(is_active))
+        
+        if fair_id:
+            query = query.where(Product.fair_id == fair_id)
         
         if search:
             query = query.where(
