@@ -26,12 +26,24 @@ router = APIRouter(prefix="/orders", tags=["Orders"])
 async def get_all_orders(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
+    search: str = Query(None),           # 👈 NUEVO
+    fair_id: uuid.UUID = Query(None),    # 👈 NUEVO
+    status: str = Query(None),           # 👈 NUEVO
+    date_from: str = Query(None),        # 👈 NUEVO
+    date_to: str = Query(None),          # 👈 NUEVO
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
     service = OrderService(db)
-    orders = await service.get_all(skip=skip, limit=limit)
-    total = await service.get_total_count()
+    orders = await service.get_all(
+        skip=skip, limit=limit,
+        search=search, fair_id=fair_id, status=status,
+        date_from=date_from, date_to=date_to,
+    )
+    total = await service.get_total_count(
+        search=search, fair_id=fair_id, status=status,
+        date_from=date_from, date_to=date_to,
+    )
     return PaginatedResponseSchema(
         data=[OrderResponseSchema.model_validate(o) for o in orders],
         total=total,
@@ -55,27 +67,34 @@ async def create_order(
     )
 
 
-# ─── ENDPOINT DE REPORTE (DEBE IR ANTES de /{order_id}) ────
+# ─── ENDPOINT DE REPORTE CON FILTROS ───────────────────────
 
 @router.get("/report")
 async def download_orders_report(
+    fair_id: uuid.UUID = Query(None),    # 👈 NUEVO
+    date_from: str = Query(None),        # 👈 NUEVO
+    date_to: str = Query(None),          # 👈 NUEVO
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
-    """Genera y descarga un reporte PDF con todas las órdenes"""
+    """Genera y descarga un reporte PDF con filtros opcionales"""
     service = OrderService(db)
     
-    # Obtener todas las órdenes con datos de usuario, items y feria
-    orders = await service.get_all_for_report()
+    orders = await service.get_all_for_report(
+        fair_id=fair_id, date_from=date_from, date_to=date_to
+    )
     
-    # Generar PDF
     pdf = ReportService.generate_orders_report(orders)
+    
+    # Nombre de archivo con fecha
+    from datetime import datetime
+    today = datetime.now().strftime("%Y-%m-%d")
     
     return Response(
         content=pdf,
         media_type="application/pdf",
         headers={
-            "Content-Disposition": "attachment; filename=reporte-ordenes-ima.pdf"
+            "Content-Disposition": f"attachment; filename=reporte-ordenes-{today}.pdf"
         },
     )
 
@@ -162,7 +181,6 @@ async def download_invoice(
             detail="Pedido no encontrado",
         )
 
-    # Cargar usuario explícitamente para evitar lazy load
     if order.user_id:
         user = await service.user_repo.get_by_id(order.user_id)
         order.user = user
