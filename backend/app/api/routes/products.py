@@ -25,11 +25,16 @@ async def get_all_products(
     limit: int = Query(10, ge=1, le=100),
     search: str = Query(None),
     category: str = Query(None),
+    fair_id: uuid.UUID = Query(None),  # 👈 AGREGADO
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_user),
 ):
     service = ProductService(db)
-    products = await service.get_all(skip=skip, limit=limit, search=search, category=category)
+    products = await service.get_all(
+        skip=skip, limit=limit, 
+        search=search, category=category,
+        fair_id=fair_id  # 👈 AGREGADO
+    )
     total = await service.get_total_count(search=search, category=category)
     return PaginatedResponseSchema(
         data=[ProductResponseSchema.model_validate(p) for p in products],
