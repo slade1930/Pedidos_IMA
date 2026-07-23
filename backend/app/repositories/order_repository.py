@@ -4,7 +4,7 @@ from typing import Optional
 from datetime import datetime, timedelta, timezone
 import uuid
 
-from sqlalchemy import select, func
+from sqlalchemy import select, func, or_
 from sqlalchemy.orm import selectinload
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -23,9 +23,14 @@ class OrderRepository(BaseRepository[Order]):
         self,
         skip: int = 0,
         limit: int = 10,
+        search: str = None,           # 👈 NUEVO
+        fair_id: uuid.UUID = None,    # 👈 NUEVO
+        status: str = None,           # 👈 NUEVO
+        date_from: str = None,        # 👈 NUEVO
+        date_to: str = None,          # 👈 NUEVO
     ) -> list[Order]:
 
-        result = await self.db.execute(
+        query = (
             select(Order)
             .where(Order.is_active.is_(True))
             .options(
@@ -33,18 +38,72 @@ class OrderRepository(BaseRepository[Order]):
                 selectinload(Order.payment),
                 selectinload(Order.user),
             )
-            .order_by(Order.created_at.desc())
-            .offset(skip)
-            .limit(limit)
         )
 
+        # Filtro por feria
+        if fair_id:
+            query = query.where(Order.fair_id == fair_id)
+
+        # Filtro por estado
+        if status:
+            query = query.where(Order.status == status)
+
+        # Búsqueda por número de orden o nombre de cliente
+        if search:
+            query = query.join(User, Order.user_id == User.id).where(
+                or_(
+                    Order.order_number.ilike(f"%{search}%"),
+                    User.full_name.ilike(f"%{search}%"),
+                    User.cedula.ilike(f"%{search}%"),
+                )
+            )
+
+        # Filtro por fecha desde
+        if date_from:
+            query = query.where(Order.created_at >= datetime.fromisoformat(date_from))
+
+        # Filtro por fecha hasta
+        if date_to:
+            query = query.where(Order.created_at <= datetime.fromisoformat(date_to))
+
+        query = query.order_by(Order.created_at.desc()).offset(skip).limit(limit)
+
+        result = await self.db.execute(query)
         return list(result.scalars().all())
 
-    async def get_total_count(self) -> int:
+    async def get_total_count(
+        self,
+        search: str = None,
+        fair_id: uuid.UUID = None,
+        status: str = None,
+        date_from: str = None,
+        date_to: str = None,
+    ) -> int:
 
-        result = await self.db.execute(
-            select(func.count()).select_from(Order).where(Order.is_active.is_(True))
-        )
+        query = select(func.count()).select_from(Order).where(Order.is_active.is_(True))
+
+        if fair_id:
+            query = query.where(Order.fair_id == fair_id)
+
+        if status:
+            query = query.where(Order.status == status)
+
+        if search:
+            query = query.join(User, Order.user_id == User.id).where(
+                or_(
+                    Order.order_number.ilike(f"%{search}%"),
+                    User.full_name.ilike(f"%{search}%"),
+                    User.cedula.ilike(f"%{search}%"),
+                )
+            )
+
+        if date_from:
+            query = query.where(Order.created_at >= datetime.fromisoformat(date_from))
+
+        if date_to:
+            query = query.where(Order.created_at <= datetime.fromisoformat(date_to))
+
+        result = await self.db.execute(query)
         return result.scalar() or 0
 
     async def get_by_user(
@@ -170,10 +229,14 @@ class OrderRepository(BaseRepository[Order]):
 
         return result.scalar_one_or_none()
 
-    # 👈 NUEVO MÉTODO: Para reportes
-    async def get_all_with_users(self) -> list[Order]:
+    async def get_all_with_users(
+        self,
+        fair_id: uuid.UUID = None,
+        date_from: str = None,
+        date_to: str = None,
+    ) -> list[Order]:
         """Obtiene todas las órdenes activas con datos del usuario, items y feria para reportes"""
-        result = await self.db.execute(
+        query = (
             select(Order)
             .where(Order.is_active.is_(True))
             .options(
@@ -181,6 +244,18 @@ class OrderRepository(BaseRepository[Order]):
                 selectinload(Order.items),
                 selectinload(Order.fair),
             )
-            .order_by(Order.created_at.desc())
         )
+
+        if fair_id:
+            query = query.where(Order.fair_id == fair_id)
+
+        if date_from:
+            query = query.where(Order.created_at >= datetime.fromisoformat(date_from))
+
+        if date_to:
+            query = query.where(Order.created_at <= datetime.fromisoformat(date_to))
+
+        query = query.order_by(Order.created_at.desc())
+
+        result = await self.db.execute(query)
         return list(result.scalars().all())
