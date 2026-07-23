@@ -151,58 +151,62 @@ export default function OrdersPage() {
 
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
-      className="space-y-6 text-white"
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="space-y-6 text-[#FFF8F0]"
     >
       <style>{`
         .chocolate-panel {
-          background-color: #2D1A10;
-          border: 2px solid #3A5F26;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+          background: linear-gradient(145deg, #28170F 0%, #1D100A 100%);
+          border: 1px solid rgba(58, 95, 38, 0.6);
+          box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.05);
         }
         .premium-select {
           appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23FBBF24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23FBBF24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 14px center;
           background-size: 16px;
           padding-right: 42px;
         }
         .yellow-btn {
-          background-color: #FBBF24;
-          color: #1E120C;
+          background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%);
+          color: #1A0D07;
           font-weight: 700;
-          box-shadow: 0 4px 14px rgba(251, 191, 36, 0.4);
-          transition: all 0.2s ease-in-out;
+          box-shadow: 0 4px 16px rgba(251, 191, 36, 0.35);
+          transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .yellow-btn:hover {
-          background-color: #F59E0B;
-          transform: translateY(-1px);
-          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+          background: linear-gradient(135deg, #FCD34D 0%, #F59E0B 100%);
+          transform: translateY(-1.5px);
+          box-shadow: 0 6px 22px rgba(251, 191, 36, 0.5);
         }
         .yellow-btn:active {
-          transform: translateY(1px);
+          transform: translateY(0);
         }
         .chocolate-input {
-          background-color: #1E120C;
-          border: 2px solid #3A5F26;
-          color: #FFFFFF;
+          background-color: #150C07;
+          border: 1.5px solid rgba(58, 95, 38, 0.5);
+          color: #FFF8F0;
         }
         .chocolate-input:focus {
           border-color: #FBBF24;
+          box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.2);
           outline: none;
+        }
+        .chocolate-input::placeholder {
+          color: #A38F80;
         }
       `}</style>
 
       {/* Cabecera */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b-2 border-[#3A5F26] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b border-[#3A5F26]/40 pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">
+          <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-sm">
             Órdenes
           </h1>
-          <p className="mt-2 text-sm text-gray-200 font-medium">
+          <p className="mt-1.5 text-sm text-[#E8D8CA] font-medium leading-relaxed">
             Supervisa, filtra y gestiona el flujo de órdenes activas y pasadas del sistema.
           </p>
         </div>
@@ -213,9 +217,9 @@ export default function OrdersPage() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={openReportModal}
-            className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-bold cursor-pointer border-2 border-[#3A5F26] bg-[#1E120C] text-[#FBBF24] hover:bg-[#3A5F26] hover:text-white transition-all duration-200"
+            className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-bold cursor-pointer border border-[#3A5F26] bg-[#1E120C]/90 text-[#FBBF24] hover:bg-[#3A5F26] hover:text-white hover:border-[#3A5F26] transition-all duration-200 shadow-md"
           >
-            <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="h-5 w-5 mr-2 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
             </svg>
             Generar Reporte
@@ -228,7 +232,7 @@ export default function OrdersPage() {
             onClick={openCreateModal}
             className="yellow-btn inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm cursor-pointer"
           >
-            <svg className="h-5 w-5 mr-2 stroke-[3px] text-[#1E120C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="h-5 w-5 mr-2 stroke-[3] text-[#1A0D07]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             Nueva Orden
@@ -240,7 +244,7 @@ export default function OrdersPage() {
       <div className="chocolate-panel p-5 rounded-2xl flex flex-col lg:flex-row gap-4">
         {/* Buscador en tiempo real */}
         <div className="relative flex-1">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#FBBF24]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#FBBF24]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
           </svg>
           <input 
@@ -248,7 +252,7 @@ export default function OrdersPage() {
             value={searchInput} 
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Buscar por número de orden, cliente o cédula..."
-            className="chocolate-input block w-full rounded-xl pl-12 pr-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] transition-all" 
+            className="chocolate-input block w-full rounded-xl pl-12 pr-4 py-3 text-sm transition-all" 
           />
         </div>
 
@@ -257,11 +261,11 @@ export default function OrdersPage() {
           <select 
             value={fairFilter} 
             onChange={(e) => setFairFilter(e.target.value)}
-            className="premium-select chocolate-input rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all cursor-pointer sm:w-56"
+            className="premium-select chocolate-input rounded-xl px-4 py-3 text-sm transition-all cursor-pointer sm:w-56 font-medium"
           >
-            <option value="" className="bg-[#1E120C] text-white">Todas las ferias</option>
+            <option value="" className="bg-[#150C07] text-[#FFF8F0]">Todas las ferias</option>
             {fairs.map((fair: { id: string; name: string }) => (
-              <option key={fair.id} value={fair.id} className="bg-[#1E120C] text-white">{fair.name}</option>
+              <option key={fair.id} value={fair.id} className="bg-[#150C07] text-[#FFF8F0]">{fair.name}</option>
             ))}
           </select>
 
@@ -269,10 +273,10 @@ export default function OrdersPage() {
           <select 
             value={statusFilter} 
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="premium-select chocolate-input rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all cursor-pointer sm:w-48"
+            className="premium-select chocolate-input rounded-xl px-4 py-3 text-sm transition-all cursor-pointer sm:w-48 font-medium"
           >
             {STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-[#1E120C] text-white">{opt.label}</option>
+              <option key={opt.value} value={opt.value} className="bg-[#150C07] text-[#FFF8F0]">{opt.label}</option>
             ))}
           </select>
         </div>
@@ -296,81 +300,81 @@ export default function OrdersPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/80" 
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
             onClick={closeModal} 
           />
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="relative chocolate-panel rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-8 text-white"
+            className="relative chocolate-panel rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-7 text-[#FFF8F0]"
           >
             <button 
               onClick={closeModal}
-              className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200 cursor-pointer" 
+              className="absolute top-4 right-4 p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 border border-white/15 transition-all duration-200 cursor-pointer" 
               aria-label="Cerrar"
             >
-              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
 
-            <div className="space-y-6 mt-2">
+            <div className="space-y-5 mt-1">
               <div>
                 <h3 className="text-xl font-bold tracking-tight text-[#FBBF24]">Generar Reporte</h3>
-                <p className="mt-1.5 text-sm text-white/70">
+                <p className="mt-1 text-sm text-[#D4C4B5]">
                   Filtra por feria y rango de fechas para generar un reporte PDF
                 </p>
               </div>
 
               {serverError && (
-                <div className="rounded-xl bg-red-950/80 border-2 border-red-600 p-4">
-                  <p className="text-sm text-red-200 font-bold">{serverError}</p>
+                <div className="rounded-xl bg-red-950/90 border border-red-500/80 p-4 shadow-sm">
+                  <p className="text-sm text-red-200 font-semibold">{serverError}</p>
                 </div>
               )}
 
               {/* Feria */}
               <div className="space-y-2">
-                <label className="block text-sm font-bold text-white">Feria</label>
+                <label className="block text-sm font-bold text-[#FFF8F0]">Feria</label>
                 <select 
                   value={reportFairId} 
                   onChange={(e) => setReportFairId(e.target.value)}
-                  className="premium-select chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all cursor-pointer"
+                  className="premium-select chocolate-input block w-full rounded-xl px-4 py-3 text-sm transition-all cursor-pointer font-medium"
                 >
-                  <option value="" className="bg-[#1E120C] text-white">Todas las ferias</option>
+                  <option value="" className="bg-[#150C07] text-[#FFF8F0]">Todas las ferias</option>
                   {fairs.map((fair: { id: string; name: string }) => (
-                    <option key={fair.id} value={fair.id} className="bg-[#1E120C] text-white">{fair.name}</option>
+                    <option key={fair.id} value={fair.id} className="bg-[#150C07] text-[#FFF8F0]">{fair.name}</option>
                   ))}
                 </select>
               </div>
 
               {/* Fecha Desde */}
               <div className="space-y-2">
-                <label className="block text-sm font-bold text-white">Fecha desde</label>
+                <label className="block text-sm font-bold text-[#FFF8F0]">Fecha desde</label>
                 <input 
                   type="date" 
                   value={reportDateFrom} 
                   onChange={(e) => setReportDateFrom(e.target.value)}
-                  className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all" 
+                  className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm transition-all font-medium" 
                 />
               </div>
 
               {/* Fecha Hasta */}
               <div className="space-y-2">
-                <label className="block text-sm font-bold text-white">Fecha hasta</label>
+                <label className="block text-sm font-bold text-[#FFF8F0]">Fecha hasta</label>
                 <input 
                   type="date" 
                   value={reportDateTo} 
                   onChange={(e) => setReportDateTo(e.target.value)}
-                  className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all" 
+                  className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm transition-all font-medium" 
                 />
               </div>
 
-              <div className="flex justify-end gap-3 pt-4 border-t-2 border-[#3A5F26]">
+              <div className="flex justify-end gap-3 pt-5 border-t border-[#3A5F26]/40">
                 <button 
                   onClick={closeModal} 
                   disabled={isDownloading}
-                  className="rounded-xl border-2 border-white/30 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50 transition-all cursor-pointer"
+                  className="rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-[#FFF8F0] hover:bg-white/10 disabled:opacity-50 transition-all cursor-pointer"
                 >
                   Cancelar
                 </button>
@@ -395,25 +399,25 @@ export default function OrdersPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/80" 
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
               onClick={closeModal} 
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative chocolate-panel rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-8 text-white"
+              className="relative chocolate-panel rounded-2xl w-full max-w-xl max-h-[90vh] overflow-y-auto p-7 text-[#FFF8F0]"
             >
               <button 
                 onClick={closeModal}
-                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200 cursor-pointer" 
+                className="absolute top-4 right-4 p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 border border-white/15 transition-all duration-200 cursor-pointer" 
                 aria-label="Cerrar"
               >
-                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              <div className="mt-2 text-white">
+              <div className="mt-1 text-[#FFF8F0]">
                 <OrderForm 
                   onSubmit={handleCreateSubmit} 
                   onCancel={closeModal}
@@ -431,32 +435,32 @@ export default function OrdersPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/80" 
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
               onClick={closeModal} 
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative chocolate-panel rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-8 text-white"
+              className="relative chocolate-panel rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto p-7 text-[#FFF8F0]"
             >
               <button 
                 onClick={closeModal}
-                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200 z-10 cursor-pointer" 
+                className="absolute top-4 right-4 p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 border border-white/15 transition-all duration-200 z-10 cursor-pointer" 
                 aria-label="Cerrar"
               >
-                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              <div className="space-y-6 mt-2">
-                <div className="rounded-xl bg-[#1E120C] p-4 border-2 border-[#3A5F26]">
+              <div className="space-y-5 mt-1">
+                <div className="rounded-xl bg-[#150C07] p-4 border border-[#3A5F26]/50 shadow-inner">
                   <OrderCard 
                     order={selectedOrder} 
                     onStatusChange={(order) => { closeModal(); openStatusModal(order); }} 
                   />
                 </div>
-                <div className="flex justify-center p-6 rounded-xl bg-[#1E120C] border-2 border-[#3A5F26]">
+                <div className="flex justify-center p-6 rounded-xl bg-[#150C07] border border-[#3A5F26]/50 shadow-inner">
                   <QRDisplay 
                     qrCode={selectedOrder.qr_code} 
                     orderNumber={selectedOrder.order_number} 
@@ -475,58 +479,58 @@ export default function OrdersPage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/80" 
+              className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
               onClick={closeModal} 
             />
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative chocolate-panel rounded-2xl w-full max-w-md p-8 text-white"
+              className="relative chocolate-panel rounded-2xl w-full max-w-md p-7 text-[#FFF8F0]"
             >
               <button 
                 onClick={closeModal}
-                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200 cursor-pointer" 
+                className="absolute top-4 right-4 p-2 rounded-xl text-white/80 hover:text-white hover:bg-white/10 border border-white/15 transition-all duration-200 cursor-pointer" 
                 aria-label="Cerrar"
               >
-                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
-              <div className="space-y-6 mt-2">
+              <div className="space-y-5 mt-1">
                 <div>
                   <h3 className="text-xl font-bold tracking-tight text-[#FBBF24]">Cambiar Estado</h3>
-                  <p className="mt-1.5 text-sm text-white">
+                  <p className="mt-1 text-sm text-[#D4C4B5]">
                     Actualizando el estado de la Orden <span className="font-bold text-[#FBBF24]">{selectedOrder.order_number}</span>
                   </p>
                 </div>
 
                 {serverError && (
-                  <div className="rounded-xl bg-red-950/80 border-2 border-red-600 p-4">
-                    <p className="text-sm text-red-200 font-bold">{serverError}</p>
+                  <div className="rounded-xl bg-red-950/90 border border-red-500/80 p-4 shadow-sm">
+                    <p className="text-sm text-red-200 font-semibold">{serverError}</p>
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <label htmlFor="status" className="block text-sm font-bold text-white">Nuevo estado</label>
+                  <label htmlFor="status" className="block text-sm font-bold text-[#FFF8F0]">Nuevo estado</label>
                   <select 
                     id="status" 
                     value={newStatus}
                     onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
                     disabled={statusMutation.isPending}
-                    className="premium-select chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all cursor-pointer"
+                    className="premium-select chocolate-input block w-full rounded-xl px-4 py-3 text-sm transition-all cursor-pointer font-medium disabled:opacity-50"
                   >
                     {STATUS_OPTIONS.filter(o => o.value !== "").map((opt) => (
-                      <option key={opt.value} value={opt.value} className="bg-[#1E120C] text-white">{opt.label}</option>
+                      <option key={opt.value} value={opt.value} className="bg-[#150C07] text-[#FFF8F0]">{opt.label}</option>
                     ))}
                   </select>
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t-2 border-[#3A5F26]">
+                <div className="flex justify-end gap-3 pt-5 border-t border-[#3A5F26]/40">
                   <button 
                     onClick={closeModal} 
                     disabled={statusMutation.isPending}
-                    className="rounded-xl border-2 border-white/30 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50 transition-all cursor-pointer"
+                    className="rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-[#FFF8F0] hover:bg-white/10 disabled:opacity-50 transition-all cursor-pointer"
                   >
                     Cancelar
                   </button>
