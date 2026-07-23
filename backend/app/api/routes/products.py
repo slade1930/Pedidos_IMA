@@ -1,57 +1,50 @@
-# app/api/routes/inventory.py
-from fastapi import APIRouter, Depends, Query
+# app/api/routes/products.py
+
+from fastapi import APIRouter, Depends, Query, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from app.services.inventory_service import InventoryService
-from app.schemas.inventory_schema import (
-    InventoryCreateSchema,
-    InventoryUpdateSchema,
-    InventoryResponseSchema,
+from app.services.product_service import ProductService
+from app.schemas.product_schema import (
+    ProductResponseSchema,
+    ProductCreateSchema,
+    ProductUpdateSchema,
 )
 from app.schemas.response_schema import ResponseSchema, PaginatedResponseSchema
-from app.api.dependencies.auth_dependencies import (
-    get_current_staff,
-    get_current_admin,
-)
+from app.api.dependencies.auth_dependencies import get_current_admin, get_current_staff
 from app.models.user_model import User
 import uuid
 
-router = APIRouter(prefix="/inventory", tags=["Inventory"])
+router = APIRouter(prefix="/products", tags=["Products"])
 
 
-@router.get("/", response_model=PaginatedResponseSchema[InventoryResponseSchema])
-async def get_all_inventory(
+@router.get("/", response_model=PaginatedResponseSchema[ProductResponseSchema])
+async def get_all_products(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=200),
-    search: str = Query(None),           # 👈 NUEVO
-    fair_id: uuid.UUID = Query(None),    # 👈 NUEVO
-    low_stock: bool = Query(False),      # 👈 NUEVO
+    search: str = Query(None),
+    category: str = Query(None),
+    fair_id: uuid.UUID = Query(None),  # 👈 NUEVO: filtrar por feria
+    is_active: bool = Query(True),
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
-    service = InventoryService(db)
+    service = ProductService(db)
     items = await service.get_all(
-        skip=skip, limit=limit, search=search, fair_id=fair_id, low_stock=low_stock
+        skip=skip, 
+        limit=limit, 
+        search=search, 
+        category=category,
+        fair_id=fair_id,  # 👈 NUEVO: pasar a service
+        is_active=is_active
     )
     total = await service.get_total_count(
-        search=search, fair_id=fair_id, low_stock=low_stock
+        search=search, 
+        category=category,
+        fair_id=fair_id,  # 👈 NUEVO: pasar a service
+        is_active=is_active
     )
     return PaginatedResponseSchema(
-        data=[
-            InventoryResponseSchema(
-                id=i.id,
-                product_id=i.product_id,
-                product_name=i.product.name if i.product else None,
-                fair_id=i.fair_id,
-                total_stock=i.total_stock,
-                reserved_stock=i.reserved_stock,
-                delivered_stock=i.delivered_stock,
-                available_stock=i.available_stock,
-                is_available=i.is_available,
-                notes=i.notes,
-            )
-            for i in items
-        ],
+        data=[ProductResponseSchema.model_validate(p) for p in items],
         total=total,
         page=(skip // limit) + 1 if limit > 0 else 1,
         limit=limit,
@@ -59,45 +52,56 @@ async def get_all_inventory(
     )
 
 
-@router.post("/", response_model=ResponseSchema[InventoryResponseSchema])
-async def create_inventory(
-    data: InventoryCreateSchema,
+@router.post("/", response_model=ResponseSchema[ProductResponseSchema])
+async def create_product(
+    data: ProductCreateSchema,
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_admin),
 ):
-    service = InventoryService(db)
-    inventory = await service.create(data)
+    service = ProductService(db)
+    product = await service.create(data)
     return ResponseSchema(
-        message="Inventario creado",
-        data=InventoryResponseSchema.model_validate(inventory),
+        message="Producto creado exitosamente",
+        data=ProductResponseSchema.model_validate(product),
     )
 
 
-@router.get(
-    "/fair/{fair_id}", response_model=ResponseSchema[list[InventoryResponseSchema]]
-)
-async def get_inventory_by_fair(
-    fair_id: uuid.UUID,
+@router.get("/{product_id}", response_model=ResponseSchema[ProductResponseSchema])
+async def get_product_by_id(
+    product_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
-    service = InventoryService(db)
-    inventory = await service.get_by_fair(fair_id)
+    service = ProductService(db)
+    product = await service.get_by_id(product_id)
     return ResponseSchema(
-        data=[InventoryResponseSchema.model_validate(i) for i in inventory]
+        data=ProductResponseSchema.model_validate(product),
     )
 
 
-@router.put("/{inventory_id}", response_model=ResponseSchema[InventoryResponseSchema])
-async def update_inventory(
-    inventory_id: uuid.UUID,
-    data: InventoryUpdateSchema,
+@router.put("/{product_id}", response_model=ResponseSchema[ProductResponseSchema])
+async def update_product(
+    product_id: uuid.UUID,
+    data: ProductUpdateSchema,
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_admin),
 ):
-    service = InventoryService(db)
-    inventory = await service.update_stock(inventory_id, data)
+    service = ProductService(db)
+    product = await service.update(product_id, data)
     return ResponseSchema(
-        message="Inventario actualizado",
-        data=InventoryResponseSchema.model_validate(inventory),
+        message="Producto actualizado exitosamente",
+        data=ProductResponseSchema.model_validate(product),
+    )
+
+
+@router.delete("/{product_id}", response_model=ResponseSchema)
+async def delete_product(
+    product_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(get_current_admin),
+):
+    service = ProductService(db)
+    await service.deactivate(product_id)
+    return ResponseSchema(
+        message="Producto desactivado exitosamente",
     )
