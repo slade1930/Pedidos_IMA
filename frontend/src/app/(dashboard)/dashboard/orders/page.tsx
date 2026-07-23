@@ -8,6 +8,7 @@ import { OrderForm } from "@/features/orders/components/OrderForm";
 import { QRDisplay } from "@/features/orders/components/QRDisplay";
 import { orderService } from "@/features/orders/services/order.service";
 import { useFairs } from "@/features/fairs/hooks/useFairs";
+import { useDebounce } from "@/hooks/useDebounce";
 import type {
   Order,
   CreateOrderPayload,
@@ -18,7 +19,8 @@ import { motion, AnimatePresence } from "framer-motion";
 
 // ─── ESTADOS DISPONIBLES ──────────────────────────────────
 
-const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
+const STATUS_OPTIONS: { value: OrderStatus | ""; label: string }[] = [
+  { value: "", label: "Todos los estados" },
   { value: "pending", label: "Pendiente" },
   { value: "confirmed", label: "Confirmada" },
   { value: "ready", label: "Lista" },
@@ -32,31 +34,37 @@ const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
 export default function OrdersPage() {
   const queryClient = useQueryClient();
 
-  const [modalMode, setModalMode] = useState<"create" | "view" | "status" | null>(null);
+  const [modalMode, setModalMode] = useState<"create" | "view" | "status" | "report" | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
-  const [fairIdFilter, setFairIdFilter] = useState<string>("");
+  const [fairFilter, setFairFilter] = useState<string>("");
   const [serverError, setServerError] = useState<string | null>(null);
   const [newStatus, setNewStatus] = useState<OrderStatus>("pending");
-  const [isDownloading, setIsDownloading] = useState(false); // 👈 Estado para el botón de reporte
+  const [isDownloading, setIsDownloading] = useState(false);
 
-  const [searchInput, setSearchInput] = useState("");
+  // Filtros del reporte
+  const [reportFairId, setReportFairId] = useState<string>("");
+  const [reportDateFrom, setReportDateFrom] = useState<string>("");
+  const [reportDateTo, setReportDateTo] = useState<string>("");
+
+  // Búsqueda en tiempo real con debounce
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   const { data: fairsData } = useFairs({ limit: 100 });
   const fairs = Array.isArray(fairsData) ? fairsData : fairsData?.data ?? [];
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setSearch(searchInput);
-  };
-
-  // 👈 HANDLER PARA DESCARGAR REPORTE
+  // 👈 HANDLER PARA DESCARGAR REPORTE CON FILTROS
   const handleDownloadReport = async () => {
     setIsDownloading(true);
     setServerError(null);
     try {
-      await orderService.downloadOrdersReport();
+      await orderService.downloadOrdersReport({
+        fair_id: reportFairId || undefined,
+        date_from: reportDateFrom || undefined,
+        date_to: reportDateTo || undefined,
+      });
+      setModalMode(null);
     } catch {
       setServerError("Error al generar el reporte");
     } finally {
@@ -108,6 +116,14 @@ export default function OrdersPage() {
     setNewStatus(order.status);
     setServerError(null);
     setModalMode("status");
+  }, []);
+
+  const openReportModal = useCallback(() => {
+    setServerError(null);
+    setReportFairId("");
+    setReportDateFrom("");
+    setReportDateTo("");
+    setModalMode("report");
   }, []);
 
   const closeModal = useCallback(() => {
@@ -191,20 +207,18 @@ export default function OrdersPage() {
           </p>
         </div>
         
-        {/* 👈 BOTONES: Generar Reporte + Nueva Orden */}
         <div className="flex items-center gap-3">
           {/* Botón Generar Reporte */}
           <motion.button 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={handleDownloadReport}
-            disabled={isDownloading}
-            className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-bold cursor-pointer border-2 border-[#3A5F26] bg-[#1E120C] text-[#FBBF24] hover:bg-[#3A5F26] hover:text-white disabled:opacity-50 transition-all duration-200"
+            onClick={openReportModal}
+            className="inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm font-bold cursor-pointer border-2 border-[#3A5F26] bg-[#1E120C] text-[#FBBF24] hover:bg-[#3A5F26] hover:text-white transition-all duration-200"
           >
             <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
             </svg>
-            {isDownloading ? "Generando..." : "Generar Reporte"}
+            Generar Reporte
           </motion.button>
 
           {/* Botón Nueva Orden */}
@@ -224,25 +238,25 @@ export default function OrdersPage() {
 
       {/* Panel de Filtros */}
       <div className="chocolate-panel p-5 rounded-2xl flex flex-col lg:flex-row gap-4">
-        <form onSubmit={handleSearchSubmit} className="flex-1">
-          <div className="relative">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#FBBF24]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-            </svg>
-            <input 
-              type="text" 
-              value={searchInput} 
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Buscar por número de orden..."
-              className="chocolate-input block w-full rounded-xl pl-12 pr-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] transition-all" 
-            />
-          </div>
-        </form>
+        {/* Buscador en tiempo real */}
+        <div className="relative flex-1">
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#FBBF24]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <input 
+            type="text" 
+            value={searchInput} 
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder="Buscar por número de orden, cliente o cédula..."
+            className="chocolate-input block w-full rounded-xl pl-12 pr-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] transition-all" 
+          />
+        </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
+          {/* Selector de Feria */}
           <select 
-            value={fairIdFilter} 
-            onChange={(e) => setFairIdFilter(e.target.value)}
+            value={fairFilter} 
+            onChange={(e) => setFairFilter(e.target.value)}
             className="premium-select chocolate-input rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all cursor-pointer sm:w-56"
           >
             <option value="" className="bg-[#1E120C] text-white">Todas las ferias</option>
@@ -251,12 +265,12 @@ export default function OrdersPage() {
             ))}
           </select>
 
+          {/* Selector de Estado */}
           <select 
             value={statusFilter} 
             onChange={(e) => setStatusFilter(e.target.value)}
             className="premium-select chocolate-input rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all cursor-pointer sm:w-48"
           >
-            <option value="" className="bg-[#1E120C] text-white">Todos los estados</option>
             {STATUS_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value} className="bg-[#1E120C] text-white">{opt.label}</option>
             ))}
@@ -267,15 +281,113 @@ export default function OrdersPage() {
       {/* Contenedor de la Tabla */}
       <div className="chocolate-panel rounded-2xl overflow-hidden">
         <OrderTable
-          search={search}
+          search={debouncedSearch}
           statusFilter={statusFilter}
-          fairIdFilter={fairIdFilter}
+          fairIdFilter={fairFilter}
           onView={openViewModal}
           onStatusChange={openStatusModal}
         />
       </div>
 
-      {/* Modales */}
+      {/* Modal Reporte */}
+      {modalMode === "report" && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/80" 
+            onClick={closeModal} 
+          />
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            className="relative chocolate-panel rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-8 text-white"
+          >
+            <button 
+              onClick={closeModal}
+              className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200 cursor-pointer" 
+              aria-label="Cerrar"
+            >
+              <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <div className="space-y-6 mt-2">
+              <div>
+                <h3 className="text-xl font-bold tracking-tight text-[#FBBF24]">Generar Reporte</h3>
+                <p className="mt-1.5 text-sm text-white/70">
+                  Filtra por feria y rango de fechas para generar un reporte PDF
+                </p>
+              </div>
+
+              {serverError && (
+                <div className="rounded-xl bg-red-950/80 border-2 border-red-600 p-4">
+                  <p className="text-sm text-red-200 font-bold">{serverError}</p>
+                </div>
+              )}
+
+              {/* Feria */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-white">Feria</label>
+                <select 
+                  value={reportFairId} 
+                  onChange={(e) => setReportFairId(e.target.value)}
+                  className="premium-select chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all cursor-pointer"
+                >
+                  <option value="" className="bg-[#1E120C] text-white">Todas las ferias</option>
+                  {fairs.map((fair: { id: string; name: string }) => (
+                    <option key={fair.id} value={fair.id} className="bg-[#1E120C] text-white">{fair.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Fecha Desde */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-white">Fecha desde</label>
+                <input 
+                  type="date" 
+                  value={reportDateFrom} 
+                  onChange={(e) => setReportDateFrom(e.target.value)}
+                  className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all" 
+                />
+              </div>
+
+              {/* Fecha Hasta */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-white">Fecha hasta</label>
+                <input 
+                  type="date" 
+                  value={reportDateTo} 
+                  onChange={(e) => setReportDateTo(e.target.value)}
+                  className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all" 
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t-2 border-[#3A5F26]">
+                <button 
+                  onClick={closeModal} 
+                  disabled={isDownloading}
+                  className="rounded-xl border-2 border-white/30 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50 transition-all cursor-pointer"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  onClick={handleDownloadReport} 
+                  disabled={isDownloading}
+                  className="yellow-btn rounded-xl px-5 py-2.5 text-sm disabled:opacity-50 transition-all cursor-pointer"
+                >
+                  {isDownloading ? "Generando..." : "Descargar PDF"}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Modales existentes */}
       <AnimatePresence>
         {modalMode === "create" && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -294,7 +406,7 @@ export default function OrdersPage() {
             >
               <button 
                 onClick={closeModal}
-                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200" 
+                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200 cursor-pointer" 
                 aria-label="Cerrar"
               >
                 <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -330,7 +442,7 @@ export default function OrdersPage() {
             >
               <button 
                 onClick={closeModal}
-                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200 z-10" 
+                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200 z-10 cursor-pointer" 
                 aria-label="Cerrar"
               >
                 <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -374,7 +486,7 @@ export default function OrdersPage() {
             >
               <button 
                 onClick={closeModal}
-                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200" 
+                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200 cursor-pointer" 
                 aria-label="Cerrar"
               >
                 <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
@@ -404,7 +516,7 @@ export default function OrdersPage() {
                     disabled={statusMutation.isPending}
                     className="premium-select chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all cursor-pointer"
                   >
-                    {STATUS_OPTIONS.map((opt) => (
+                    {STATUS_OPTIONS.filter(o => o.value !== "").map((opt) => (
                       <option key={opt.value} value={opt.value} className="bg-[#1E120C] text-white">{opt.label}</option>
                     ))}
                   </select>
