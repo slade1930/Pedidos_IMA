@@ -23,6 +23,8 @@ export const orderService = {
     if (filters?.search) params.set("search", filters.search);
     if (filters?.status) params.set("status", filters.status);
     if (filters?.fair_id) params.set("fair_id", filters.fair_id);
+    if (filters?.date_from) params.set("date_from", filters.date_from);  // 👈 NUEVO
+    if (filters?.date_to) params.set("date_to", filters.date_to);        // 👈 NUEVO
     if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
     if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
 
@@ -70,18 +72,28 @@ export const orderService = {
   },
 
   /**
-   * Descarga un reporte PDF con todas las órdenes.
-   * Usa apiClient con responseType blob para recibir el PDF correctamente.
+   * Descarga un reporte PDF con filtros opcionales.
    * 
    * GET /api/v1/orders/report
    */
-  async downloadOrdersReport(): Promise<void> {
-    // Usar apiClient con responseType: 'blob' para recibir el PDF
-    const response = await apiClient.get("/orders/report", {
+  async downloadOrdersReport(filters?: {
+    fair_id?: string;
+    date_from?: string;
+    date_to?: string;
+  }): Promise<void> {
+    const params = new URLSearchParams();
+    
+    if (filters?.fair_id) params.set("fair_id", filters.fair_id);
+    if (filters?.date_from) params.set("date_from", filters.date_from);
+    if (filters?.date_to) params.set("date_to", filters.date_to);
+    
+    const queryString = params.toString();
+    const endpoint = queryString ? `/orders/report?${queryString}` : "/orders/report";
+
+    const response = await apiClient.get(endpoint, {
       responseType: "blob",
     });
 
-    // Crear URL temporal y descargar
     const url = window.URL.createObjectURL(response.data);
     const link = document.createElement("a");
     link.href = url;
