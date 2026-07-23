@@ -103,6 +103,8 @@ export interface OrderFilters {
   search?: string;
   status?: OrderStatus;
   fair_id?: string;
+  date_from?: string;  // 👈 NUEVO
+  date_to?: string;    // 👈 NUEVO
   skip?: number;
   limit?: number;
 }
