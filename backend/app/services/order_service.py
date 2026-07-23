@@ -38,17 +38,39 @@ class OrderService:
     def _generate_pickup_code(self) -> str:
         return "".join(random.choices(string.digits, k=5))
 
-    async def get_all(self, skip: int = 0, limit: int = 10) -> list[Order]:
-        return await self.order_repo.get_all(skip, limit)
+    async def get_all(
+        self,
+        skip: int = 0,
+        limit: int = 10,
+        search: str = None,
+        fair_id: uuid.UUID = None,
+        status: str = None,
+        date_from: str = None,
+        date_to: str = None,
+    ) -> list[Order]:
+        return await self.order_repo.get_all(
+            skip=skip, limit=limit,
+            search=search, fair_id=fair_id, status=status,
+            date_from=date_from, date_to=date_to,
+        )
 
-    async def get_total_count(self) -> int:
-        return await self.order_repo.get_total_count()
+    async def get_total_count(
+        self,
+        search: str = None,
+        fair_id: uuid.UUID = None,
+        status: str = None,
+        date_from: str = None,
+        date_to: str = None,
+    ) -> int:
+        return await self.order_repo.get_total_count(
+            search=search, fair_id=fair_id, status=status,
+            date_from=date_from, date_to=date_to,
+        )
 
     async def get_by_id(self, order_id: uuid.UUID) -> Optional[Order]:
         return await self.order_repo.get_by_id(order_id)
 
     async def create(self, user_id: uuid.UUID, data: OrderCreateSchema) -> Order:
-        # ─── Obtener datos del usuario ──────────────────
         user = await self.user_repo.get_by_id(user_id)
         if not user:
             raise HTTPException(
@@ -77,10 +99,6 @@ class OrderService:
                         "next_available_date": next_available.isoformat(),
                     },
                 )
-
-        # ❌ ELIMINADO: Validación "un pedido por feria"
-        # Ahora los usuarios pueden comprar múltiples veces en la misma feria
-        # siempre que hayan pasado los 8 días de PDA
 
         # ─── Validar productos y calcular total ──────────
         total = 0.0
@@ -207,6 +225,13 @@ class OrderService:
     async def get_by_fair(self, fair_id: uuid.UUID) -> list[Order]:
         return await self.order_repo.get_by_fair(fair_id)
 
-    async def get_all_for_report(self) -> list[Order]:
+    async def get_all_for_report(
+        self,
+        fair_id: uuid.UUID = None,
+        date_from: str = None,
+        date_to: str = None,
+    ) -> list[Order]:
         """Obtiene todas las órdenes con datos de usuario, items y feria para reportes"""
-        return await self.order_repo.get_all_with_users()
+        return await self.order_repo.get_all_with_users(
+            fair_id=fair_id, date_from=date_from, date_to=date_to
+        )
