@@ -10,12 +10,39 @@ from app.schemas.product_schema import (
     ProductUpdateSchema,
 )
 from app.schemas.response_schema import ResponseSchema, PaginatedResponseSchema
-from app.api.dependencies.auth_dependencies import get_current_admin, get_current_staff
+from app.api.dependencies.auth_dependencies import get_current_admin, get_current_staff, get_current_user
 from app.models.user_model import User
 import uuid
 
 router = APIRouter(prefix="/products", tags=["Products"])
 
+
+# ─── ENDPOINT PÚBLICO (SIN AUTENTICACIÓN) ──────────────────
+# DEBE IR ANTES de /{product_id} para que FastAPI no confunda "public" con un UUID
+
+@router.get("/public", response_model=ResponseSchema[list[ProductResponseSchema]])
+async def get_public_products(
+    fair_id: uuid.UUID = Query(None),
+    category: str = Query(None),
+    search: str = Query(None),
+    db: AsyncSession = Depends(get_db),
+):
+    """Endpoint público para que los clientes vean productos disponibles. NO requiere autenticación."""
+    service = ProductService(db)
+    products = await service.get_all(
+        skip=0,
+        limit=100,
+        search=search,
+        category=category,
+        fair_id=fair_id,
+    )
+
+    return ResponseSchema(
+        data=[ProductResponseSchema.model_validate(p) for p in products]
+    )
+
+
+# ─── ENDPOINTS DE ADMINISTRACIÓN (REQUIEREN AUTENTICACIÓN) ──
 
 @router.get("/", response_model=PaginatedResponseSchema[ProductResponseSchema])
 async def get_all_products(
@@ -23,25 +50,22 @@ async def get_all_products(
     limit: int = Query(100, ge=1, le=200),
     search: str = Query(None),
     category: str = Query(None),
-    fair_id: uuid.UUID = Query(None),  # 👈 NUEVO: filtrar por feria
-    is_active: bool = Query(True),
+    fair_id: uuid.UUID = Query(None),
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
     service = ProductService(db)
     items = await service.get_all(
-        skip=skip, 
-        limit=limit, 
-        search=search, 
+        skip=skip,
+        limit=limit,
+        search=search,
         category=category,
-        fair_id=fair_id,  # 👈 NUEVO: pasar a service
-        is_active=is_active
+        fair_id=fair_id,
     )
     total = await service.get_total_count(
-        search=search, 
+        search=search,
         category=category,
-        fair_id=fair_id,  # 👈 NUEVO: pasar a service
-        is_active=is_active
+        fair_id=fair_id,
     )
     return PaginatedResponseSchema(
         data=[ProductResponseSchema.model_validate(p) for p in items],
@@ -66,14 +90,32 @@ async def create_product(
     )
 
 
-@router.get("/{product_id}", response_model=ResponseSchema[ProductResponseSchema])
-async def get_product_by_id(
-    product_id: uuid.UUID,
+@router.get("/fair/{fair_id}", response_model=ResponseSchema[list[ProductResponseSchema]])
+async def get_products_by_fair(
+    fair_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
     service = ProductService(db)
+    products = await service.get_by_fair(fair_id)
+    return ResponseSchema(
+        data=[ProductResponseSchema.model_validate(p) for p in products]
+    )
+
+
+@router.get("/{product_id}", response_model=ResponseSchema[ProductResponseSchema])
+async def get_product_by_id(
+    product_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(get_current_user),
+):
+    service = ProductService(db)
     product = await service.get_by_id(product_id)
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Producto no encontrado",
+        )
     return ResponseSchema(
         data=ProductResponseSchema.model_validate(product),
     )
