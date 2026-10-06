@@ -163,8 +163,10 @@ class CSRFOriginMiddleware(BaseHTTPMiddleware):
 
     Reglas:
     - DEBUG → omitido (dev/tests; igual que el rate limit).
-    - Sec-Fetch-Site == "cross-site" → 403 (los navegadores modernos lo
-      envían siempre en peticiones web).
+    - Sec-Fetch-Site == "cross-site" → se permite SOLO si el Origin está en
+      ALLOWED_ORIGINS (el frontend real vive en un dominio distinto al backend,
+      p.ej. Vercel → Render, y su Página es cross-site por diseño); sin Origin
+      o con Origin no permitido → 403.
     - Origin presente y distinto de ALLOWED_ORIGINS y del propio host → 403.
     - Sin Origin ni Sec-Fetch-Site (curl, apps nativas) → pasa: no hay
       contexto de navegador que explotar.
@@ -181,7 +183,11 @@ class CSRFOriginMiddleware(BaseHTTPMiddleware):
 
         blocked_reason = None
         if site == "cross-site":
-            blocked_reason = f"sec-fetch-site={site}"
+            # Trusted origin (ej: pedidos-ima.vercel.app → pedidos-ima.onrender.com):
+            # el navegador no permite forjar Origin en fetch cross-origin, así que
+            # confiar en ALLOWED_ORIGINS es seguro pese a ser cross-site.
+            if not (origin and origin in settings.ALLOWED_ORIGINS):
+                blocked_reason = f"sec-fetch-site={site}"
         elif origin:
             same_host = urlparse(origin).netloc == request.headers.get("host")
             if origin not in settings.ALLOWED_ORIGINS and not same_host:

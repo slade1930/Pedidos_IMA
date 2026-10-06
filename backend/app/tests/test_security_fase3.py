@@ -317,6 +317,21 @@ async def test_csrf_bloquea_sec_fetch_site_cross(monkeypatch):
     assert res.json()["code"] == "ORIGIN_BLOCKED"
 
 
+async def test_csrf_premite_cross_site_con_origin_permitido(monkeypatch):
+    monkeypatch.setattr(settings, "DEBUG", False)
+    async with _csrf_client() as client:
+        res = await _post_login_csrf(
+            client,
+            {
+                "Sec-Fetch-Site": "cross-site",
+                "Origin": "https://pedidos-ima.vercel.app",
+            },
+        )
+    # Cross-site con Origin en ALLOWED_ORIGINS es la app real (Vercel → Render):
+    # no corta por CSRF (token inválido → 401, no 403)
+    assert res.status_code == 401
+
+
 async def test_csrf_bloquea_origin_no_permitido(monkeypatch):
     monkeypatch.setattr(settings, "DEBUG", False)
     async with _csrf_client() as client:
