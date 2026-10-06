@@ -353,32 +353,26 @@ export default function AuthSwitch({
           .itas-as .panel p { display: none; }
         }
 
-        /* ── MÓVIL: layout apilado, página con scroll real ────────────────
-           Elimina el círculo y los paneles que tapaban el formulario.
-           El formulario queda SIEMPRE visible y la página hace scroll.   */
-        .itas-as .mobile-switch { display: none; }
-
+        /* ── MÓVIL: mismo diseño y animación, formulario en flujo ─────────
+           El círculo y los paneles siguen animando, pero el formulario se
+           coloca EN FLUJO entre los paneles (z10, encima del círculo z6 y
+           debajo de los botones de panel z11): nunca queda tapado y la
+           página crece/desplaza si el registro es alto.                   */
         @media (max-width: 870px) {
-          .itas-as {
-            padding: 0;
-            justify-content: flex-start;
-            background: #ffffff;
-          }
-
+          /* El contenedor crece con el contenido: nada se recorta */
           .itas-as .container {
-            width: 100%;
-            max-width: none;
-            min-height: 100dvh;
             height: auto;
-            border-radius: 0;
-            box-shadow: none;
-            overflow: visible;
+            min-height: 100dvh;
           }
 
-          /* Elimina el círculo decorativo y los paneles laterales */
-          .itas-as .container:before { display: none; }
-          .itas-as .panels-container { display: none; }
+          /* Paneles con altura fija (no proporcional al alto total) y por
+             encima del formulario para conservar sus botones activos */
+          .itas-as .panels-container {
+            grid-template-rows: 170px minmax(0, 1fr) 170px;
+            z-index: 11;
+          }
 
+          /* Formulario en flujo, centrado entre los paneles */
           .itas-as .forms-container {
             position: static;
             height: auto;
@@ -386,73 +380,45 @@ export default function AuthSwitch({
 
           .itas-as .signin-signup,
           .itas-as .container.sign-up-mode .signin-signup {
-            position: static;
+            position: relative;
             top: auto;
             left: auto;
             transform: none;
             width: 100%;
             height: auto;
-            z-index: 2;
+            z-index: 10;
+            margin-top: 170px;
+            margin-bottom: 170px;
           }
 
           .itas-as .sign-in-form,
           .itas-as .sign-up-form {
             height: auto;
             overflow: visible;
-            padding: 24px 20px 48px;
+            padding: 0.4rem 1.5rem 0.4rem;
           }
-          .itas-as .sign-in-form { display: flex; }
-          .itas-as .sign-up-form { display: none; }
-          .itas-as .container.sign-up-mode .sign-up-form { display: flex; }
-          .itas-as .container.sign-up-mode .sign-in-form { display: none; }
 
-          .itas-as .mobile-switch {
+          /* Vistas alternadas en flujo con fade suave */
+          .itas-as .signin-signup { display: block; }
+          .itas-as .sign-in-form {
             display: flex;
-            width: 100%;
-            border-bottom: 1px solid #e6f2ef;
-            background: #ffffff;
-            position: sticky;
-            top: 0;
-            z-index: 20;
+            animation: itas-form-in 0.35s ease both;
           }
-          .itas-as .mobile-switch button {
-            flex: 1;
-            height: 46px;
-            background: none;
-            border: none;
-            border-bottom: 2px solid transparent;
-            font-size: 13px;
-            font-weight: 600;
-            color: #7c9aa6;
-            cursor: pointer;
-            letter-spacing: 0.02em;
+          .itas-as .sign-up-form { display: none; }
+          .itas-as .container.sign-up-mode .sign-up-form {
+            display: flex;
+            animation: itas-form-in 0.35s ease both;
           }
-          .itas-as .mobile-switch button.active {
-            color: #1b4f72;
-            border-bottom-color: #2e7d9e;
-          }
+          .itas-as .container.sign-up-mode .sign-in-form { display: none; }
+        }
+
+        @keyframes itas-form-in {
+          from { opacity: 0; transform: translateY(14px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
 
       <div className="container" ref={containerRef}>
-        {/* Toggle móvil (solo visible en pantallas pequeñas) */}
-        <div className="mobile-switch">
-          <button
-            type="button"
-            className={!isSignUp ? "active" : ""}
-            onClick={() => setIsSignUp(false)}
-          >
-            Iniciar sesión
-          </button>
-          <button
-            type="button"
-            className={isSignUp ? "active" : ""}
-            onClick={() => setIsSignUp(true)}
-          >
-            Crear cuenta
-          </button>
-        </div>
-
         <div className="forms-container">
           <div className="signin-signup">
             {/* Vista: Iniciar sesión */}
