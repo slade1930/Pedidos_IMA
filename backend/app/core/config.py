@@ -48,6 +48,7 @@ class Settings(BaseSettings):
         "itas-backend",
         "pedidos-ima.vercel.app",
         "*.vercel.app",
+        "*.onrender.com",
     ]
 
     # Redis
