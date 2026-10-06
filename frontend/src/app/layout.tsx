@@ -5,18 +5,19 @@ import type { ReactNode } from "react";
 import { AuthProvider } from "@/providers/AuthProvider";
 import { QueryProvider } from "@/providers/QueryProvider";
 import ThemeProvider from "@/providers/ThemeProvider";
+import { CookieConsent } from "@/components/features/CookieConsent";
 import "./globals.css";
 
 // ─── METADATA ──────────────────────────────────────────────
 
 export const metadata: Metadata = {
   title: {
-    default: "IMA System",
-    template: "%s — IMA System",
+    default: "ITAS",
+    template: "%s — ITAS",
   },
-  description: "Sistema de gestión integral IMA",
-  keywords: ["IMA", "gestión", "ferias", "inventario", "órdenes"],
-  authors: [{ name: "IMA System" }],
+  description: "Sistema de gestión integral ITAS",
+  keywords: ["ITAS", "gestión", "ferias", "inventario", "órdenes"],
+  authors: [{ name: "ITAS" }],
   robots: {
     index: true,
     follow: true,
@@ -46,7 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <div className="flex h-screen items-center justify-center bg-gray-50">
               <div className="flex flex-col items-center gap-4">
                 <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
-                <p className="text-sm text-gray-500">Cargando IMA System...</p>
+                <p className="text-sm text-gray-500">Cargando ITAS...</p>
               </div>
             </div>
           }
@@ -54,6 +55,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <QueryProvider>
             <ThemeProvider>
               {children}
+              <CookieConsent />
             </ThemeProvider>
           </QueryProvider>
         </AuthProvider>

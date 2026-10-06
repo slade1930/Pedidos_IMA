@@ -18,7 +18,9 @@ export const apiClient = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 15000,
+  // Permite recibir/enviar la cookie httpOnly "itas_refresh" (login/refresh/logout)
+  withCredentials: true,
+  timeout: 30000,
 });
 
 // ─── TIPOS ────────────────────────────────────────────────
@@ -62,23 +64,16 @@ function getErrorMessage(data: unknown): string {
 
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const publicRoutes = ["/auth/login", "/auth/refresh", "/users/register"];
-
-    const isPublicRoute = publicRoutes.some((route) =>
-      config.url?.includes(route)
-    );
-
-    if (!isPublicRoute) {
-      const token = tokenStorage.getAccessToken();
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
+    // FASE 1.1: el access token viaja en la cookie httpOnly "itas_access"
+    // y se envía automáticamente con withCredentials. No se agrega
+    // header Authorization manual desde JS (evita exfiltración por XSS).
 
     // Si los datos son FormData, eliminar Content-Type para que axios lo configure automáticamente
     if (config.data instanceof FormData) {
       delete config.headers["Content-Type"];
     }
+
+    // NO agregar trailing slash - FastAPI redirige 307 y pierde el body del POST
 
     return config;
   },
@@ -91,16 +86,16 @@ apiClient.interceptors.request.use(
 
 let isRefreshing = false;
 let failedQueue: Array<{
-  resolve: (token: string) => void;
-  reject: (error: AxiosError) => void;
+  retry: () => void;
+  fail: (error: AxiosError) => void;
 }> = [];
 
-function processQueue(error: AxiosError | null, token: string | null): void {
+function processQueue(error: AxiosError | null = null): void {
   failedQueue.forEach((request) => {
-    if (error || !token) {
-      request.reject(error!);
+    if (error) {
+      request.fail(error);
     } else {
-      request.resolve(token);
+      request.retry();
     }
   });
   failedQueue = [];
@@ -108,7 +103,7 @@ function processQueue(error: AxiosError | null, token: string | null): void {
 
 apiClient.interceptors.response.use(
   (response: AxiosResponse) => {
-    // 👈 Si es blob, devolver sin modificar
+    // Si es blob, devolver sin modificar
     if (response.config.responseType === "blob" || response.data instanceof Blob) {
       return response;
     }
@@ -129,26 +124,24 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
     };
 
+    const isAuthEndpoint =
+      originalRequest.url?.includes("/auth/refresh") ||
+      // FASE 1.5: un 401 en login/register/logout NO debe disparar refresh
+      originalRequest.url?.includes("/auth/login") ||
+      originalRequest.url?.includes("/auth/logout") ||
+      originalRequest.url?.includes("/users/register");
+
     if (
       error.response?.status === 401 &&
-      !originalRequest.url?.includes("/auth/refresh") &&
+      !isAuthEndpoint &&
       !originalRequest._retry
     ) {
-      const refreshToken = tokenStorage.getRefreshToken();
-
-      if (!refreshToken) {
-        tokenStorage.clearSession();
-        return Promise.reject(error);
-      }
-
       if (isRefreshing) {
-        return new Promise<string>((resolve, reject) => {
+        // Esperar a que el refresh en curso termine y reintentar (o fallar)
+        return new Promise<AxiosResponse>((resolve, reject) => {
           failedQueue.push({
-            resolve: (token: string) => {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-              resolve(apiClient(originalRequest));
-            },
-            reject,
+            retry: () => resolve(apiClient(originalRequest)),
+            fail: reject,
           });
         });
       }
@@ -157,22 +150,24 @@ apiClient.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const response = await axios.post<{ success: boolean; data: { access_token: string } }>(
+        // FASE 1.1: el refresh token viaja en la cookie httpOnly "itas_refresh";
+        // el navegador la envía con withCredentials. La nueva access token se
+        // rota en la cookie "itas_access" automáticamente (set-cookie).
+        await axios.post(
           `${API_URL}${API_VERSION}/auth/refresh`,
-          { refresh_token: refreshToken },
-          { headers: { "Content-Type": "application/json" } }
+          {},
+          {
+            headers: { "Content-Type": "application/json" },
+            withCredentials: true,
+          }
         );
 
-        const payload = response.data;
-        const newAccessToken = payload.data.access_token;
-        tokenStorage.setAccessToken(newAccessToken);
-
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        processQueue(null, newAccessToken);
+        tokenStorage.markSessionActive();
+        processQueue();
 
         return apiClient(originalRequest);
       } catch (refreshError) {
-        processQueue(refreshError as AxiosError, null);
+        processQueue(refreshError as AxiosError);
         tokenStorage.clearSession();
         return Promise.reject(refreshError);
       } finally {

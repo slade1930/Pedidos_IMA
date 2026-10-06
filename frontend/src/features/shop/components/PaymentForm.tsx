@@ -3,7 +3,10 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/cart.store";
+import { useAuthStore } from "@/stores/auth.store";
 import { useCheckout } from "@/features/shop/hooks/useCheckout";
+import { usePdaRestriction } from "@/features/shop/hooks/usePdaRestriction";
+import { PdaRestrictionCard } from "@/features/shop/components/PdaRestrictionCard";
 import { PaymentMethodSelector } from "@/features/payments/components/PaymentMethodSelector";
 import { YappyPayment } from "@/features/shop/components/YappyPayment";
 import { CardPayment } from "@/features/shop/components/CardPayment";
@@ -54,6 +57,9 @@ export function PaymentForm() {
   const items = useCartStore((state) => state.items);
   const subtotal = useCartStore((state) => state.getSubtotal());
   const checkout = useCheckout();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { data: pdaStatus } = usePdaRestriction();
+  const restriction = isAuthenticated && pdaStatus && !pdaStatus.can_purchase ? pdaStatus.restriction : null;
 
   const [step, setStep] = useState<Step>("method");
   const [method, setMethod] = useState<PaymentMethod>("yappy");
@@ -88,6 +94,7 @@ export function PaymentForm() {
   }, [checkout.isSuccess, checkout.data, router]);
 
   const handleMethodSelect = (selectedMethod: PaymentMethod) => {
+    if (restriction) return;
     setMethod(selectedMethod);
     setServerError(null);
     setPdaError(null);
@@ -95,6 +102,7 @@ export function PaymentForm() {
   };
 
   const handlePaymentSuccess = () => {
+    if (restriction) return;
     setSuccessMessage("¡Pago Exitoso!");
     setSuccessSubmessage("Creando tu pedido...");
     setStep("success");
@@ -113,8 +121,29 @@ export function PaymentForm() {
 
   // ─── RENDER ─────────────────────────────────────────
 
+  if (restriction) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8 relative min-h-screen overflow-hidden text-[#142b45]">
+        <div className="max-w-lg mx-auto space-y-6">
+          <PdaRestrictionCard
+            restriction={restriction}
+            hint="Ya realizaste tu compra del mes. El pago está bloqueado hasta que se libere tu próximo cupo."
+          />
+          <div className="flex justify-center">
+            <button
+              onClick={() => router.push("/shop/products")}
+              className="rounded-2xl bg-gradient-to-r from-[#142b45] to-[#1b4f72] px-8 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-[#142b45]/15 hover:opacity-95 transition-all"
+            >
+              Ir a Productos
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 relative min-h-screen overflow-hidden text-[#1E3A1E]">
+    <div className="max-w-4xl mx-auto px-4 py-8 relative min-h-screen overflow-hidden text-[#142b45]">
       {/* Estilos CSS Locales para Diseño Premium */}
       <style>{`
         .premium-glow {
@@ -129,7 +158,7 @@ export function PaymentForm() {
           border: 1px solid rgba(58, 95, 38, 0.08);
         }
         .dark-glass-receipt {
-          background: linear-gradient(145deg, #1A331A, #0E1D0E);
+          background: linear-gradient(145deg, #0e1e33, #0E1D0E);
           border: 1px solid rgba(251, 191, 36, 0.15);
         }
         .grain-bg {
@@ -144,7 +173,7 @@ export function PaymentForm() {
           animation: float-slow 6s ease-in-out infinite;
         }
         .receipt-dotted-bottom {
-          background-image: radial-gradient(circle, transparent 30%, #1A331A 30%);
+          background-image: radial-gradient(circle, transparent 30%, #0e1e33 30%);
           background-size: 12px 12px;
           background-position: bottom;
           height: 6px;
@@ -152,8 +181,8 @@ export function PaymentForm() {
       `}</style>
 
       {/* Círculos de Luces de Fondo Animadas (Ambient Decor) */}
-      <div className="absolute top-10 left-10 w-72 h-72 bg-[#3A5F26]/5 rounded-full blur-3xl pointer-events-none animate-float" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#FBBF24]/5 rounded-full blur-3xl pointer-events-none animate-float" style={{ animationDelay: "2s" }} />
+      <div className="absolute top-10 left-10 w-72 h-72 bg-[#1b4f72]/5 rounded-full blur-3xl pointer-events-none animate-float" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#2fd4a7]/5 rounded-full blur-3xl pointer-events-none animate-float" style={{ animationDelay: "2s" }} />
 
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
@@ -180,7 +209,7 @@ export function PaymentForm() {
             )}
           </AnimatePresence>
 
-          {/* Error PDA (Restricciones del IMA) */}
+          {/* Error PDA (Restricciones del ITAS) */}
           <AnimatePresence>
             {pdaError && (
               <motion.div 
@@ -188,7 +217,7 @@ export function PaymentForm() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300, damping: 22 }}
-                className="pda-glow rounded-3xl border-2 border-[#FBBF24] bg-gradient-to-br from-amber-50 to-amber-100/60 p-6 space-y-4 relative overflow-hidden"
+                className="pda-glow rounded-3xl border-2 border-[#2fd4a7] bg-gradient-to-br from-amber-50 to-amber-100/60 p-6 space-y-4 relative overflow-hidden"
               >
                 {/* Patrón de fondo */}
                 <div className="absolute inset-0 opacity-[0.03] bg-repeat pointer-events-none grain-bg" />
@@ -199,7 +228,7 @@ export function PaymentForm() {
                   </div>
                   <div>
                     <h4 className="text-base font-black text-amber-950 leading-tight">Control de Beneficios</h4>
-                    <p className="text-[10px] text-amber-600 font-extrabold uppercase tracking-widest mt-0.5">IMA Panamá</p>
+                    <p className="text-[10px] text-amber-600 font-extrabold uppercase tracking-widest mt-0.5">ITAS Panamá</p>
                   </div>
                 </div>
 
@@ -244,10 +273,10 @@ export function PaymentForm() {
             
             <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
               <div className="flex items-center gap-2">
-                <ShoppingBag size={18} className="text-[#FBBF24]" />
+                <ShoppingBag size={18} className="text-[#2fd4a7]" />
                 <h2 className="text-xs font-black uppercase tracking-wider text-white">Detalle de Productos</h2>
               </div>
-              <span className="text-[10px] font-bold bg-[#3A5F26] text-[#FBBF24] border border-[#FBBF24]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+              <span className="text-[10px] font-bold bg-[#1b4f72] text-[#2fd4a7] border border-[#2fd4a7]/30 px-2.5 py-0.5 rounded-full flex items-center gap-1">
                 <Lock size={10} /> Conexión Segura
               </span>
             </div>
@@ -263,7 +292,7 @@ export function PaymentForm() {
                   className="flex justify-between items-center text-xs font-bold group-hover:bg-white/2 p-1.5 rounded-lg transition-colors"
                 >
                   <span className="text-white/80 max-w-[200px] truncate">
-                    {item.product_name} <span className="text-[#FBBF24] font-medium font-mono">× {item.quantity}</span>
+                    {item.product_name} <span className="text-[#2fd4a7] font-medium font-mono">× {item.quantity}</span>
                   </span>
                   <span className="text-white font-extrabold font-mono">{formatPrice(item.unit_price * item.quantity)}</span>
                 </motion.div>
@@ -282,7 +311,7 @@ export function PaymentForm() {
               </div>
               
               <div className="flex justify-between items-center pt-3 border-t border-white/10 font-bold">
-                <span className="text-xs text-[#FBBF24] uppercase tracking-widest flex items-center gap-1"><Coins size={12} /> Total a Pagar</span>
+                <span className="text-xs text-[#2fd4a7] uppercase tracking-widest flex items-center gap-1"><Coins size={12} /> Total a Pagar</span>
                 <span className="text-2xl font-black font-mono tracking-tight text-white">{formatPrice(subtotal)}</span>
               </div>
             </div>
@@ -300,7 +329,7 @@ export function PaymentForm() {
           <div className="glass-card rounded-2xl p-4 shadow-sm relative overflow-hidden flex items-center justify-between">
             <div className="absolute top-1/2 left-[10%] right-[10%] h-0.5 bg-gray-200 -translate-y-1/2 z-0" />
             <motion.div 
-              className="absolute top-1/2 left-[10%] h-0.5 bg-gradient-to-r from-[#3A5F26] to-[#FBBF24] -translate-y-1/2 z-0 origin-left"
+              className="absolute top-1/2 left-[10%] h-0.5 bg-gradient-to-r from-[#1b4f72] to-[#2fd4a7] -translate-y-1/2 z-0 origin-left"
               initial={{ width: "0%" }}
               animate={{ 
                 width: step === "method" ? "0%" : step === "pay" ? "50%" : "100%" 
@@ -312,9 +341,9 @@ export function PaymentForm() {
             <div className="relative z-10 flex flex-col items-center gap-1.5">
               <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-300 border-2 ${
                 step === "method" 
-                  ? "bg-[#3A5F26] text-white border-[#3A5F26] scale-110 shadow-lg shadow-[#3A5F26]/20" 
+                  ? "bg-[#1b4f72] text-white border-[#1b4f72] scale-110 shadow-lg shadow-[#1b4f72]/20" 
                   : (step === "pay" || step === "success") 
-                    ? "bg-[#FBBF24] text-[#1E3A1E] border-[#FBBF24]" 
+                    ? "bg-[#2fd4a7] text-[#142b45] border-[#2fd4a7]" 
                     : "bg-white text-gray-400 border-gray-200"
               }`}>
                 {step === "pay" || step === "success" ? <Check size={14} strokeWidth={3} /> : "1"}
@@ -326,9 +355,9 @@ export function PaymentForm() {
             <div className="relative z-10 flex flex-col items-center gap-1.5">
               <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-300 border-2 ${
                 step === "pay" 
-                  ? "bg-[#3A5F26] text-white border-[#3A5F26] scale-110 shadow-lg shadow-[#3A5F26]/20" 
+                  ? "bg-[#1b4f72] text-white border-[#1b4f72] scale-110 shadow-lg shadow-[#1b4f72]/20" 
                   : step === "success" 
-                    ? "bg-[#FBBF24] text-[#1E3A1E] border-[#FBBF24]" 
+                    ? "bg-[#2fd4a7] text-[#142b45] border-[#2fd4a7]" 
                     : "bg-white text-gray-400 border-gray-200"
               }`}>
                 {step === "success" ? <Check size={14} strokeWidth={3} /> : "2"}
@@ -340,7 +369,7 @@ export function PaymentForm() {
             <div className="relative z-10 flex flex-col items-center gap-1.5">
               <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-black transition-all duration-300 border-2 ${
                 step === "success" 
-                  ? "bg-[#3A5F26] text-[#FBBF24] border-[#FBBF24] scale-110 shadow-lg shadow-[#FBBF24]/30" 
+                  ? "bg-[#1b4f72] text-[#2fd4a7] border-[#2fd4a7] scale-110 shadow-lg shadow-[#2fd4a7]/30" 
                   : "bg-white text-gray-400 border-gray-200"
               }`}>
                 3
@@ -353,7 +382,7 @@ export function PaymentForm() {
           <div className="premium-glow glass-card rounded-3xl p-6 sm:p-8 min-h-[380px] relative overflow-hidden">
             
             {/* Header del Formulario */}
-            <div className="flex items-center gap-2 border-b border-[#3A5F26]/10 pb-4 mb-6">
+            <div className="flex items-center gap-2 border-b border-[#1b4f72]/10 pb-4 mb-6">
               {step !== "method" && (
                 <motion.button 
                   whileHover={{ scale: 1.1, x: -3 }}

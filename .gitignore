@@ -126,3 +126,9 @@ pnpm-debug.log*
 
 # Archivos descargados de Windows
 *.Zone.Identifier
+
+#############################
+# opencode local config
+#############################
+
+.opencode/

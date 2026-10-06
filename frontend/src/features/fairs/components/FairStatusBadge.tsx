@@ -22,8 +22,8 @@ const STATUS_CONFIG: Record<
   },
   active: {
     label: "Activa",
-    className: "bg-gradient-to-r from-[#3D5A1E]/10 to-[#5C8A3C]/15 border-[#3D5A1E]/20 text-[#3D5A1E] shadow-sm",
-    dotClass: "bg-[#3D5A1E] shadow-[0_0_6px_#3D5A1E]",
+    className: "bg-gradient-to-r from-[#1b4f72]/10 to-[#2e7d9e]/15 border-[#1b4f72]/20 text-[#1b4f72] shadow-sm",
+    dotClass: "bg-[#1b4f72] shadow-[0_0_6px_#1b4f72]",
   },
   paused: {
     label: "Pausada",
@@ -60,8 +60,8 @@ export function FairStatusBadge({ status, size = "md" }: FairStatusBadgeProps) {
     <span className={`inline-flex items-center gap-1.5 rounded-full border leading-none uppercase ${SIZE_STYLES[size]} ${config.className}`}>
       {status === "active" ? (
         <span className={`relative flex ${dotSize}`}>
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5C8A3C] opacity-75"></span>
-          <span className={`relative inline-flex rounded-full ${dotSize} bg-[#3D5A1E] shadow-[0_0_6px_#3D5A1E]`}></span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2e7d9e] opacity-75"></span>
+          <span className={`relative inline-flex rounded-full ${dotSize} bg-[#1b4f72] shadow-[0_0_6px_#1b4f72]`}></span>
         </span>
       ) : (
         <span className={`rounded-full ${dotSize} ${config.dotClass}`} />

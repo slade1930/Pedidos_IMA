@@ -4,8 +4,11 @@ import { NextResponse, type NextRequest } from "next/server";
 
 // ─── RUTAS ─────────────────────────────────────────────────
 
-/** Rutas públicas que no requieren autenticación */
-const PUBLIC_ROUTES = ["/login", "/register"];
+/** Rutas de autenticación (requieren no tener sesión) */
+const AUTH_ROUTES = ["/login", "/register"];
+
+/** Rutas legales públicas para todos (autenticado o no) */
+const LEGAL_ROUTES = ["/privacy", "/terms"];
 
 /** Prefijos de rutas públicas (tienda, ferias públicas) */
 const PUBLIC_PREFIXES = ["/shop", "/public-fairs"];
@@ -19,13 +22,20 @@ const LOGIN_ROUTE = "/login";
 /** Ruta por defecto para usuarios autenticados (clientes) */
 const DEFAULT_ROUTE = "/shop";
 
-/** Ruta para administradores (se define en el frontend según rol) */
-const DASHBOARD_ROUTE = "/dashboard";
-
 // ─── MIDDLEWARE ────────────────────────────────────────────
 
 export function middleware(request: NextRequest) {
   const { pathname, searchParams } = request.nextUrl;
+
+  // ─── FORZAR HTTPS ─────────────────────────────────
+  const proto = request.headers.get("x-forwarded-proto");
+  const host = request.nextUrl.hostname;
+  const isLocalHost = ["localhost", "127.0.0.1", "0.0.0.0"].includes(host);
+  if (proto === "http" && !isLocalHost) {
+    const httpsUrl = request.nextUrl.clone();
+    httpsUrl.protocol = "https:";
+    return NextResponse.redirect(httpsUrl);
+  }
 
   // Verificar cookie ligera de sesión
   const hasSession = request.cookies.get("has_session")?.value === "true";
@@ -35,10 +45,15 @@ export function middleware(request: NextRequest) {
     (prefix) => pathname === prefix || pathname.startsWith(prefix + "/")
   );
 
+  // ─── RUTAS LEGALES: acceso libre para todos ─────────
+  if (LEGAL_ROUTES.includes(pathname)) {
+    return NextResponse.next();
+  }
+
   // ─── USUARIO NO AUTENTICADO ────────────────────────
   if (!hasSession) {
     // Ruta pública (shop, public-fairs, login, register) → permitir
-    if (isPublicPrefix || PUBLIC_ROUTES.includes(pathname)) {
+    if (isPublicPrefix || AUTH_ROUTES.includes(pathname)) {
       return NextResponse.next();
     }
 
@@ -54,22 +69,18 @@ export function middleware(request: NextRequest) {
   }
 
   // ─── USUARIO AUTENTICADO ───────────────────────────
-  if (hasSession) {
-    // Intentando acceder a login o register → redirigir a tienda
-    if (PUBLIC_ROUTES.includes(pathname)) {
-      const redirectTo = searchParams.get("redirect") || DEFAULT_ROUTE;
-      return NextResponse.redirect(new URL(redirectTo, request.url));
-    }
-
-    // Ruta raíz → redirigir a tienda
-    if (pathname === "/") {
-      return NextResponse.redirect(new URL(DEFAULT_ROUTE, request.url));
-    }
-
-    // Cualquier otra ruta → permitir
-    return NextResponse.next();
+  // Intentando acceder a login o register → redirigir a tienda
+  if (AUTH_ROUTES.includes(pathname)) {
+    const redirectTo = searchParams.get("redirect") || DEFAULT_ROUTE;
+    return NextResponse.redirect(new URL(redirectTo, request.url));
   }
 
+  // Ruta raíz → redirigir a tienda
+  if (pathname === "/") {
+    return NextResponse.redirect(new URL(DEFAULT_ROUTE, request.url));
+  }
+
+  // Cualquier otra ruta → permitir
   return NextResponse.next();
 }
 

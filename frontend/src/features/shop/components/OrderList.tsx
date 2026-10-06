@@ -1,8 +1,12 @@
+// src/features/shop/components/OrderList.tsx
+
 "use client";
 
 import { useState } from "react";
 import Link from "next/link";
+import { orderService } from "@/features/orders/services/order.service";
 import { useMyOrders } from "@/features/shop/hooks/useMyOrders";
+import { ReorderButton } from "@/features/shop/components/ReorderButton";
 import type { Order, OrderStatus } from "@/features/orders/types/order.types";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -22,6 +26,10 @@ import {
 // ─── UTILITARIOS ───────────────────────────────────────────
 
 function formatPrice(price: number): string {
+  // Validar que el valor sea un número válido
+  if (isNaN(price) || price === null || price === undefined) {
+    return "$0.00";
+  }
   return new Intl.NumberFormat("es-PA", {
     style: "currency",
     currency: "USD",
@@ -38,7 +46,7 @@ function formatDate(dateString: string): string {
       hour: "2-digit",
       minute: "2-digit",
     });
-  } catch (e) {
+  } catch {
     return "Reciente";
   }
 }
@@ -72,7 +80,6 @@ function getStatusLabel(status: OrderStatus): string {
 function ListSkeleton() {
   return (
     <div className="space-y-4">
-      {/* Estilos locales para shimmer */}
       <style>{`
         @keyframes skeleton-shimmer {
           0% { background-position: -200% 0; }
@@ -117,8 +124,6 @@ export function OrderList() {
   const { data: orders, isPending, isError } = useMyOrders();
   const [filter, setFilter] = useState<string>("all");
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
   if (isPending) return <ListSkeleton />;
 
   if (isError) {
@@ -137,10 +142,10 @@ export function OrderList() {
 
   const orderList = Array.isArray(orders) ? orders : [];
 
-  // Cálculos estadísticos rápidos para añadir valor al diseño
+  // Cálculos estadísticos - Convertir a Number para evitar NaN
   const totalSpent = orderList
     .filter(o => o.status !== "cancelled" && o.status !== "expired")
-    .reduce((sum, o) => sum + (o.total_amount || 0), 0);
+    .reduce((sum, o) => sum + (Number(o.total_amount) || 0), 0);
   const pendingPickups = orderList.filter(o => o.status === "ready").length;
   const activeOrders = orderList.filter(o => o.status === "pending" || o.status === "confirmed").length;
 
@@ -156,7 +161,7 @@ export function OrderList() {
   if (orderList.length === 0) {
     return (
       <div className="bg-white/80 backdrop-blur-md rounded-3xl border border-gray-200/60 p-12 text-center max-w-md mx-auto shadow-sm space-y-5">
-        <div className="mx-auto h-16 w-16 rounded-2xl bg-[#3A5F26]/8 flex items-center justify-center text-[#3A5F26] border border-[#3A5F26]/15">
+        <div className="mx-auto h-16 w-16 rounded-2xl bg-[#1b4f72]/8 flex items-center justify-center text-[#1b4f72] border border-[#1b4f72]/15">
           <FileText size={24} strokeWidth={2} />
         </div>
         <div className="space-y-2">
@@ -168,7 +173,7 @@ export function OrderList() {
         <div className="pt-2">
           <Link 
             href="/shop/products" 
-            className="inline-flex items-center gap-1.5 text-xs font-black text-[#3A5F26] bg-[#3A5F26]/8 px-5 py-2.5 rounded-full tracking-widest uppercase border border-[#3A5F26]/12 hover:bg-[#3A5F26]/12 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-black text-[#1b4f72] bg-[#1b4f72]/8 px-5 py-2.5 rounded-full tracking-widest uppercase border border-[#1b4f72]/12 hover:bg-[#1b4f72]/12 transition-colors"
           >
             Ver Productos
           </Link>
@@ -240,9 +245,9 @@ export function OrderList() {
         </div>
       </div>
 
-      {/* SELECTOR DE FILTRO REDISEÑADO */}
+      {/* SELECTOR DE FILTRO */}
       <div className="flex items-center justify-between border-b border-gray-100 pb-3 mt-4">
-        <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-[#3A5F26]">
+        <div className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-[#1b4f72]">
           <Filter size={14} />
           <span>Filtrar</span>
         </div>
@@ -253,7 +258,7 @@ export function OrderList() {
               onClick={() => setFilter(option.value)}
               className={`rounded-full px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest transition-all ${
                 filter === option.value
-                  ? "bg-[#3A5F26] text-white shadow-md shadow-[#3A5F26]/10"
+                  ? "bg-[#1b4f72] text-white shadow-md shadow-[#1b4f72]/10"
                   : "bg-gray-50 text-gray-500 hover:bg-gray-100 hover:text-gray-900 border border-gray-100"
               }`}
             >
@@ -306,24 +311,21 @@ export function OrderList() {
                   <div className={`relative block rounded-3xl border transition-all hover:shadow-lg premium-shadow group overflow-hidden ${
                     isReady 
                       ? "border-emerald-300 bg-gradient-to-r from-emerald-50/20 to-white" 
-                      : "bg-white border-gray-150 hover:border-[#3A5F26]/30"
+                      : "bg-white border-gray-150 hover:border-[#1b4f72]/30"
                   }`}>
-                    {/* Indicador de Hover lateral */}
                     <div className={`absolute left-0 top-0 bottom-0 w-1.5 transition-colors ${
-                      isReady ? "bg-emerald-500" : "bg-transparent group-hover:bg-[#FBBF24]"
+                      isReady ? "bg-emerald-500" : "bg-transparent group-hover:bg-[#2fd4a7]"
                     }`} />
 
                     <div className="p-5 md:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      {/* Enlace principal */}
                       <Link
                         href={`/shop/orders/${order.id}`}
                         className="flex items-start gap-4 flex-grow min-w-0"
                       >
-                        {/* Icono de Pedido */}
                         <div className={`h-11 w-11 rounded-2xl border flex items-center justify-center flex-shrink-0 transition-all ${
                           isReady 
                             ? "bg-emerald-100 border-emerald-200 text-emerald-700" 
-                            : "bg-gray-50 border-gray-200 text-gray-500 group-hover:text-[#3A5F26] group-hover:bg-[#3A5F26]/5 group-hover:border-[#3A5F26]/20"
+                            : "bg-gray-50 border-gray-200 text-gray-500 group-hover:text-[#1b4f72] group-hover:bg-[#1b4f72]/5 group-hover:border-[#1b4f72]/20"
                         }`}>
                           <Receipt size={18} strokeWidth={2} />
                         </div>
@@ -331,7 +333,7 @@ export function OrderList() {
                         <div className="min-w-0">
                           <h3 className="text-xs font-black uppercase tracking-wider text-gray-900 flex items-center gap-1.5">
                             <span>Pedido</span>
-                            <span className={`font-mono text-xs font-extrabold ${isReady ? "text-emerald-700" : "text-[#3A5F26]"}`}>
+                            <span className={`font-mono text-xs font-extrabold ${isReady ? "text-emerald-700" : "text-[#1b4f72]"}`}>
                               {order.order_number}
                             </span>
                           </h3>
@@ -347,36 +349,33 @@ export function OrderList() {
                         </div>
                       </Link>
 
-                      {/* Métricas y Badge */}
                       <div className="flex items-center justify-between sm:justify-end gap-5 border-t sm:border-t-0 pt-3 sm:pt-0 border-gray-50">
                         <div className="text-left sm:text-right">
                           <span className="text-[9px] text-gray-400 font-black uppercase tracking-widest block">Monto Total</span>
                           <span className="text-base font-black text-gray-900 font-mono tracking-tight flex items-center gap-0.5 mt-0.5">
                             <Coins size={12} className="text-gray-400" />
-                            {formatPrice(order.total_amount)}
+                            {formatPrice(Number(order.total_amount))}
                           </span>
                         </div>
 
                         <div className="flex items-center gap-3">
-                          {/* Botón Factura Rápida (para pedidos confirmados/entregados) */}
                           {["confirmed", "delivered", "ready"].includes(order.status) && (
-                            <a
-                              href={`${apiUrl}/api/v1/orders/${order.id}/invoice`}
-                              target="_blank"
-                              rel="noopener noreferrer"
+                            <button
+                              type="button"
+                              onClick={() =>
+                                orderService.downloadInvoice(order.id, `factura-${order.order_number}.pdf`)
+                              }
                               className="h-8 w-8 rounded-xl border border-gray-200 hover:border-gray-300 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-white transition-colors flex-shrink-0"
                               title="Descargar Factura"
                             >
                               <FileDown size={14} />
-                            </a>
+                            </button>
                           )}
 
-                          {/* Badge de Estado */}
                           <span className={`inline-flex rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-widest leading-none ${getStatusBadgeClass(order.status)}`}>
                             {getStatusLabel(order.status)}
                           </span>
                           
-                          {/* Chevron de navegación */}
                           <Link href={`/shop/orders/${order.id}`} className="flex-shrink-0">
                             <ChevronRight 
                               size={16} 
@@ -385,6 +384,11 @@ export function OrderList() {
                             />
                           </Link>
                         </div>
+                      </div>
+
+                      {/* Acción Volver a Pedir */}
+                      <div className="flex items-center justify-end border-t border-[#1b4f72]/10 mt-4 pt-4">
+                        <ReorderButton order={order} className="flex items-center gap-3" />
                       </div>
                     </div>
                   </div>

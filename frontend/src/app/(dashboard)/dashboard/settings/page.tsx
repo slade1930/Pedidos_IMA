@@ -48,10 +48,12 @@ export default function SettingsPage() {
 
   // ─── MUTACIÓN: CAMBIAR CONTRASEÑA ───────────────────
   const passwordMutation = useMutation({
-    mutationFn: (password: string) => {
-      if (!user) throw new Error("No autenticado");
-      return userService.updateMe({ password } as UpdateUserPayload);
-    },
+    mutationFn: ({ current, next }: { current: string; next: string }) =>
+      userService.changePassword({
+        current_password: current,
+        new_password: next,
+        confirm_password: next,
+      }),
     onSuccess: () => {
       setCurrentPassword("");
       setNewPassword("");
@@ -108,7 +110,7 @@ export default function SettingsPage() {
       return;
     }
 
-    passwordMutation.mutate(newPassword);
+    passwordMutation.mutate({ current: currentPassword, next: newPassword });
   };
 
   const isSubmitting = profileMutation.isPending || passwordMutation.isPending;
@@ -123,19 +125,19 @@ export default function SettingsPage() {
       {/* Estilos CSS personalizados de la paleta Chocolate, Verde, Amarillo y Blanco */}
       <style>{`
         .chocolate-panel {
-          background-color: #2D1A10; /* Chocolate oscuro */
-          border: 2px solid #3A5F26; /* Verde */
+          background-color: #142b45; /* Chocolate oscuro */
+          border: 2px solid #1b4f72; /* Verde */
           box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
         }
         .yellow-btn {
-          background-color: #FBBF24; /* Amarillo */
-          color: #1E120C; /* Chocolate oscuro */
+          background-color: #2fd4a7; /* Amarillo */
+          color: #0e1e33; /* Chocolate oscuro */
           font-weight: 700;
           box-shadow: 0 4px 14px rgba(251, 191, 36, 0.4);
           transition: all 0.2s ease-in-out;
         }
         .yellow-btn:hover {
-          background-color: #F59E0B;
+          background-color: #2fbf9b;
           transform: translateY(-1px);
           box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
         }
@@ -143,18 +145,18 @@ export default function SettingsPage() {
           transform: translateY(1px);
         }
         .chocolate-input {
-          background-color: #1E120C;
-          border: 2px solid #3A5F26;
+          background-color: #0e1e33;
+          border: 2px solid #1b4f72;
           color: #FFFFFF;
         }
         .chocolate-input:focus {
-          border-color: #FBBF24;
+          border-color: #2fd4a7;
           outline: none;
         }
       `}</style>
 
       {/* Cabecera */}
-      <div className="border-b-2 border-[#3A5F26] pb-6">
+      <div className="border-b-2 border-[#1b4f72] pb-6">
         <h1 className="text-3xl font-extrabold tracking-tight text-white">Configuración</h1>
         <p className="mt-2 text-sm text-gray-200 font-medium">Gestiona tu perfil y la seguridad de tu cuenta</p>
       </div>
@@ -178,9 +180,9 @@ export default function SettingsPage() {
       {/* Sección: Perfil */}
       <div className="chocolate-panel rounded-2xl p-6 space-y-6">
         {/* Cabecera de Sección */}
-        <div className="flex items-center gap-4 pb-4 border-b border-[#3A5F26]/30">
-          <div className="h-12 w-12 rounded-xl bg-[#FBBF24] border-2 border-[#3A5F26] flex items-center justify-center shadow-md">
-            <span className="text-lg font-black text-[#1E120C]">
+        <div className="flex items-center gap-4 pb-4 border-b border-[#1b4f72]/30">
+          <div className="h-12 w-12 rounded-xl bg-[#2fd4a7] border-2 border-[#1b4f72] flex items-center justify-center shadow-md">
+            <span className="text-lg font-black text-[#0e1e33]">
               {user?.full_name?.charAt(0).toUpperCase() ?? "U"}
             </span>
           </div>
@@ -195,7 +197,7 @@ export default function SettingsPage() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="rounded-xl bg-[#1B4314]/80 border-2 border-[#22C55E] p-4 shadow-md"
+            className="rounded-xl bg-[#142b45]/80 border-2 border-[#22C55E] p-4 shadow-md"
           >
             <p className="text-sm text-[#4ADE80] font-bold">Perfil actualizado correctamente</p>
           </motion.div>
@@ -211,7 +213,7 @@ export default function SettingsPage() {
               value={fullName} 
               onChange={(e) => setFullName(e.target.value)}
               disabled={isSubmitting}
-              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all"
+              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#2fd4a7] disabled:opacity-50 transition-all"
               placeholder="Tu nombre completo" 
             />
           </div>
@@ -224,7 +226,7 @@ export default function SettingsPage() {
               value={email} 
               onChange={(e) => setEmail(e.target.value)}
               disabled={isSubmitting}
-              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all"
+              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#2fd4a7] disabled:opacity-50 transition-all"
               placeholder="correo@ejemplo.com" 
             />
           </div>
@@ -239,15 +241,15 @@ export default function SettingsPage() {
               value={phone} 
               onChange={(e) => setPhone(e.target.value)}
               disabled={isSubmitting}
-              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all"
+              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#2fd4a7] disabled:opacity-50 transition-all"
               placeholder="6666-6666" 
             />
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t-2 border-[#3A5F26]/30">
+          <div className="flex items-center justify-between pt-4 border-t-2 border-[#1b4f72]/30">
             <div className="text-sm font-bold text-white">
               Rol de cuenta:{" "}
-              <span className="inline-flex rounded-lg bg-black/50 border border-[#3A5F26] px-3 py-1 text-xs font-bold text-[#FBBF24] capitalize shadow-inner">
+              <span className="inline-flex rounded-lg bg-black/50 border border-[#1b4f72] px-3 py-1 text-xs font-bold text-[#2fd4a7] capitalize shadow-inner">
                 {user?.role ?? "—"}
               </span>
             </div>
@@ -265,7 +267,7 @@ export default function SettingsPage() {
       {/* Sección: Contraseña */}
       <div className="chocolate-panel rounded-2xl p-6 space-y-6">
         {/* Cabecera de Sección */}
-        <div className="pb-4 border-b border-[#3A5F26]/30">
+        <div className="pb-4 border-b border-[#1b4f72]/30">
           <h2 className="text-lg font-bold text-white">Cambiar Contraseña</h2>
           <p className="text-xs text-gray-300 font-semibold mt-0.5">Asegura tu cuenta actualizando tu contraseña periódicamente</p>
         </div>
@@ -275,7 +277,7 @@ export default function SettingsPage() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="rounded-xl bg-[#1B4314]/80 border-2 border-[#22C55E] p-4 shadow-md"
+            className="rounded-xl bg-[#142b45]/80 border-2 border-[#22C55E] p-4 shadow-md"
           >
             <p className="text-sm text-[#4ADE80] font-bold">Contraseña actualizada correctamente</p>
           </motion.div>
@@ -292,7 +294,7 @@ export default function SettingsPage() {
               onChange={(e) => setCurrentPassword(e.target.value)} 
               disabled={isSubmitting}
               autoComplete="current-password"
-              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all"
+              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#2fd4a7] disabled:opacity-50 transition-all"
               placeholder="••••••••" 
             />
           </div>
@@ -306,7 +308,7 @@ export default function SettingsPage() {
               onChange={(e) => setNewPassword(e.target.value)} 
               disabled={isSubmitting}
               autoComplete="new-password"
-              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all"
+              className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#2fd4a7] disabled:opacity-50 transition-all"
               placeholder="Mínimo 8 caracteres" 
             />
             {newPassword && newPassword.length < 8 && (
@@ -323,7 +325,7 @@ export default function SettingsPage() {
               onChange={(e) => setConfirmPassword(e.target.value)} 
               disabled={isSubmitting}
               autoComplete="new-password"
-              className={`chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all ${
+              className={`chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#2fd4a7] disabled:opacity-50 transition-all ${
                 confirmPassword && newPassword !== confirmPassword ? "border-red-500 focus:ring-red-500 focus:border-red-500" : ""
               }`}
               placeholder="Repite la contraseña" 
@@ -333,7 +335,7 @@ export default function SettingsPage() {
             )}
           </div>
 
-          <div className="flex justify-end pt-4 border-t-2 border-[#3A5F26]/30">
+          <div className="flex justify-end pt-4 border-t-2 border-[#1b4f72]/30">
             <button 
               type="submit" 
               disabled={isSubmitting}

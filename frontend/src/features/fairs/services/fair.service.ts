@@ -54,6 +54,17 @@ export const fairService = {
   },
 
   /**
+   * Obtiene ferias activas y próximas sin autenticación
+   * (catálogo público de la tienda).
+   *
+   * GET /api/v1/fairs/public
+   */
+  async getPublicFairs(): Promise<Fair[]> {
+    const response = await apiClient.get<Fair[]>(`/fairs/public`);
+    return response.data;
+  },
+
+  /**
    * Obtiene una feria por su ID.
    * 
    * GET /api/v1/fairs/{id}

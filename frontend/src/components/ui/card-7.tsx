@@ -11,6 +11,8 @@ interface InteractiveProductCardProps extends React.HTMLAttributes<HTMLDivElemen
   title: string;
   price: string;
   onAddToCart?: () => void;
+  /** Cantidad disponible en stock (0 = agotado) */
+  stock?: number;
 }
 
 // --- COMPONENT DEFINITION ---
@@ -22,6 +24,7 @@ export function InteractiveProductCard({
   title,
   price,
   onAddToCart,
+  stock,
   ...props
 }: InteractiveProductCardProps) {
   const cardRef = React.useRef<HTMLDivElement>(null);
@@ -58,7 +61,7 @@ export function InteractiveProductCard({
       onMouseLeave={handleMouseLeave}
       style={style}
       className={cn(
-        "relative w-full aspect-[9/12] rounded-3xl bg-[#2D1A10] shadow-xl overflow-hidden group border-2 border-[#3A5F26]/30 hover:border-[#FBBF24]/50 transition-all",
+        "relative w-full aspect-[9/12] rounded-3xl bg-[#142b45] shadow-xl overflow-hidden group border-2 border-[#1b4f72]/30 hover:border-[#2fd4a7]/50 transition-all",
         "transform-style-3d",
         className
       )}
@@ -73,7 +76,7 @@ export function InteractiveProductCard({
           style={{ transform: "translateZ(-15px) scale(1.05)" }}
         />
       ) : (
-        <div className="absolute inset-0 bg-[#1E120C] flex items-center justify-center rounded-3xl" style={{ transform: "translateZ(-15px) scale(1.05)" }}>
+        <div className="absolute inset-0 bg-[#0e1e33] flex items-center justify-center rounded-3xl" style={{ transform: "translateZ(-15px) scale(1.05)" }}>
           <svg className="h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
           </svg>
@@ -90,7 +93,7 @@ export function InteractiveProductCard({
         {/* Category Header */}
         <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-black/40 p-3.5 backdrop-blur-md">
           <div className="flex flex-col">
-            <span className="text-[10px] font-black uppercase tracking-wider text-[#FBBF24]">{categoryLabel}</span>
+            <span className="text-[10px] font-black uppercase tracking-wider text-[#2fd4a7]">{categoryLabel}</span>
             <h3 className="text-base font-black text-white leading-tight mt-0.5 line-clamp-1">{title}</h3>
           </div>
           <span className="text-xs font-bold text-gray-300 bg-white/10 px-2 py-0.5 rounded-md">
@@ -100,20 +103,40 @@ export function InteractiveProductCard({
 
         {/* Bottom Actions */}
         <div className="mt-auto flex items-center justify-between gap-3 pt-4 border-t border-white/10">
-          <div className="rounded-xl bg-black/55 px-3 py-2 text-base font-black text-white border border-[#FBBF24]/30 shadow-md">
+          <div className="rounded-xl bg-black/55 px-3 py-2 text-base font-black text-white border border-[#2fd4a7]/30 shadow-md">
             {price}
           </div>
           {onAddToCart && (
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                onAddToCart();
-              }}
-              className="rounded-xl px-4 py-2.5 text-xs font-extrabold shadow-md cursor-pointer hover:bg-[#F59E0B] transition-all bg-[#FBBF24] text-[#1E3A1E]"
-            >
-              Agregar
-            </button>
+            <div className="flex flex-col items-stretch gap-1.5">
+              {typeof stock === "number" && (
+                <span
+                  className={`inline-flex items-center justify-center gap-1 rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-wider ${
+                    stock <= 0
+                      ? "bg-red-500/20 text-red-300 border border-red-400/30"
+                      : stock <= 5
+                      ? "bg-amber-500/20 text-amber-300 border border-amber-400/30"
+                      : "bg-white/10 text-gray-200 border border-white/10"
+                  }`}
+                >
+                  {stock <= 0 ? "Agotado" : `Quedan ${stock}`}
+                </span>
+              )}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onAddToCart();
+                }}
+                disabled={typeof stock === "number" && stock <= 0}
+                className={`rounded-xl px-4 py-2.5 text-xs font-extrabold shadow-md transition-all ${
+                  typeof stock === "number" && stock <= 0
+                    ? "bg-gray-700/60 text-gray-400 cursor-not-allowed"
+                    : "cursor-pointer hover:bg-[#2fbf9b] bg-[#2fd4a7] text-[#142b45]"
+                }`}
+              >
+                {typeof stock === "number" && stock <= 0 ? "Agotado" : "Agregar"}
+              </button>
+            </div>
           )}
         </div>
       </div>

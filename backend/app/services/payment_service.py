@@ -1,6 +1,7 @@
 # app/services/payment_service.py
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timezone
 from app.repositories.payment_repository import PaymentRepository
 from app.repositories.order_repository import OrderRepository
 from app.models.payment_model import Payment
@@ -38,8 +39,25 @@ class PaymentService:
                 detail="Este pedido ya tiene un pago asociado",
             )
 
-        payment = Payment(**data.model_dump())
-        return await self.payment_repo.create(payment)
+        # Crear pago ya COMPLETADO (auto-confirmación al pagar)
+        payment_data = data.model_dump()
+        payment_data["status"] = PaymentStatus.COMPLETED
+        from datetime import datetime, timezone
+        payment_data["paid_at"] = datetime.now(timezone.utc)
+        
+        payment = Payment(**payment_data)
+        created = await self.payment_repo.create(payment)
+
+        # Auto-confirmar la orden cuando se paga
+        await self.order_repo.update(
+            order.id,
+            {
+                "status": OrderStatus.CONFIRMED,
+                "payment_status": PaymentStatus.COMPLETED,
+            },
+        )
+
+        return created
 
     async def confirm(self, payment_id: uuid.UUID, transaction_id: str) -> Payment:
         payment = await self.payment_repo.get_by_id(payment_id)

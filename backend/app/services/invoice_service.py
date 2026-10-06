@@ -21,10 +21,10 @@ from app.models.order_model import Order
 
 class InvoiceService:
 
-    # ─── COLORES IMA ───────────────────────────────────
-    IMA_GREEN = colors.HexColor("#166534")
-    IMA_LIGHT_GREEN = colors.HexColor("#dcfce7")
-    IMA_GOLD = colors.HexColor("#f59e0b")
+    # ─── COLORES ITAS ───────────────────────────────────
+    ITAS_GREEN = colors.HexColor("#1b4f72")
+    ITAS_LIGHT_GREEN = colors.HexColor("#e4f0ed")
+    ITAS_GOLD = colors.HexColor("#2fd4a7")
     WHITE = colors.white
     GRAY = colors.HexColor("#6b7280")
     LIGHT_GRAY = colors.HexColor("#f9fafb")
@@ -49,7 +49,7 @@ class InvoiceService:
             "Header",
             parent=styles["Normal"],
             fontSize=22,
-            textColor=cls.IMA_GREEN,
+            textColor=cls.ITAS_GREEN,
             fontName="Helvetica-Bold",
             alignment=0,
         )
@@ -61,10 +61,10 @@ class InvoiceService:
             textColor=cls.GRAY,
         )
 
-        elements.append(Paragraph("IMA SYSTEM", header_style))
-        elements.append(Paragraph("Instituto de Mercadeo Agropecuario", subheader_style))
+        elements.append(Paragraph("ITAS", header_style))
+        elements.append(Paragraph("Iniciativa Tecnológica de Abasto Social", subheader_style))
         elements.append(Paragraph("Factura Digital de Pedido", subheader_style))
-        elements.append(HRFlowable(width="100%", color=cls.IMA_GREEN, thickness=2))
+        elements.append(HRFlowable(width="100%", color=cls.ITAS_GREEN, thickness=2))
         elements.append(Spacer(1, 16))
 
         # ─── DATOS DEL PEDIDO ──────────────────────────
@@ -103,13 +103,13 @@ class InvoiceService:
                 "Pickup",
                 parent=styles["Normal"],
                 fontSize=12,
-                textColor=cls.IMA_GREEN,
+                textColor=cls.ITAS_GREEN,
                 fontName="Helvetica-Bold",
                 alignment=0,
             )
             elements.append(Paragraph("CÓDIGO DE RETIRO", pickup_style))
             elements.append(Paragraph(
-                f"<font size='24' color='#166534'><b>{order.pickup_code}</b></font>",
+                f"<font size='24' color='#1b4f72'><b>{order.pickup_code}</b></font>",
                 info_style
             ))
             elements.append(Paragraph("Presenta este código en la feria para recoger tu pedido", subheader_style))
@@ -153,7 +153,7 @@ class InvoiceService:
         table_data.append([
             Paragraph("", table_cell_style),
             Paragraph("", table_cell_style),
-            Paragraph("<b>TOTAL</b>", ParagraphStyle("TH2", parent=table_header_style, textColor=cls.IMA_GREEN)),
+            Paragraph("<b>TOTAL</b>", ParagraphStyle("TH2", parent=table_header_style, textColor=cls.ITAS_GREEN)),
             Paragraph(f"<b>${float(order.total_amount):.2f}</b>", ParagraphStyle("TD2", parent=table_cell_style, fontName="Helvetica-Bold")),
         ])
 
@@ -162,7 +162,7 @@ class InvoiceService:
 
         table_style = TableStyle([
             # Header
-            ("BACKGROUND", (0, 0), (-1, 0), cls.IMA_GREEN),
+            ("BACKGROUND", (0, 0), (-1, 0), cls.ITAS_GREEN),
             ("TEXTCOLOR", (0, 0), (-1, 0), cls.WHITE),
             # Grid
             ("GRID", (0, 0), (-1, -2), 0.5, cls.LIGHT_GRAY),
@@ -175,8 +175,8 @@ class InvoiceService:
             # Filas alternas
             ("BACKGROUND", (0, 1), (-1, -2), cls.LIGHT_GRAY),
             # Total
-            ("BACKGROUND", (0, -1), (-1, -1), cls.IMA_LIGHT_GREEN),
-            ("LINEABOVE", (0, -1), (-1, -1), 1.5, cls.IMA_GREEN),
+            ("BACKGROUND", (0, -1), (-1, -1), cls.ITAS_LIGHT_GREEN),
+            ("LINEABOVE", (0, -1), (-1, -1), 1.5, cls.ITAS_GREEN),
         ])
 
         table.setStyle(table_style)
@@ -199,7 +199,7 @@ class InvoiceService:
         )
         elements.append(HRFlowable(width="100%", color=cls.GRAY))
         elements.append(Paragraph(
-            "IMA System - Instituto de Mercadeo Agropecuario - Panamá",
+            "ITAS - Iniciativa Tecnológica de Abasto Social - Panamá",
             footer_style
         ))
         elements.append(Paragraph(

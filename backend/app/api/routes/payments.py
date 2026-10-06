@@ -18,7 +18,7 @@ import uuid
 router = APIRouter(prefix="/payments", tags=["Payments"])
 
 
-@router.get("/", response_model=PaginatedResponseSchema[PaymentResponseSchema])
+@router.get("", response_model=PaginatedResponseSchema[PaymentResponseSchema])
 async def get_all_payments(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
@@ -37,7 +37,7 @@ async def get_all_payments(
     )
 
 
-@router.post("/", response_model=ResponseSchema[PaymentResponseSchema])
+@router.post("", response_model=ResponseSchema[PaymentResponseSchema])
 async def create_payment(
     data: PaymentCreateSchema,
     db: AsyncSession = Depends(get_db),

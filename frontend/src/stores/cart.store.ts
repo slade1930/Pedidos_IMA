@@ -13,6 +13,7 @@ export interface CartItem {
   unit_price: number;
   max_per_user: number;
   stock: number;
+  image_url?: string | null;
 }
 
 interface CartState {
@@ -193,7 +194,7 @@ export const useCartStore = create<CartState>()(
       },
     }),
     {
-      name: "ima-cart",
+      name: "itas-cart",
       partialize: (state) => ({
         items: state.items,
         fairId: state.fairId,

@@ -4,8 +4,7 @@ import { apiClient } from "@/lib/api/client";
 import type {
   LoginCredentials,
   RegisterData,
-  TokenResponse,
-  RefreshTokenResponse,
+  SessionResponse,
   LogoutResponse,
   AuthUser,
 } from "@/features/auth/types/auth.types";
@@ -13,12 +12,12 @@ import type {
 export const authService = {
   /**
    * Inicia sesión con email y contraseña.
-   * Retorna los tokens.
-   * 
+   * Los tokens se reciben en cookies httpOnly (itas_access / itas_refresh).
+   *
    * POST /api/v1/auth/login
    */
-  async login(credentials: LoginCredentials): Promise<TokenResponse> {
-    const response = await apiClient.post<TokenResponse>(
+  async login(credentials: LoginCredentials): Promise<SessionResponse> {
+    const response = await apiClient.post<SessionResponse>(
       "/auth/login",
       credentials
     );
@@ -27,7 +26,7 @@ export const authService = {
 
   /**
    * Registra un nuevo usuario.
-   * 
+   *
    * POST /api/v1/users/register
    */
   async register(data: RegisterData): Promise<AuthUser> {
@@ -40,7 +39,7 @@ export const authService = {
 
   /**
    * Cierra sesión.
-   * 
+   *
    * POST /api/v1/auth/logout
    */
   async logout(): Promise<LogoutResponse> {
@@ -49,21 +48,8 @@ export const authService = {
   },
 
   /**
-   * Refresca el access token.
-   * 
-   * POST /api/v1/auth/refresh
-   */
-  async refreshToken(refreshToken: string): Promise<RefreshTokenResponse> {
-    const response = await apiClient.post<TokenResponse>(
-      "/auth/refresh",
-      { refresh_token: refreshToken }
-    );
-    return response.data;
-  },
-
-  /**
    * Obtiene el perfil del usuario autenticado.
-   * 
+   *
    * GET /api/v1/users/me
    */
   async getMe(): Promise<AuthUser> {

@@ -19,18 +19,46 @@ import uuid
 router = APIRouter(prefix="/inventory", tags=["Inventory"])
 
 
-@router.get("/", response_model=PaginatedResponseSchema[InventoryResponseSchema])
+@router.get("", response_model=PaginatedResponseSchema[InventoryResponseSchema])
 async def get_all_inventory(
     skip: int = Query(0, ge=0),
-    limit: int = Query(10, ge=1, le=100),
+    limit: int = Query(100, ge=1, le=200),
+    search: str = Query(None, description="Buscar por nombre o SKU del producto"),
+    fair_id: uuid.UUID = Query(None, description="Filtrar por feria"),
+    low_stock: bool = Query(False, description="Filtrar solo stock bajo"),
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
     service = InventoryService(db)
-    items = await service.get_all(skip=skip, limit=limit)
-    total = await service.get_total_count()
+    items = await service.get_all(
+        skip=skip,
+        limit=limit,
+        search=search,
+        fair_id=fair_id,
+        low_stock=low_stock,
+    )
+    total = await service.get_total_count(
+        search=search,
+        fair_id=fair_id,
+        low_stock=low_stock,
+    )
     return PaginatedResponseSchema(
-        data=[InventoryResponseSchema.model_validate(i) for i in items],
+        data=[
+            InventoryResponseSchema(
+                id=i.id,
+                product_id=i.product_id,
+                product_name=i.product.name if i.product else None,  # 👈 NUEVO
+                fair_id=i.fair_id,
+                total_stock=i.total_stock,
+                reserved_stock=i.reserved_stock,
+                delivered_stock=i.delivered_stock,
+                available_stock=i.available_stock,
+                low_stock_threshold=i.low_stock_threshold,
+                is_available=i.is_available,
+                notes=i.notes,
+            )
+            for i in items
+        ],
         total=total,
         page=(skip // limit) + 1 if limit > 0 else 1,
         limit=limit,
@@ -38,7 +66,7 @@ async def get_all_inventory(
     )
 
 
-@router.post("/", response_model=ResponseSchema[InventoryResponseSchema])
+@router.post("", response_model=ResponseSchema[InventoryResponseSchema])
 async def create_inventory(
     data: InventoryCreateSchema,
     db: AsyncSession = Depends(get_db),

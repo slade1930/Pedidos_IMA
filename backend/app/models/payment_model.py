@@ -18,7 +18,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from sqlalchemy.dialects.postgresql import UUID
+from app.core.types import UuidType
 
 from app.models.base_model import BaseModel
 
@@ -34,7 +34,7 @@ class Payment(BaseModel):
 
     # Relaciones
     order_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        UuidType(),
         ForeignKey("orders.id", ondelete="CASCADE"),
         unique=True,
         nullable=False,
@@ -94,6 +94,17 @@ class Payment(BaseModel):
 
     notes: Mapped[str | None] = mapped_column(
         Text,
+        nullable=True,
+    )
+
+    # Datos del método de pago
+    phone_number: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+    )
+
+    card_last4: Mapped[str | None] = mapped_column(
+        String(4),
         nullable=True,
     )
 

@@ -33,7 +33,7 @@ const STALE_TIME = 1 * 60 * 1000;
  * ```tsx
  * const { data: order, isPending } = useOrder("abc-123-def");
  * // order.items → array de OrderItem
- * // order.qr_code → string del QR
+ * // order.pickup_code → código de retiro
  * ```
  */
 export function useOrder(id: string | null | undefined) {

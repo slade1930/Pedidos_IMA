@@ -45,9 +45,9 @@ export function ProductCategoryBadge({
 
   return (
     <span
-      className={`inline-flex items-center rounded-full bg-[#E8DDD0]/15 dark:bg-slate-900/50 text-[#4A3728] dark:text-slate-300 border border-[#E8DDD0]/35 dark:border-slate-800/80 backdrop-blur-md shadow-[0_2px_8px_rgba(74,55,40,0.01)] transition-all duration-300 hover:bg-[#E8DDD0]/25 dark:hover:bg-slate-900/80 selection:bg-transparent ${SIZE_STYLES[size]}`}
+      className={`inline-flex items-center rounded-full bg-[#e4f0ed]/15 dark:bg-slate-900/50 text-[#142b45] dark:text-slate-300 border border-[#e4f0ed]/35 dark:border-slate-800/80 backdrop-blur-md shadow-[0_2px_8px_rgba(74,55,40,0.01)] transition-all duration-300 hover:bg-[#e4f0ed]/25 dark:hover:bg-slate-900/80 selection:bg-transparent ${SIZE_STYLES[size]}`}
     >
-      <span className={`rounded-full bg-[#5C8A3C]/70 dark:bg-[#5C8A3C] shrink-0 ${DOT_SIZE[size]}`} />
+      <span className={`rounded-full bg-[#2e7d9e]/70 dark:bg-[#2e7d9e] shrink-0 ${DOT_SIZE[size]}`} />
       {category}
     </span>
   );

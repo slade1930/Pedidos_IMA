@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import type { JSX } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useAuthStore } from "@/stores/auth.store";
 import { NAV_ITEMS } from "@/components/layout/nav-items";
 import type { UserRole } from "@/features/auth/types/auth.types";
@@ -47,7 +48,7 @@ const itemVariants: Variants = {
 // ─── ÍCONOS ───────────────────────────────────────────────────────────────────
 
 function NavIcon({ name, active }: { name: string; active: boolean }) {
-  const color = active ? "#F2A900" : "rgba(253,248,240,0.35)";
+  const color = active ? "#2fd4a7" : "rgba(253,248,240,0.35)";
   const stroke = 1.6;
 
   const icons: Record<string, JSX.Element> = {
@@ -90,6 +91,11 @@ function NavIcon({ name, active }: { name: string; active: boolean }) {
       <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke={color} strokeWidth={stroke} aria-hidden="true">
         <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
+    Bell: (
+      <svg width="17" height="17" fill="none" viewBox="0 0 24 24" stroke={color} strokeWidth={stroke} aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
       </svg>
     ),
   };
@@ -182,6 +188,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
     { label: "Principal",   keys: ["LayoutDashboard", "Users", "Store"] },
     { label: "Inventario",  keys: ["Package", "ClipboardList", "ShoppingCart"] },
     { label: "Finanzas",    keys: ["CreditCard", "Settings"] },
+    { label: "Comunicación", keys: ["Bell"] },
   ];
 
   return (
@@ -200,7 +207,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
               position: "fixed",
               inset: 0,
               zIndex: 40,
-              background: "rgba(30,46,14,0.65)",
+              background: "rgba(8,18,35,0.7)",
               backdropFilter: "blur(4px)",
               WebkitBackdropFilter: "blur(4px)",
             }}
@@ -220,7 +227,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
               inset: "0 auto 0 0",
               zIndex: 50,
               width: "272px",
-              background: "#1e2e0e",
+              background: "#142b45",
               display: "flex",
               flexDirection: "column",
               overflow: "hidden",
@@ -234,32 +241,34 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
-                background: "linear-gradient(180deg, #2a3f14 0%, #1e2e0e 100%)",
-                borderBottom: "1px solid rgba(242,169,0,0.12)",
+                background: "linear-gradient(180deg, #1b4f72 0%, #142b45 100%)",
+                borderBottom: "1px solid rgba(47,212,167,0.25)",
                 flexShrink: 0,
               }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: "9px" }}>
                 <div
                   style={{
-                    width: "32px", height: "32px",
-                    borderRadius: "8px",
-                    background: "#F2A900",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: "10px", fontWeight: 700, color: "#3D5A1E",
-                    letterSpacing: "-0.02em",
-                    boxShadow: "0 0 0 1px rgba(242,169,0,0.3)",
+                    display: "flex", alignItems: "center",
+                    filter: "drop-shadow(0 2px 8px rgba(0,0,0,0.35))",
                     flexShrink: 0,
                   }}
                 >
-                  IMA
+                  <Image
+                    src="/images/ITAS_logo.png"
+                    alt="ITAS"
+                    width={1254}
+                    height={1254}
+                    className="relative w-auto h-8 object-contain"
+                    priority
+                  />
                 </div>
                 <div>
-                  <p style={{ fontSize: "12.5px", fontWeight: 600, color: "#FDF8F0", margin: 0, lineHeight: 1.2 }}>
-                    IMA System
+                  <p style={{ fontSize: "12.5px", fontWeight: 600, color: "#eef6f4", margin: 0, lineHeight: 1.2 }}>
+                    ITAS
                   </p>
-                  <p style={{ fontSize: "9px", color: "rgba(253,248,240,0.32)", margin: 0, letterSpacing: "0.05em", textTransform: "uppercase" }}>
-                    Mercadeo Agropecuario
+                  <p style={{ fontSize: "9px", color: "#8fdcc9", margin: 0, letterSpacing: "0.05em", textTransform: "uppercase" }}>
+                    Abasto Social
                   </p>
                 </div>
               </div>
@@ -285,12 +294,12 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
               </button>
             </div>
 
-            {/* Línea dorada */}
+            {/* Línea esmeralda */}
             <div
               aria-hidden="true"
               style={{
                 height: "1.5px",
-                background: "linear-gradient(90deg, transparent, #F2A900 40%, #F2A900 60%, transparent)",
+                background: "linear-gradient(90deg, transparent, #2fd4a7 40%, #2fd4a7 60%, transparent)",
                 opacity: 0.45,
                 flexShrink: 0,
               }}
@@ -330,8 +339,8 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                             padding: "8px 10px",
                             borderRadius: "9px",
                             marginBottom: "2px",
-                            background: active ? "rgba(242,169,0,0.09)" : "transparent",
-                            border: `1px solid ${active ? "rgba(242,169,0,0.18)" : "transparent"}`,
+                            background: active ? "rgba(47,212,167,0.1)" : "transparent",
+                            border: `1px solid ${active ? "rgba(47,212,167,0.2)" : "transparent"}`,
                             cursor: "pointer",
                             textAlign: "left",
                             transition: "background 0.15s, border-color 0.15s",
@@ -348,7 +357,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                             style={{
                               width: "32px", height: "32px",
                               borderRadius: "8px",
-                              background: active ? "rgba(242,169,0,0.14)" : "rgba(255,255,255,0.05)",
+                              background: active ? "rgba(47,212,167,0.16)" : "rgba(255,255,255,0.05)",
                               display: "flex", alignItems: "center", justifyContent: "center",
                               flexShrink: 0,
                               transition: "background 0.15s",
@@ -362,7 +371,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                             style={{
                               fontSize: "13px",
                               fontWeight: 500,
-                              color: active ? "#F2A900" : "rgba(253,248,240,0.5)",
+                              color: active ? "#2fd4a7" : "rgba(253,248,240,0.5)",
                               flex: 1,
                               transition: "color 0.15s",
                             }}
@@ -376,7 +385,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                               style={{
                                 width: "6px", height: "6px",
                                 borderRadius: "50%",
-                                background: "#F2A900",
+                                background: "#2fd4a7",
                                 flexShrink: 0,
                               }}
                             />
@@ -403,8 +412,8 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                   alignItems: "center",
                   gap: "10px",
                   padding: "10px 12px",
-                  background: "rgba(242,169,0,0.07)",
-                  border: "1px solid rgba(242,169,0,0.15)",
+                  background: "rgba(47,212,167,0.08)",
+                  border: "1px solid rgba(47,212,167,0.18)",
                   borderRadius: "10px",
                 }}
               >
@@ -413,9 +422,9 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
                   style={{
                     width: "34px", height: "34px",
                     borderRadius: "9px",
-                    background: "#F2A900",
+                    background: "#2fd4a7",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: "13px", fontWeight: 700, color: "#3D5A1E",
+                    fontSize: "13px", fontWeight: 700, color: "#1b4f72",
                     flexShrink: 0,
                   }}
                 >
@@ -424,7 +433,7 @@ export function MobileNav({ isOpen, onClose }: MobileNavProps) {
 
                 {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ fontSize: "12.5px", fontWeight: 600, color: "#FDF8F0", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <p style={{ fontSize: "12.5px", fontWeight: 600, color: "#eef6f4", margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                     {user?.full_name ?? "Usuario"}
                   </p>
                   <p style={{ fontSize: "10px", color: "rgba(253,248,240,0.38)", margin: "2px 0 0", textTransform: "capitalize" }}>

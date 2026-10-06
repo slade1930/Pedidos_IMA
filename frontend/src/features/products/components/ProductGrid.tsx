@@ -2,13 +2,13 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useProducts } from "@/features/products/hooks/useProducts";
 import type { Product } from "@/features/products/types/product.types";
 
 // ─── CONSTANTES ────────────────────────────────────────────
 
-const PAGE_SIZE = 12;
+const PAGE_SIZE = 100;
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 // ─── PROPS ─────────────────────────────────────────────────
@@ -18,6 +18,7 @@ interface ProductGridProps {
   onDelete?: (product: Product) => void;
   search?: string;
   categoryFilter?: string;
+  fairFilter?: string;  // 👈 NUEVO
 }
 
 // ─── UTILITARIOS DE DISEÑO ─────────────────────────────────
@@ -58,7 +59,7 @@ function getCategoryGradient(category: string): { from: string; to: string } {
     case "vegetables":
       return { from: "#10b981", to: "#4ade80" };
     case "fruits":
-      return { from: "#f59e0b", to: "#f97316" };
+      return { from: "#2fbf9b", to: "#f97316" };
     case "grains":
       return { from: "#d97706", to: "#854d0e" };
     case "meats":
@@ -66,44 +67,10 @@ function getCategoryGradient(category: string): { from: string; to: string } {
     case "dairy":
       return { from: "#38bdf8", to: "#3b82f6" };
     default:
-      return { from: "#4A3728", to: "#E8DDD0" };
+      return { from: "#142b45", to: "#e4f0ed" };
   }
 }
 
-function getFallbackImage(category: string, id: string): string {
-  const images: Record<string, string[]> = {
-    vegetables: [
-      "https://images.unsplash.com/photo-1566385101042-1a0aa0c1268c?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1597362925123-77861d3fbac7?auto=format&fit=crop&w=500&q=80",
-    ],
-    fruits: [
-      "https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1519996521430-02b798c1d881?auto=format&fit=crop&w=500&q=80",
-    ],
-    grains: [
-      "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&w=500&q=80",
-    ],
-    meats: [
-      "https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?auto=format&fit=crop&w=500&q=80",
-    ],
-    dairy: [
-      "https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1563636619-e9143da7973b?auto=format&fit=crop&w=500&q=80",
-    ],
-    other: [
-      "https://images.unsplash.com/photo-1506368249639-73a05d6f6488?auto=format&fit=crop&w=500&q=80",
-      "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=500&q=80",
-    ],
-  };
-
-  const list = images[category] || images["other"];
-  const index = id ? id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0) % list.length : 0;
-  return list[index];
-}
-
-// 👈 FUNCIÓN PARA CONSTRUIR URL COMPLETA DE IMAGEN
 function getImageUrl(product: Product): string {
   if (product.image_url) {
     if (product.image_url.startsWith("http")) {
@@ -111,7 +78,7 @@ function getImageUrl(product: Product): string {
     }
     return `${API_URL}${product.image_url}`;
   }
-  return getFallbackImage(product.category, product.id);
+  return "";
 }
 
 // ─── SKELETON EN CUADRÍCULA ────────────────────────────────
@@ -145,7 +112,7 @@ function GridSkeleton() {
 
 // ─── COMPONENTE PRINCIPAL ──────────────────────────────────
 
-export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: ProductGridProps) {
+export function ProductGrid({ onEdit, onDelete, search, categoryFilter, fairFilter }: ProductGridProps) {
   const [skip, setSkip] = useState(0);
   const page = Math.floor(skip / PAGE_SIZE) + 1;
 
@@ -154,13 +121,27 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
     limit: PAGE_SIZE,
     ...(search && { search }),
     ...(categoryFilter && categoryFilter !== "" && { category: categoryFilter }),
+    ...(fairFilter && { fair_id: fairFilter }),  // 👈 NUEVO
   };
+
+  // Resetear página al cambiar filtros
+  useEffect(() => {
+    setSkip(0);
+  }, [search, categoryFilter, fairFilter]);  // 👈 fairFilter agregado
 
   const { data, isPending, isError, error, isFetching } = useProducts(filters);
 
   const products = Array.isArray(data) ? data : data?.data ?? [];
-  const totalPages = !Array.isArray(data) ? data?.pages ?? 1 : 1;
   const totalItems = !Array.isArray(data) ? data?.total ?? products.length : products.length;
+  const totalPages = Math.ceil(totalItems / PAGE_SIZE) || 1;
+
+  const handlePrevious = () => {
+    setSkip((p) => Math.max(0, p - PAGE_SIZE));
+  };
+
+  const handleNext = () => {
+    setSkip((p) => p + PAGE_SIZE);
+  };
 
   return (
     <div className="space-y-6 w-full">
@@ -198,41 +179,37 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map((product) => {
             const { from, to } = getCategoryGradient(product.category);
-            const imageUrl = getImageUrl(product); // 👈 Usar la función corregida
+            const imageUrl = getImageUrl(product);
 
             return (
               <div key={product.id} className="group relative w-full transition-all duration-500">
-                {/* Paneles Skew de Fondo */}
                 <span
                   className="absolute top-0 left-[15px] w-[calc(100%-30px)] h-full rounded-2xl transform skew-x-[4deg] transition-all duration-500 group-hover:skew-x-0 group-hover:left-0 group-hover:w-full"
-                  style={{
-                    background: `linear-gradient(315deg, ${from}, ${to})`,
-                  }}
+                  style={{ background: `linear-gradient(315deg, ${from}, ${to})` }}
                 />
                 <span
                   className="absolute top-0 left-[15px] w-[calc(100%-30px)] h-full rounded-2xl transform skew-x-[4deg] blur-[15px] opacity-50 transition-all duration-500 group-hover:skew-x-0 group-hover:left-0 group-hover:w-full"
-                  style={{
-                    background: `linear-gradient(315deg, ${from}, ${to})`,
-                  }}
+                  style={{ background: `linear-gradient(315deg, ${from}, ${to})` }}
                 />
 
-                {/* Contenedor principal de la tarjeta de producto */}
                 <div className="relative z-20 w-full p-4 bg-white/95 dark:bg-slate-950/85 backdrop-blur-xl border border-slate-200/50 dark:border-slate-850/85 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.015)] transition-all duration-500 group-hover:bg-white/100 group-hover:dark:bg-slate-950/95 group-hover:border-transparent group-hover:translate-y-[-4px] flex flex-col justify-between h-full min-h-[410px]">
                   
                   <div>
-                    {/* Contenedor de Imagen de Producto */}
                     <div className="relative w-full aspect-[16/10] bg-slate-50 dark:bg-slate-900 rounded-xl overflow-hidden mb-3 border border-slate-100 dark:border-slate-850">
-                      <img 
-                        src={imageUrl} 
-                        alt={product.name} 
-                        className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = getFallbackImage(product.category, product.id);
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-80" />
-
-                      {/* Badge inactivo overlay */}
+                      {imageUrl ? (
+                        <img 
+                          src={imageUrl} 
+                          alt={product.name} 
+                          className="h-full w-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        />
+                      ) : (
+                        <div className="h-full w-full flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+                          <svg className="w-12 h-12 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+                          </svg>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent opacity-80 pointer-events-none" />
                       {!product.is_active && (
                         <div className="absolute top-2.5 right-2.5 z-30">
                           <span className="flex-shrink-0 inline-flex items-center rounded-full bg-rose-500/10 backdrop-blur-md text-rose-600 border border-rose-500/30 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide">
@@ -242,7 +219,6 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                       )}
                     </div>
 
-                    {/* Información Básica */}
                     <div className="space-y-1">
                       <h4 className="text-sm font-extrabold text-slate-900 dark:text-white truncate group-hover:text-indigo-650 dark:group-hover:text-indigo-400 transition-colors">
                         {product.name}
@@ -252,10 +228,9 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                       </p>
                     </div>
 
-                    {/* Chips de Detalles */}
                     <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
-                      <span className="inline-flex items-center rounded-full bg-[#E8DDD0]/15 dark:bg-slate-900/50 text-[#4A3728] dark:text-slate-350 border border-[#E8DDD0]/35 dark:border-slate-800/80 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
-                        <span className="w-1 h-1 rounded-full bg-[#5C8A3C] mr-1 shrink-0" />
+                      <span className="inline-flex items-center rounded-full bg-[#e4f0ed]/15 dark:bg-slate-900/50 text-[#142b45] dark:text-slate-350 border border-[#e4f0ed]/35 dark:border-slate-800/80 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
+                        <span className="w-1 h-1 rounded-full bg-[#2e7d9e] mr-1 shrink-0" />
                         {getCategoryLabel(product.category)}
                       </span>
                       <span className="inline-flex rounded-full bg-slate-100 dark:bg-slate-900 text-slate-650 dark:text-slate-400 border border-slate-200/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider">
@@ -265,9 +240,8 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                   </div>
 
                   <div>
-                    {/* Fila de precio */}
                     <div className="mt-4 flex items-baseline justify-between border-t border-slate-100 dark:border-slate-900/50 pt-2.5">
-                      <span className="text-lg font-black text-[#4A3728] dark:text-white">
+                      <span className="text-lg font-black text-[#142b45] dark:text-white">
                         {formatPrice(product.price)}
                       </span>
                       <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
@@ -275,17 +249,16 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
                       </span>
                     </div>
 
-                    {/* Acciones */}
                     <div className="mt-3 flex items-center gap-2 pt-3 border-t border-slate-150/80 dark:border-slate-900/50">
                       <button 
                         onClick={() => onEdit?.(product)}
-                        className="flex-1 rounded-xl bg-white/40 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 px-2 py-2 text-xs font-bold text-indigo-650 dark:text-indigo-450 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 hover:border-indigo-300 dark:hover:border-indigo-900 active:scale-95 transition-all duration-200 text-center"
+                        className="flex-1 rounded-xl bg-white/40 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 px-2 py-2 text-xs font-bold text-indigo-650 dark:text-indigo-450 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 hover:border-indigo-300 dark:hover:border-indigo-900 active:scale-95 transition-all duration-200 text-center cursor-pointer"
                       >
                         Editar
                       </button>
                       <button 
                         onClick={() => onDelete?.(product)}
-                        className="flex-1 rounded-xl bg-white/40 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 px-2 py-2 text-xs font-bold text-rose-600 dark:text-rose-455 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-300 dark:hover:border-rose-900 active:scale-95 transition-all duration-200 text-center"
+                        className="flex-1 rounded-xl bg-white/40 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 px-2 py-2 text-xs font-bold text-rose-600 dark:text-rose-455 hover:bg-rose-50 dark:hover:bg-rose-950/20 hover:border-rose-300 dark:hover:border-rose-900 active:scale-95 transition-all duration-200 text-center cursor-pointer"
                       >
                         Eliminar
                       </button>
@@ -301,7 +274,7 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
 
       {/* Paginación */}
       {!isPending && !isError && products.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4.5 border border-slate-200/40 dark:border-slate-800/40 bg-white/60 dark:bg-slate-950/40 backdrop-blur-md rounded-2xl shadow-inner mt-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-4 border border-slate-200/40 dark:border-slate-800/40 bg-white/60 dark:bg-slate-950/40 backdrop-blur-md rounded-2xl shadow-inner mt-8">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">
             Mostrando{" "}
             <span className="font-extrabold text-slate-800 dark:text-white">{skip + 1}</span>
@@ -313,17 +286,17 @@ export function ProductGrid({ onEdit, onDelete, search, categoryFilter }: Produc
 
           <div className="flex items-center gap-3">
             <button 
-              onClick={() => setSkip((p) => Math.max(0, p - PAGE_SIZE))}
+              onClick={handlePrevious}
               disabled={skip <= 0 || isFetching}
-              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-40 disabled:hover:bg-white/85 transition-all duration-200 shadow-sm"
+              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-40 transition-all duration-200 shadow-sm cursor-pointer"
             >
               Anterior
             </button>
             <span className="text-xs font-bold text-slate-600 dark:text-slate-400">Página {page} de {totalPages}</span>
             <button 
-              onClick={() => setSkip((p) => Math.min((totalPages - 1) * PAGE_SIZE, p + PAGE_SIZE))}
-              disabled={skip >= (totalPages - 1) * PAGE_SIZE || isFetching}
-              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-40 disabled:hover:bg-white/85 transition-all duration-200 shadow-sm"
+              onClick={handleNext}
+              disabled={skip + PAGE_SIZE >= totalItems || isFetching}
+              className="rounded-xl border border-slate-200 dark:border-slate-800 px-4 py-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-350 bg-white/80 dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-850 disabled:opacity-40 transition-all duration-200 shadow-sm cursor-pointer"
             >
               Siguiente
             </button>

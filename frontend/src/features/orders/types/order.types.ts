@@ -45,8 +45,6 @@ export interface Order {
   total_amount: number;
   payment_method: PaymentMethod;
   payment_status: PaymentStatus;
-  qr_code: string | null;
-  qr_used: boolean;
   pickup_code: string | null;
   customer_name: string | null;
   customer_cedula: string | null;
@@ -81,6 +79,11 @@ export interface PdaRestriction {
   next_available_date: string;
 }
 
+export interface PdaStatus {
+  can_purchase: boolean;
+  restriction: PdaRestriction | null;
+}
+
 // ─── RESPUESTAS ───────────────────────────────────────────
 
 export interface OrdersResponse {
@@ -103,6 +106,8 @@ export interface OrderFilters {
   search?: string;
   status?: OrderStatus;
   fair_id?: string;
+  date_from?: string;  // 👈 NUEVO
+  date_to?: string;    // 👈 NUEVO
   skip?: number;
   limit?: number;
 }

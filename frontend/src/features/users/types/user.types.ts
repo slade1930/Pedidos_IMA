@@ -53,6 +53,21 @@ export interface UpdateUserPayload {
   email?: string;
 }
 
+// ─── CAMBIAR CONTRASEÑA ───────────────────────────────────
+
+/**
+ * Datos para cambiar la contraseña del usuario autenticado.
+ * Coincide con ChangePasswordSchema del backend y exige la
+ * contraseña actual (FASE 1.6).
+ *
+ * POST /api/v1/users/change-password
+ */
+export interface ChangePasswordPayload {
+  current_password: string;
+  new_password: string;
+  confirm_password: string;
+}
+
 // ─── ACTUALIZAR USUARIO (ADMIN) ───────────────────────────
 
 /**

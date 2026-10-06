@@ -22,6 +22,7 @@ export interface Product {
   is_available: boolean;
   is_featured: boolean;
   is_active: boolean;
+  available_stock?: number;
   created_at?: string;
   updated_at?: string;
 }
@@ -30,9 +31,9 @@ export interface Product {
 
 export interface CreateProductPayload {
   name: string;
-  sku?: string;  // 👈 Agregado (el backend lo requiere)
+  sku?: string;
   description?: string | null;
-  image?: File | null;  // 👈 NUEVO: Imagen para subir
+  image?: File | null;
   price: number;
   unit: ProductUnit;
   category: ProductCategory;
@@ -44,9 +45,9 @@ export interface CreateProductPayload {
 
 export interface UpdateProductPayload {
   name?: string;
-  sku?: string;  // 👈 Agregado
+  sku?: string;
   description?: string | null;
-  image?: File | null;  // 👈 NUEVO: Imagen para subir/actualizar
+  image?: File | null;
   price?: number;
   unit?: ProductUnit;
   category?: ProductCategory;
@@ -78,6 +79,7 @@ export interface ProductFilters {
   is_active?: boolean;
   min_price?: number;
   max_price?: number;
+  fair_id?: string;
   skip?: number;
   limit?: number;
 }

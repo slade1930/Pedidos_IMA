@@ -79,6 +79,24 @@ class FairRepository(BaseRepository[Fair]):
 
         return list(result.scalars().all())
 
+    async def get_shop_fairs(
+        self,
+    ) -> list[Fair]:
+        """Ferias disponibles para la tienda: habilitadas por el
+        admin (is_active) y en estado active/upcoming, sin ventana
+        de fechas — el admin gestiona la disponibilidad con el
+        interruptor y el estado, no con el calendario."""
+        result = await self.db.execute(
+            select(Fair)
+            .where(
+                Fair.is_active.is_(True),
+                Fair.status.in_(["active", "upcoming"]),
+            )
+            .order_by(Fair.start_date.asc())
+        )
+
+        return list(result.scalars().all())
+
     async def get_finished_fairs(
         self,
     ) -> list[Fair]:

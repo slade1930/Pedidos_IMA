@@ -16,11 +16,6 @@ from app.utils.validators import (
     validate_password_strength,
     sanitize_string,
 )
-from app.utils.qr_generator import (
-    generate_qr_token,
-    generate_qr_image_base64,
-    decode_qr_token,
-)
 from app.utils.pdf_generator import generate_invoice_pdf
 
 __all__ = [
@@ -38,8 +33,5 @@ __all__ = [
     "validate_phone_panama",
     "validate_password_strength",
     "sanitize_string",
-    "generate_qr_token",
-    "generate_qr_image_base64",
-    "decode_qr_token",
     "generate_invoice_pdf",
 ]

@@ -1,0 +1,21 @@
+# backend/.dockerignore
+venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+.env
+.env.*
+!.env.example
+logs/
+static/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+alembic/versions/*.pyc

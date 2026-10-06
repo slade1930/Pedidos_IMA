@@ -16,7 +16,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from sqlalchemy.dialects.postgresql import UUID
+from app.core.types import UuidType
 
 from app.models.base_model import BaseModel
 
@@ -34,14 +34,14 @@ class OrderItem(BaseModel):
 
     # Relaciones
     order_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        UuidType(),
         ForeignKey("orders.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
     product_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        UuidType(),
         ForeignKey("products.id", ondelete="CASCADE"),
         nullable=False,
         index=True,

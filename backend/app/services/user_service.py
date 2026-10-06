@@ -8,8 +8,10 @@ from app.schemas.user_schema import (
     UserUpdateSchema,
     UserAdminUpdateSchema,
 )
-from app.core.security import hash_password
+from app.core.security import hash_password, verify_password
 from app.core.constants import UserRole
+from app.core.token_store import token_store
+from app.schemas.auth_schema import ChangePasswordSchema
 import uuid
 
 
@@ -73,3 +75,29 @@ class UserService:
 
     async def deactivate(self, user_id: uuid.UUID) -> bool:
         return await self.user_repo.soft_delete(user_id)
+
+    async def change_password(
+        self, user_id: uuid.UUID, data: ChangePasswordSchema
+    ) -> User:
+        """FASE 1.6: cambia la contraseña SOLO si la actual es correcta."""
+        user = await self.get_by_id(user_id)
+
+        if not verify_password(data.current_password, user.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La contraseña actual es incorrecta",
+            )
+
+        if data.current_password == data.new_password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="La nueva contraseña no puede ser igual a la actual",
+            )
+
+        updated = await self.user_repo.update(
+            user.id, {"hashed_password": hash_password(data.new_password)}
+        )
+
+        # Al cambiar la contraseña se invalidan todos los refresh tokens emitidos
+        await token_store.revoke_all_for_user(str(user.id))
+        return updated

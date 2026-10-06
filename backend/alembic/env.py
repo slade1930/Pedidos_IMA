@@ -15,7 +15,7 @@ from alembic import context
 
 # Importa tu configuración y tus modelos
 from app.core.config import settings
-from app.core.database import Base
+from app.core.database import Base, get_async_database_url
 
 # IMPORTANTE: Importa TODOS tus modelos aquí
 from app.models.user_model import User
@@ -25,6 +25,7 @@ from app.models.inventory_model import Inventory
 from app.models.order_model import Order
 from app.models.order_item_model import OrderItem
 from app.models.payment_model import Payment
+from app.models.notification_model import Notification, UserNotification
 
 # this is the Alembic Config object
 config = context.config
@@ -40,7 +41,7 @@ target_metadata = Base.metadata
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode."""
     # Usa la URL de tu .env
-    url = settings.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://")
+    url = get_async_database_url()
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -63,9 +64,7 @@ async def run_async_migrations() -> None:
     """Run migrations in 'online' mode with async support."""
     # Configura la URL desde tu .env
     configuration = config.get_section(config.config_ini_section)
-    configuration["sqlalchemy.url"] = settings.DATABASE_URL.replace(
-        "postgresql://", "postgresql+asyncpg://"
-    )
+    configuration["sqlalchemy.url"] = get_async_database_url()
 
     connectable = async_engine_from_config(
         configuration,

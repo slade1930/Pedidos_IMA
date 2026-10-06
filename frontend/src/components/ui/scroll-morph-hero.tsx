@@ -92,7 +92,7 @@ function FlipCard({ src, index, target }: FlipCardProps) {
                 "https://images.unsplash.com/photo-1540420773420-3366772f4999?w=300&q=80";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#1E3A1E]/40 to-transparent opacity-60 transition-opacity group-hover:opacity-20" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#142b45]/40 to-transparent opacity-60 transition-opacity group-hover:opacity-20" />
         </div>
 
         {/* Back */}
@@ -101,14 +101,14 @@ function FlipCard({ src, index, target }: FlipCardProps) {
           style={{
             backfaceVisibility: "hidden",
             transform: "rotateY(180deg)",
-            background: "linear-gradient(135deg, #1E3A1E 0%, #3A5F26 100%)",
+            background: "linear-gradient(135deg, #142b45 0%, #1b4f72 100%)",
             border: "1.5px solid rgba(251,191,36,0.4)",
           }}
         >
-          <div className="w-6 h-6 rounded-full bg-[#FBBF24]/20 flex items-center justify-center mb-1">
-            <span className="text-[#FBBF24] text-[10px]">✦</span>
+          <div className="w-6 h-6 rounded-full bg-[#2fd4a7]/20 flex items-center justify-center mb-1">
+            <span className="text-[#2fd4a7] text-[10px]">✦</span>
           </div>
-          <p className="text-[7px] font-black text-[#FBBF24] uppercase tracking-widest">IMA</p>
+          <p className="text-[7px] font-black text-[#2fd4a7] uppercase tracking-widest">ITAS</p>
           <p className="text-[8px] font-medium text-white/80 mt-0.5">Panamá</p>
         </div>
       </motion.div>
@@ -121,7 +121,7 @@ function FlipCard({ src, index, target }: FlipCardProps) {
 function StatPill({ value, label }: { value: string; label: string }) {
   return (
     <div className="flex flex-col items-center px-4 py-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-      <span className="text-lg font-black text-[#FBBF24] tabular-nums leading-none">{value}</span>
+      <span className="text-lg font-black text-[#2fd4a7] tabular-nums leading-none">{value}</span>
       <span className="text-[8px] text-white/50 font-bold uppercase tracking-widest mt-1">{label}</span>
     </div>
   );
@@ -251,7 +251,7 @@ export default function ScrollMorphHero() {
       className="relative w-full h-full overflow-hidden flex flex-col items-center justify-center"
       style={{
         background:
-          "radial-gradient(ellipse 80% 70% at 50% 110%, rgba(58,95,38,0.22) 0%, transparent 70%), linear-gradient(to bottom, #0D1F0D 0%, #132613 100%)",
+          "radial-gradient(ellipse 80% 70% at 50% 110%, rgba(58,95,38,0.22) 0%, transparent 70%), linear-gradient(to bottom, #0e1e33 0%, #0e1e33 100%)",
       }}
     >
       {/* Subtle grain overlay */}
@@ -275,25 +275,25 @@ export default function ScrollMorphHero() {
         transition={{ duration: 0.9 }}
       >
         {/* Eyebrow badge */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-[#FBBF24]/30 bg-[#3A5F26]/30 px-4 py-1.5 mb-6 backdrop-blur-sm">
-          <Leaf className="w-3.5 h-3.5 text-[#FBBF24]" />
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FBBF24]">
-            Instituto de Mercadeo Agropecuario · Panamá
+        <div className="inline-flex items-center gap-2 rounded-full border border-[#2fd4a7]/30 bg-[#1b4f72]/30 px-4 py-1.5 mb-6 backdrop-blur-sm">
+          <Leaf className="w-3.5 h-3.5 text-[#2fd4a7]" />
+          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[#2fd4a7]">
+            ITAS · Iniciativa Tecnológica de Abasto Social
           </span>
         </div>
 
         {/* Main title */}
         <AnimatedText
-          text="BIENVENIDO AL IMA"
+          text="TU PEDIDO A UN CLIC"
           textClassName="text-[2.2rem] sm:text-[3.5rem] md:text-[4.5rem] lg:text-[5.5rem] font-black tracking-tight leading-none"
-          gradientColors="linear-gradient(90deg, #FFFFFF 0%, #FBBF24 35%, #86efac 60%, #FBBF24 80%, #FFFFFF 100%)"
+          gradientColors="linear-gradient(90deg, #FFFFFF 0%, #2fd4a7 35%, #8fdcc9 60%, #2fd4a7 80%, #FFFFFF 100%)"
           gradientAnimationDuration={4.5}
         />
 
         {/* Subtitle */}
         <p className="max-w-2xl mx-auto mt-6 text-sm sm:text-base text-white/70 font-medium leading-relaxed">
-          Encuentra alimentos de primera necesidad directo del productor nacional. 
-          Abastecemos arroz de primera, legumbres frescas de tierras altas, vegetales 
+          tu retiro en minutos. Encuentra alimentos de primera necesidad directo del productor nacional.
+          Abastecemos arroz de primera, legumbres frescas de tierras altas, vegetales
           y productos de la canasta básica a precios regulados y accesibles para tu hogar.
         </p>
 
@@ -301,9 +301,9 @@ export default function ScrollMorphHero() {
         <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
           <Link
             href="/shop/products"
-            className="group inline-flex items-center gap-2 rounded-xl px-7 py-3.5 text-sm font-bold text-[#1E3A1E] transition-all duration-200 active:scale-95"
+            className="group inline-flex items-center gap-2 rounded-xl px-7 py-3.5 text-sm font-bold text-[#142b45] transition-all duration-200 active:scale-95"
             style={{
-              background: "#FBBF24",
+              background: "#2fd4a7",
               boxShadow: "0 4px 20px rgba(251,191,36,0.40)",
             }}
           >
@@ -319,7 +319,7 @@ export default function ScrollMorphHero() {
         </div>
 
         {/* Hint text */}
-        <p className="text-[10px] font-black tracking-[0.25em] text-[#FBBF24]/60 uppercase mt-12 animate-pulse">
+        <p className="text-[10px] font-black tracking-[0.25em] text-[#2fd4a7]/60 uppercase mt-12 animate-pulse">
           Desplaza la rueda del mouse para explorar
         </p>
       </motion.div>
@@ -329,7 +329,7 @@ export default function ScrollMorphHero() {
         style={{ opacity: contentOpacity, y: contentY }}
         className="absolute top-[8%] left-0 right-0 z-30 flex flex-col items-center text-center px-4 pointer-events-none"
       >
-        <span className="inline-flex rounded-full border border-[#FBBF24]/30 bg-[#3A5F26]/40 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#FBBF24] mb-3">
+        <span className="inline-flex rounded-full border border-[#2fd4a7]/30 bg-[#1b4f72]/40 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-[#2fd4a7] mb-3">
           Cosechas de Nuestra Tierra
         </span>
         <h3 className="text-xl md:text-3xl font-black text-white tracking-tight">
@@ -343,7 +343,7 @@ export default function ScrollMorphHero() {
         <div className="flex items-center gap-3 mt-5 pointer-events-auto">
           <Link
             href="/shop/products"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-[#3A5F26] border border-[#FBBF24]/30 px-4 py-2 text-xs font-bold text-white hover:bg-[#2d5720] transition-colors"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[#1b4f72] border border-[#2fd4a7]/30 px-4 py-2 text-xs font-bold text-white hover:bg-[#1b4f72] transition-colors"
           >
             Ver Productos
             <ArrowRight className="w-3 h-3" />

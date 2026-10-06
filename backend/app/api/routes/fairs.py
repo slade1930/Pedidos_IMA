@@ -19,7 +19,7 @@ import uuid
 router = APIRouter(prefix="/fairs", tags=["Fairs"])
 
 
-@router.get("/", response_model=PaginatedResponseSchema[FairResponseSchema])
+@router.get("", response_model=PaginatedResponseSchema[FairResponseSchema])
 async def get_all_fairs(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
@@ -42,17 +42,16 @@ async def get_all_fairs(
 async def get_public_fairs(
     db: AsyncSession = Depends(get_db),
 ):
-    """Endpoint público para que los clientes vean las ferias disponibles"""
+    """Endpoint público para que los clientes vean las ferias
+    disponibles (habilitadas y en estado active/upcoming)."""
     service = FairService(db)
-    fairs = await service.get_active()
-    upcoming = await service.get_upcoming()
-    all_fairs = fairs + upcoming
+    fairs = await service.get_shop_fairs()
     return ResponseSchema(
-        data=[FairResponseSchema.model_validate(f) for f in all_fairs]
+        data=[FairResponseSchema.model_validate(f) for f in fairs]
     )
 
 
-@router.post("/", response_model=ResponseSchema[FairResponseSchema])
+@router.post("", response_model=ResponseSchema[FairResponseSchema])
 async def create_fair(
     data: FairCreateSchema,
     db: AsyncSession = Depends(get_db),

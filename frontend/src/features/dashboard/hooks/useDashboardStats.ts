@@ -1,99 +1,79 @@
 // src/features/dashboard/hooks/useDashboardStats.ts
 
-import { useQueries } from "@tanstack/react-query";
-import { userService } from "@/features/users/services/user.service";
-import { fairService } from "@/features/fairs/services/fair.service";
-import { productService } from "@/features/products/services/product.service";
-import { inventoryService } from "@/features/inventory/services/inventory.service";
+import { useQuery } from "@tanstack/react-query";
+import { dashboardService } from "@/features/dashboard/services/dashboard.service";
 import { orderService } from "@/features/orders/services/order.service";
-import { paymentService } from "@/features/payments/services/payment.service";
-import type { DashboardStats } from "@/features/dashboard/types/dashboard.types";
-import type { RecentOrder } from "@/features/dashboard/types/dashboard.types";
+import type {
+  DashboardStats,
+  RevenuePeriod,
+} from "@/features/dashboard/types/dashboard.types";
+import type { Order } from "@/features/orders/types/order.types";
 
 // ─── CONSTANTES ────────────────────────────────────────────
 
-const STALE_TIME = 2 * 60 * 1000;
+const STALE_TIME = 60 * 1000;
+
+// ─── MAPA DE PERÍODO -> MESES ──────────────────────────────
+
+export const PERIOD_MONTHS: Record<RevenuePeriod, number> = {
+  month: 1, // Este mes (solo 1 mes → para la serie se muestran los últimos 3 para contexto)
+  "6m": 6,
+  "12m": 12,
+  year: 12, // Año completo (año calendario actual)
+};
 
 // ─── HOOK ──────────────────────────────────────────────────
 
-export function useDashboardStats() {
-  const results = useQueries({
-    queries: [
-      {
-        queryKey: ["users", { limit: 1 }],
-        queryFn: () => userService.getUsers({ limit: 1 }),
-        staleTime: STALE_TIME,
-      },
-      {
-        queryKey: ["fairs", { limit: 1 }],
-        queryFn: () => fairService.getFairs({ limit: 1 }),
-        staleTime: STALE_TIME,
-      },
-      {
-        queryKey: ["products", { limit: 1 }],
-        queryFn: () => productService.getProducts({ limit: 1 }),
-        staleTime: STALE_TIME,
-      },
-      {
-        queryKey: ["inventory", { low_stock: true, limit: 5 }],
-        queryFn: () => inventoryService.getInventory({ low_stock: true, limit: 5 }),
-        staleTime: STALE_TIME,
-      },
-      {
-        queryKey: ["orders", { limit: 1 }],
-        queryFn: () => orderService.getOrders({ limit: 1 }),
-        staleTime: STALE_TIME,
-      },
-      {
-        queryKey: ["orders", "recent", { limit: 10 }],
-        queryFn: () => orderService.getOrders({ limit: 10 }),
-        staleTime: STALE_TIME,
-      },
-      {
-        queryKey: ["payments", { limit: 1 }],
-        queryFn: () => paymentService.getPayments({ limit: 1 }),
-        staleTime: STALE_TIME,
-      },
-    ],
+/**
+ * useDashboardStats
+ *
+ * Obtiene las métricas reales del dashboard desde el endpoint
+ * /api/v1/dashboard/stats. El período controla cuántos meses de
+ * evolución se piden al backend.
+ */
+export function useDashboardStats(period: RevenuePeriod = "12m") {
+  // Para "Este mes" pedimos 3 meses (últimos 2 + actual) para dar contexto gráfico
+  let months = PERIOD_MONTHS[period] ?? 12;
+  if (period === "month") months = 3;
+
+  const query = useQuery<DashboardStats>({
+    queryKey: ["dashboard", "stats", { months }],
+    queryFn: () => dashboardService.getStats(months),
+    staleTime: STALE_TIME,
   });
 
-  const [usersQ, fairsQ, productsQ, inventoryQ, ordersQ, recentQ, paymentsQ] = results;
+  const recentOrdersQuery = useQuery({
+    queryKey: ["dashboard", "recent-orders"],
+    queryFn: () => orderService.getOrders({ limit: 8 }),
+    staleTime: STALE_TIME,
+  });
 
-  const isLoading = results.some((q) => q.isLoading);
-  const isError = results.some((q) => q.isError);
-  const errors = results
-    .filter((q) => q.error)
-    .map((q) => (q.error as { message?: string })?.message || "Error");
+  // El interceptor de axios unwrappe "data" de forma inconsistente:
+  // a veces es un array directo, a veces un objeto { data, total, ... }.
+  const recentOrdersData = recentOrdersQuery.data as
+    | Order[]
+    | { data: Order[]; total?: number }
+    | undefined;
 
-  // Calcular stats desde los datos reales
-  const stats: DashboardStats = {
-    total_users: usersQ.data?.total ?? 0,
-    total_fairs: fairsQ.data?.total ?? 0,
-    total_products: productsQ.data?.total ?? 0,
-    total_orders: ordersQ.data?.total ?? 0,
-    total_revenue: 0, // No podemos calcular sin sumar payments
-    active_fairs: 0,  // Requiere filtrar por status
-    pending_orders: 0, // Requiere filtrar por status
-    low_stock_products: inventoryQ.data?.total ?? 0,
-  };
-
-  // Órdenes recientes
-  const recentOrders: RecentOrder[] = (recentQ.data?.data ?? []).map((order) => ({
-    id: order.id,
-    order_number: order.order_number,
-    customer_name: order.user_id, // Usamos user_id como fallback
-    total_amount: order.total_amount,
-    status: order.status,
-    created_at: order.created_at ?? "",
-  }));
+  const recentOrders = Array.isArray(recentOrdersData)
+    ? recentOrdersData
+    : (recentOrdersData?.data ?? []);
 
   return {
-    stats,
+    data: query.data,
+    stats: query.data?.totals,
+    revenueSeries: query.data?.revenue_series ?? [],
+    ordersByStatus: query.data?.orders_by_status ?? {},
+    paymentsByMethod: query.data?.payments_by_method ?? {},
     recentOrders,
-    isLoading,
-    isError,
-    errors,
-    refetch: () => results.forEach((q) => q.refetch()),
+    isLoading: query.isLoading,
+    isFetching: query.isFetching,
+    isError: query.isError,
+    error: query.error,
+    refetch: () => {
+      query.refetch();
+      recentOrdersQuery.refetch();
+    },
   };
 }
 

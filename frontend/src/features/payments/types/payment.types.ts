@@ -26,6 +26,11 @@ export interface Payment {
   amount: number;
   transaction_id: string | null;
   reference_code: string | null;
+  phone_number: string | null;
+  card_last4: string | null;
+  created_at: string | null;
+  order_number: string | null;
+  customer_name: string | null;
 }
 
 // ─── CREAR PAGO ───────────────────────────────────────────

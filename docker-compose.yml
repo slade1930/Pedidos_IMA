@@ -1,0 +1,119 @@
+# docker-compose.yml
+
+services:
+  # ─── Backend FastAPI ──────────────────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: itas-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      # Base de datos: Neon (remoto) por defecto.
+      # Para usar el PostgreSQL local del compose, pon DATABASE_URL vacío y DB_SSL=disable
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-slade}:${POSTGRES_PASSWORD:-slade152502}@postgres:5432/${POSTGRES_DB:-itas_system}}
+      # SSL requerido para Neon, deshabilitado para postgres local
+      DB_SSL: ${DB_SSL:-disable}
+      # En Docker (producción) los docs /docs y /redoc quedan ocultos.
+      # Para verlos en desarrollo: DEBUG=True en app/.env
+      DEBUG: ${DEBUG:-False}
+      # FASE 3: revocación de tokens y lockouts persisten en Redis.
+      # Si Redis no responde, el backend cae a memoria automáticamente
+      # (no depende de Redis para estar healthy).
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - ./backend/static:/app/static
+      - ./backend/logs:/app/logs
+    networks:
+      - itas_network
+    depends_on:
+      redis:
+        condition: service_started
+    healthcheck:
+      # Usar 127.0.0.1 (Host lo envía como 127.0.0.1, permitido en prod).
+      # Con "localhost:8000" Starlette no matchea el hostname y devuelve 400.
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ─── Redis (FASE 3): revocación de tokens y lockouts ─────
+  # Volátil por diseño (sin volumen): si el contenedor se recrea, el backend
+  # funciona igual con fallback en memoria. El healthcheck NO condiciona al
+  # backend: caída de Redis nunca impide arrancar.
+  redis:
+    image: redis:7-alpine
+    container_name: itas-redis
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    networks:
+      - itas_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
+  # ─── Frontend Next.js ─────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: itas-frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      # En producción apunta al backend del compose
+      # API_URL: http://backend:8000
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - itas_network
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:3000/shop"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  # ─── PostgreSQL local (opcional) ──────────────────────────
+  # La app usa Neon por defecto (ver app/.env).
+  # Para usar una BD local en su lugar:
+  #   1. Pon DATABASE_URL vacío y DB_SSL=disable en app/.env
+  #   2. Descomenta este bloque:
+  #
+  # postgres:
+  #   image: postgres:16-alpine
+  #   container_name: itas-postgres
+  #   restart: unless-stopped
+  #   environment:
+  #     POSTGRES_USER: ${POSTGRES_USER:-slade}
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-slade152502}
+  #     POSTGRES_DB: ${POSTGRES_DB:-itas_system}
+  #   ports:
+  #     - "5433:5432"
+  #   volumes:
+  #     - itas_pgdata:/var/lib/postgresql/data
+  #   networks:
+  #     - itas_network
+  #   healthcheck:
+  #     test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-slade} -d ${POSTGRES_DB:-itas_system}"]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
+
+# volumes:
+  # itas_pgdata:
+
+networks:
+  itas_network:
+    driver: bridge

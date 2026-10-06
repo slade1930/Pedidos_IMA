@@ -10,6 +10,7 @@ from app.schemas.order_schema import (
     OrderCreateSchema,
     OrderStatusUpdateSchema,
     OrderResponseSchema,
+    PdaStatusSchema,
 )
 from app.schemas.response_schema import ResponseSchema, PaginatedResponseSchema
 from app.api.dependencies.auth_dependencies import (
@@ -22,16 +23,28 @@ import uuid
 router = APIRouter(prefix="/orders", tags=["Orders"])
 
 
-@router.get("/", response_model=PaginatedResponseSchema[OrderResponseSchema])
+@router.get("", response_model=PaginatedResponseSchema[OrderResponseSchema])
 async def get_all_orders(
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
+    search: str = Query(None),           # 👈 NUEVO
+    fair_id: uuid.UUID = Query(None),    # 👈 NUEVO
+    status: str = Query(None),           # 👈 NUEVO
+    date_from: str = Query(None),        # 👈 NUEVO
+    date_to: str = Query(None),          # 👈 NUEVO
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
     service = OrderService(db)
-    orders = await service.get_all(skip=skip, limit=limit)
-    total = await service.get_total_count()
+    orders = await service.get_all(
+        skip=skip, limit=limit,
+        search=search, fair_id=fair_id, status=status,
+        date_from=date_from, date_to=date_to,
+    )
+    total = await service.get_total_count(
+        search=search, fair_id=fair_id, status=status,
+        date_from=date_from, date_to=date_to,
+    )
     return PaginatedResponseSchema(
         data=[OrderResponseSchema.model_validate(o) for o in orders],
         total=total,
@@ -41,7 +54,7 @@ async def get_all_orders(
     )
 
 
-@router.post("/", response_model=ResponseSchema[OrderResponseSchema])
+@router.post("", response_model=ResponseSchema[OrderResponseSchema])
 async def create_order(
     data: OrderCreateSchema,
     db: AsyncSession = Depends(get_db),
@@ -55,27 +68,34 @@ async def create_order(
     )
 
 
-# ─── ENDPOINT DE REPORTE (DEBE IR ANTES de /{order_id}) ────
+# ─── ENDPOINT DE REPORTE CON FILTROS ───────────────────────
 
 @router.get("/report")
 async def download_orders_report(
+    fair_id: uuid.UUID = Query(None),    # 👈 NUEVO
+    date_from: str = Query(None),        # 👈 NUEVO
+    date_to: str = Query(None),          # 👈 NUEVO
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
-    """Genera y descarga un reporte PDF con todas las órdenes"""
+    """Genera y descarga un reporte PDF con filtros opcionales"""
     service = OrderService(db)
     
-    # Obtener todas las órdenes con datos de usuario, items y feria
-    orders = await service.get_all_for_report()
+    orders = await service.get_all_for_report(
+        fair_id=fair_id, date_from=date_from, date_to=date_to
+    )
     
-    # Generar PDF
     pdf = ReportService.generate_orders_report(orders)
+    
+    # Nombre de archivo con fecha
+    from datetime import datetime
+    today = datetime.now().strftime("%Y-%m-%d")
     
     return Response(
         content=pdf,
         media_type="application/pdf",
         headers={
-            "Content-Disposition": "attachment; filename=reporte-ordenes-ima.pdf"
+            "Content-Disposition": f"attachment; filename=reporte-ordenes-{today}.pdf"
         },
     )
 
@@ -88,6 +108,17 @@ async def get_my_orders(
     service = OrderService(db)
     orders = await service.get_by_user(current_user.id)
     return ResponseSchema(data=[OrderResponseSchema.model_validate(o) for o in orders])
+
+
+@router.get("/pda-restriction", response_model=ResponseSchema[PdaStatusSchema])
+async def get_pda_restriction(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """Estado de elegibilidad del ciudadano: si puede comprar o cuándo se le habilita de nuevo."""
+    service = OrderService(db)
+    status_ = await service.get_pda_status(current_user)
+    return ResponseSchema(data=PdaStatusSchema.model_validate(status_))
 
 
 @router.get("/fair/{fair_id}", response_model=ResponseSchema[list[OrderResponseSchema]])
@@ -133,16 +164,16 @@ async def update_order_status(
     )
 
 
-@router.post("/validate-qr", response_model=ResponseSchema[OrderResponseSchema])
-async def validate_qr(
-    qr_code: str,
+@router.post("/validate-pickup", response_model=ResponseSchema[OrderResponseSchema])
+async def validate_pickup(
+    pickup_code: str,
     db: AsyncSession = Depends(get_db),
     _: User = Depends(get_current_staff),
 ):
     service = OrderService(db)
-    order = await service.validate_qr(qr_code)
+    order = await service.validate_pickup_code(pickup_code)
     return ResponseSchema(
-        message="QR válido",
+        message="Código válido",
         data=OrderResponseSchema.model_validate(order),
     )
 
@@ -151,8 +182,9 @@ async def validate_qr(
 async def download_invoice(
     order_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    """Descarga factura en PDF. Acceso público por UUID seguro."""
+    """Descarga factura en PDF. Requiere autenticación."""
     service = OrderService(db)
     order = await service.get_by_id(order_id)
 
@@ -162,7 +194,13 @@ async def download_invoice(
             detail="Pedido no encontrado",
         )
 
-    # Cargar usuario explícitamente para evitar lazy load
+    # Solo el dueño del pedido o un staff puede ver la factura
+    if order.user_id != current_user.id and current_user.role not in ("ADMIN", "STAFF"):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para acceder a esta factura",
+        )
+
     if order.user_id:
         user = await service.user_repo.get_by_id(order.user_id)
         order.user = user

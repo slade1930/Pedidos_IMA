@@ -56,13 +56,13 @@ export function CartItem({ item }: CartItemProps) {
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
       className="space-y-1.5"
     >
-      <div className="p-4 bg-white border border-[#3A5F26]/12 rounded-2xl shadow-sm hover:border-[#FBBF24]/50 transition-all duration-300 flex items-stretch gap-4 relative overflow-hidden group">
+      <div className="p-4 bg-white border border-[#1b4f72]/12 rounded-2xl shadow-sm hover:border-[#2fd4a7]/50 transition-all duration-300 flex items-stretch gap-4 relative overflow-hidden group">
         
         {/* Decoración superior sutil */}
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#FBBF24]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#2fd4a7]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Lado Izquierdo: Imagen o Fallback de Producto Agrícola */}
-        <div className="h-20 w-20 rounded-xl overflow-hidden bg-gradient-to-br from-[#F4F6F3] to-[#EBF0E8] border border-[#3A5F26]/10 flex-shrink-0 flex items-center justify-center relative">
+        <div className="h-20 w-20 rounded-xl overflow-hidden bg-gradient-to-br from-[#eef6f4] to-[#e4f0ed] border border-[#1b4f72]/10 flex-shrink-0 flex items-center justify-center relative">
           {productImg ? (
             <img
               src={productImg}
@@ -73,7 +73,7 @@ export function CartItem({ item }: CartItemProps) {
               }}
             />
           ) : (
-            <div className="flex flex-col items-center justify-center text-[#3A5F26]/40">
+            <div className="flex flex-col items-center justify-center text-[#1b4f72]/40">
               <Sprout size={24} strokeWidth={1.8} className="animate-pulse" />
               <span className="text-[7px] font-black tracking-wider uppercase mt-1">FRESCO</span>
             </div>
@@ -86,16 +86,16 @@ export function CartItem({ item }: CartItemProps) {
           <div className="flex items-start justify-between gap-2">
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="inline-flex items-center text-[8px] font-black uppercase tracking-wider text-[#3A5F26] bg-[#3A5F26]/8 px-1.5 py-0.5 rounded">
+                <span className="inline-flex items-center text-[8px] font-black uppercase tracking-wider text-[#1b4f72] bg-[#1b4f72]/8 px-1.5 py-0.5 rounded">
                   Feria Libre
                 </span>
                 {item.max_per_user > 0 && (
-                  <span className="inline-flex items-center gap-0.5 text-[8px] text-[#B45309] bg-[#FBBF24]/12 px-1.5 py-0.5 rounded font-black uppercase tracking-wider">
+                  <span className="inline-flex items-center gap-0.5 text-[8px] text-[#B45309] bg-[#2fd4a7]/12 px-1.5 py-0.5 rounded font-black uppercase tracking-wider">
                     <Sparkles size={8} /> Max: {item.max_per_user}
                   </span>
                 )}
               </div>
-              <h4 className="text-sm font-black text-[#1E3A1E] mt-1.5 line-clamp-1 leading-snug">
+              <h4 className="text-sm font-black text-[#142b45] mt-1.5 line-clamp-1 leading-snug">
                 {item.product_name}
               </h4>
               <p className="text-[11px] text-gray-400 font-bold mt-0.5">
@@ -113,17 +113,17 @@ export function CartItem({ item }: CartItemProps) {
           </div>
 
           {/* Fila Inferior: Controles de cantidad y precio subtotal */}
-          <div className="flex items-center justify-between border-t border-[#3A5F26]/8 pt-2 mt-2 gap-2">
+          <div className="flex items-center justify-between border-t border-[#1b4f72]/8 pt-2 mt-2 gap-2">
             {/* Controles de Cantidad */}
-            <div className="flex items-center bg-[#F9FAF9] border border-[#3A5F26]/12 rounded-xl p-0.5 shadow-sm">
+            <div className="flex items-center bg-[#eef6f4] border border-[#1b4f72]/12 rounded-xl p-0.5 shadow-sm">
               <button
                 onClick={handleDecrease}
-                className="h-7 w-7 rounded-lg flex items-center justify-center text-gray-500 hover:bg-white hover:text-[#1E3A1E] transition-all cursor-pointer shadow-sm"
+                className="h-7 w-7 rounded-lg flex items-center justify-center text-gray-500 hover:bg-white hover:text-[#142b45] transition-all cursor-pointer shadow-sm"
                 aria-label="Disminuir cantidad"
               >
                 <Minus size={10} strokeWidth={2.5} />
               </button>
-              <span className="w-7 text-center text-xs font-black text-[#1E3A1E]">
+              <span className="w-7 text-center text-xs font-black text-[#142b45]">
                 {item.quantity}
               </span>
               <button
@@ -132,7 +132,7 @@ export function CartItem({ item }: CartItemProps) {
                 className={`h-7 w-7 rounded-lg flex items-center justify-center transition-all cursor-pointer ${
                   cantAddMore
                     ? "opacity-30 cursor-not-allowed text-gray-300"
-                    : "text-gray-500 hover:bg-white hover:text-[#1E3A1E] shadow-sm"
+                    : "text-gray-500 hover:bg-white hover:text-[#142b45] shadow-sm"
                 }`}
                 title={isMaxedOut ? "Límite alcanzado" : isOutOfStock ? "Stock agotado" : "Agregar más"}
                 aria-label="Aumentar cantidad"
@@ -143,8 +143,8 @@ export function CartItem({ item }: CartItemProps) {
 
             {/* Subtotal del Item */}
             <div className="text-right">
-              <span className="text-[10px] text-[#3A5F26]/60 font-black uppercase tracking-wider block leading-none">Total</span>
-              <span className="text-base font-black text-[#1E3A1E] mt-1 block tracking-tight tabular-nums">
+              <span className="text-[10px] text-[#1b4f72]/60 font-black uppercase tracking-wider block leading-none">Total</span>
+              <span className="text-base font-black text-[#142b45] mt-1 block tracking-tight tabular-nums">
                 {formatPrice(item.unit_price * item.quantity)}
               </span>
             </div>

@@ -117,22 +117,22 @@ export default function FairsPage() {
   return (
     <div className="space-y-6 relative">
       {/* Luces de fondo ambientadas */}
-      <div className="absolute top-[-80px] right-[-80px] -z-10 h-[300px] w-[300px] rounded-full bg-[#5C8A3C]/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[200px] left-[-80px] -z-10 h-[300px] w-[300px] rounded-full bg-[#E8DDD0]/20 dark:bg-slate-900/30 blur-[120px] pointer-events-none" />
+      <div className="absolute top-[-80px] right-[-80px] -z-10 h-[300px] w-[300px] rounded-full bg-[#2e7d9e]/5 blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[200px] left-[-80px] -z-10 h-[300px] w-[300px] rounded-full bg-[#e4f0ed]/20 dark:bg-slate-900/30 blur-[120px] pointer-events-none" />
 
       {/* Cabecera de Página */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-black tracking-tight text-[#4A3728] dark:text-white leading-none">
+          <h1 className="text-3xl font-black tracking-tight text-[#142b45] dark:text-white leading-none">
             Ferias
           </h1>
-          <p className="mt-2 text-sm text-[#4A3728]/60 dark:text-slate-400 font-medium">
+          <p className="mt-2 text-sm text-[#142b45]/60 dark:text-slate-400 font-medium">
             Gestiona y visualiza las ferias activas del sistema
           </p>
         </div>
         <button 
           onClick={openCreateModal}
-          className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] px-5 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.18)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
+          className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-[#1b4f72] to-[#2e7d9e] px-5 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.18)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300"
         >
           <svg className="h-5 w-5 mr-2 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -145,7 +145,7 @@ export default function FairsPage() {
       <div className="flex flex-col sm:flex-row gap-4">
         <form onSubmit={handleSearchSubmit} className="flex-1">
           <div className="relative group">
-            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#4A3728]/50 dark:text-slate-500 group-focus-within:text-[#3D5A1E] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-[#142b45]/50 dark:text-slate-500 group-focus-within:text-[#1b4f72] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
             <input 
@@ -153,7 +153,7 @@ export default function FairsPage() {
               value={searchInput} 
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Buscar por nombre o ubicación..."
-              className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-11 pr-4 py-3 text-sm shadow-sm placeholder-[#4A3728]/40 dark:placeholder-slate-650 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300" 
+              className="block w-full rounded-xl border border-[#e4f0ed] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-11 pr-4 py-3 text-sm shadow-sm placeholder-[#142b45]/40 dark:placeholder-slate-650 focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:border-[#1b4f72] text-[#142b45] dark:text-white transition-all duration-300" 
             />
           </div>
         </form>
@@ -163,7 +163,7 @@ export default function FairsPage() {
           <select 
             value={statusFilter} 
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="block w-full rounded-xl border border-[#E8DDD0] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-4 pr-10 py-3 text-sm shadow-sm focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] text-[#4A3728] dark:text-white transition-all duration-300 appearance-none"
+            className="block w-full rounded-xl border border-[#e4f0ed] dark:border-slate-800 bg-white/70 dark:bg-slate-900/40 pl-4 pr-10 py-3 text-sm shadow-sm focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:border-[#1b4f72] text-[#142b45] dark:text-white transition-all duration-300 appearance-none"
           >
             <option value="">Todos los estados</option>
             <option value="upcoming">Próxima</option>
@@ -172,7 +172,7 @@ export default function FairsPage() {
             <option value="finished">Finalizada</option>
             <option value="cancelled">Cancelada</option>
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#4A3728]/60 dark:text-slate-500">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#142b45]/60 dark:text-slate-500">
             <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
               <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
             </svg>
@@ -187,7 +187,7 @@ export default function FairsPage() {
       {modalMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-950/40 backdrop-blur-md transition-opacity" onClick={closeModal} />
-          <div className="relative bg-white dark:bg-slate-950 rounded-3xl border border-[#E8DDD0]/30 dark:border-slate-900/60 shadow-[0_24px_60px_rgba(0,0,0,0.12)] w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 md:p-8 animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative bg-white dark:bg-slate-950 rounded-3xl border border-[#e4f0ed]/30 dark:border-slate-900/60 shadow-[0_24px_60px_rgba(0,0,0,0.12)] w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 md:p-8 animate-in fade-in zoom-in-95 duration-200">
             <button 
               onClick={closeModal}
               className="absolute top-5 right-5 p-1.5 rounded-xl text-slate-400 hover:text-slate-650 hover:bg-slate-100 dark:hover:bg-slate-900 transition-colors" 
@@ -214,9 +214,9 @@ export default function FairsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-extrabold text-[#4A3728] dark:text-white leading-snug">Eliminar Feria</h3>
+              <h3 className="text-lg font-extrabold text-[#142b45] dark:text-white leading-snug">Eliminar Feria</h3>
               <p className="mt-2.5 text-sm text-slate-505 dark:text-slate-400 leading-relaxed font-normal">
-                ¿Estás seguro de eliminar <span className="font-extrabold text-[#4A3728] dark:text-white">{deleteConfirm.name}</span>?
+                ¿Estás seguro de eliminar <span className="font-extrabold text-[#142b45] dark:text-white">{deleteConfirm.name}</span>?
               </p>
             </div>
             <div className="mt-6 flex items-center justify-center gap-3">

@@ -21,15 +21,25 @@ export function Footer({ variant = "dashboard" }: FooterProps) {
   if (variant === "dashboard") {
     return (
       <footer className="border-t border-neutral-200/50 bg-white/60 backdrop-blur-md px-6 py-4">
-        <div className="flex items-center justify-between text-[11px] font-medium text-[#4A3728]/50 tracking-wide">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-medium text-[#142b45]/50 tracking-wide">
           <p>
-            &copy; {currentYear} <span className="font-bold text-[#4A3728]/70">{APP.NAME}</span>. Todos los derechos reservados.
+            &copy; {currentYear} <span className="font-bold text-[#142b45]/70">{APP.NAME}</span>. Todos los derechos reservados.
           </p>
-          <div className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#5C8A3C]/40 animate-pulse" />
-            <span className="font-mono bg-neutral-100/80 border border-neutral-200/40 px-1.5 py-0.5 rounded text-[10px] font-bold">
-              v{APP.VERSION}
-            </span>
+          <div className="flex items-center gap-3">
+            <a href="/privacy" className="hover:text-[#1b4f72] hover:underline underline-offset-4 transition-colors">
+              Privacidad
+            </a>
+            <span className="text-[#142b45]/30">·</span>
+            <a href="/terms" className="hover:text-[#1b4f72] hover:underline underline-offset-4 transition-colors">
+              Términos
+            </a>
+            <span className="text-[#142b45]/30">·</span>
+            <div className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2e7d9e]/40 animate-pulse" />
+              <span className="font-mono bg-neutral-100/80 border border-neutral-200/40 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                v{APP.VERSION}
+              </span>
+            </div>
           </div>
         </div>
       </footer>
@@ -38,10 +48,10 @@ export function Footer({ variant = "dashboard" }: FooterProps) {
 
   // ─── PÚBLICO ────────────────────────────────────────
   return (
-    <footer className="border-t border-neutral-200/60 bg-gradient-to-b from-white to-[#FDF8F0]/30 relative overflow-hidden">
+    <footer className="border-t border-neutral-200/60 bg-gradient-to-b from-white to-[#eef6f4]/30 relative overflow-hidden">
       {/* Decorative organic background line */}
       <div 
-        className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#3D5A1E]/10 to-transparent opacity-50"
+        className="absolute bottom-0 left-0 right-0 h-[3px] bg-gradient-to-r from-transparent via-[#1b4f72]/10 to-transparent opacity-50"
         aria-hidden="true"
       />
 
@@ -49,24 +59,24 @@ export function Footer({ variant = "dashboard" }: FooterProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Marca */}
           <div className="space-y-3">
-            <h3 className="text-xs font-bold text-[#4A3728] uppercase tracking-widest leading-none">
+            <h3 className="text-xs font-bold text-[#142b45] uppercase tracking-widest leading-none">
               {APP.NAME}
             </h3>
-            <p className="text-xs text-[#4A3728]/60 leading-relaxed max-w-xs font-medium">
+            <p className="text-xs text-[#142b45]/60 leading-relaxed max-w-xs font-medium">
               {APP.DESCRIPTION}
             </p>
           </div>
 
           {/* Enlaces */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+            <h4 className="text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
               Enlaces
             </h4>
             <ul className="space-y-2">
               <li>
                 <a
                   href="/login"
-                  className="text-xs font-semibold text-[#4A3728]/60 hover:text-[#3D5A1E] hover:underline underline-offset-4 transition-colors flex items-center gap-1"
+                  className="text-xs font-semibold text-[#142b45]/60 hover:text-[#1b4f72] hover:underline underline-offset-4 transition-colors flex items-center gap-1"
                 >
                   Iniciar Sesión
                 </a>
@@ -74,9 +84,25 @@ export function Footer({ variant = "dashboard" }: FooterProps) {
               <li>
                 <a
                   href="/register"
-                  className="text-xs font-semibold text-[#4A3728]/60 hover:text-[#3D5A1E] hover:underline underline-offset-4 transition-colors flex items-center gap-1"
+                  className="text-xs font-semibold text-[#142b45]/60 hover:text-[#1b4f72] hover:underline underline-offset-4 transition-colors flex items-center gap-1"
                 >
                   Registrarse
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/privacy"
+                  className="text-xs font-semibold text-[#142b45]/60 hover:text-[#1b4f72] hover:underline underline-offset-4 transition-colors flex items-center gap-1"
+                >
+                  Política de Privacidad
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/terms"
+                  className="text-xs font-semibold text-[#142b45]/60 hover:text-[#1b4f72] hover:underline underline-offset-4 transition-colors flex items-center gap-1"
+                >
+                  Términos y Condiciones
                 </a>
               </li>
             </ul>
@@ -84,10 +110,10 @@ export function Footer({ variant = "dashboard" }: FooterProps) {
 
           {/* Contacto */}
           <div className="space-y-3">
-            <h4 className="text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+            <h4 className="text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
               Soporte
             </h4>
-            <p className="text-xs text-[#4A3728]/60 leading-relaxed font-medium max-w-xs">
+            <p className="text-xs text-[#142b45]/60 leading-relaxed font-medium max-w-xs">
               ¿Necesitas ayuda? Contacta al equipo de soporte para resolver dudas del sistema o reportar problemas.
             </p>
           </div>
@@ -95,14 +121,24 @@ export function Footer({ variant = "dashboard" }: FooterProps) {
 
         {/* Copyright */}
         <div className="mt-10 pt-6 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <p className="text-[11px] font-medium text-[#4A3728]/50 tracking-wide">
-            &copy; {currentYear} <span className="font-bold text-[#4A3728]/65">{APP.NAME}</span>. Todos los derechos reservados.
+          <p className="text-[11px] font-medium text-[#142b45]/50 tracking-wide">
+            &copy; {currentYear} <span className="font-bold text-[#142b45]/65">{APP.NAME}</span>. Todos los derechos reservados.
           </p>
-          <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#4A3728]/50">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#5C8A3C]/40 animate-pulse" />
-            <span className="font-mono bg-neutral-50 border border-neutral-200/50 px-1.5 py-0.5 rounded text-[10px] font-bold">
-              v{APP.VERSION}
-            </span>
+          <div className="flex items-center gap-3 text-[11px] font-medium text-[#142b45]/50">
+            <a href="/privacy" className="hover:text-[#1b4f72] hover:underline underline-offset-4 transition-colors">
+              Privacidad
+            </a>
+            <span className="text-[#142b45]/30">·</span>
+            <a href="/terms" className="hover:text-[#1b4f72] hover:underline underline-offset-4 transition-colors">
+              Términos
+            </a>
+            <span className="text-[#142b45]/30">·</span>
+            <div className="flex items-center gap-1.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#2e7d9e]/40 animate-pulse" />
+              <span className="font-mono bg-neutral-50 border border-neutral-200/50 px-1.5 py-0.5 rounded text-[10px] font-bold">
+                v{APP.VERSION}
+              </span>
+            </div>
           </div>
         </div>
       </div>

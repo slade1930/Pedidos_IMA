@@ -42,10 +42,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Limpiar datos del usuario anterior antes de login
       useCartStore.getState().clearCart();
 
-      const tokens = await authService.login(credentials);
-
-      tokenStorage.setAccessToken(tokens.access_token);
-      tokenStorage.setRefreshToken(tokens.refresh_token);
+      // FASE 1.1: login deja las cookies httpOnly (itas_access/itas_refresh)
+      await authService.login(credentials);
+      tokenStorage.markSessionActive();
 
       const user = await authService.getMe();
 
@@ -70,13 +69,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const user = await authService.register(data);
 
-      const tokens = await authService.login({
+      await authService.login({
         email: data.email,
         password: data.password,
       });
-
-      tokenStorage.setAccessToken(tokens.access_token);
-      tokenStorage.setRefreshToken(tokens.refresh_token);
+      tokenStorage.markSessionActive();
 
       set({
         user,
@@ -104,7 +101,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Limpiar localStorage de la app
       if (typeof window !== "undefined") {
-        localStorage.removeItem("ima-cart");
+        localStorage.removeItem("itas-cart");
       }
 
       // Resetear estado
@@ -145,16 +142,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   initialize: () => {
     if (get().isInitialized) return;
 
-    const hasAccessToken = tokenStorage.hasAccessToken();
-    const hasRefreshToken = tokenStorage.hasRefreshToken();
-
-    if (hasAccessToken || hasRefreshToken) {
+    // FASE 1.1: la sesión se detecta con la cookie ligera "has_session".
+    // Los tokens httpOnly no son legibles desde JS.
+    if (tokenStorage.hasSession()) {
       get()
         .fetchMe()
         .finally(() => {
           set({ isInitialized: true });
         });
     } else {
+      tokenStorage.clearSession();
       set({
         isInitialized: true,
         user: null,

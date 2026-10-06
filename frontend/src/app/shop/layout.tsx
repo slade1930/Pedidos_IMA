@@ -9,10 +9,10 @@ import { ShopFooter } from "@/features/shop/components/ShopFooter";
 
 export const metadata: Metadata = {
   title: {
-    default: "IMA System — Tienda",
-    template: "%s — IMA System",
+    default: "ITAS — Tienda",
+    template: "%s — ITAS",
   },
-  description: "Realiza tus pedidos para las ferias del IMA",
+  description: "Realiza tus pedidos para las ferias del ITAS",
 };
 
 // ─── LAYOUT ────────────────────────────────────────────────

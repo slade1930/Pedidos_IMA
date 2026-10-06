@@ -19,7 +19,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from sqlalchemy.dialects.postgresql import UUID
+from app.core.types import UuidType
 
 from app.models.base_model import BaseModel
 
@@ -108,7 +108,7 @@ class Product(BaseModel):
 
     # Relación feria
     fair_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        UuidType(),
         ForeignKey("fairs.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -124,6 +124,7 @@ class Product(BaseModel):
         "Inventory",
         back_populates="product",
         uselist=False,
+        lazy="selectin",
     )
 
     order_items: Mapped[list["OrderItem"]] = relationship(

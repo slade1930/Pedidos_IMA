@@ -8,6 +8,7 @@ from app.core.database import engine, Base
 from app.core.middleware import setup_middlewares
 from app.api.router import api_router
 from app.utils.logger import setup_logger, log
+from app.core.cloudinary_config import init_cloudinary  # 👈 NUEVO
 import os
 from pathlib import Path
 
@@ -17,9 +18,16 @@ from pathlib import Path
 async def lifespan(app: FastAPI):
     # Startup
     setup_logger()
-    log.info("🚀 Iniciando IMA System API...")
+    log.info("🚀 Iniciando ITAS API...")
     
-    # 👈 Crear directorios necesarios
+    # Inicializar Cloudinary
+    try:
+        init_cloudinary()
+        log.info("☁️  Cloudinary configurado")
+    except Exception as e:
+        log.warning(f"⚠️  Cloudinary no configurado: {e}")
+    
+    # Crear directorios necesarios
     Path("static/images/fairs").mkdir(parents=True, exist_ok=True)
     log.info("📁 Directorios estáticos creados")
 
@@ -31,7 +39,7 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
-    log.info("🛑 Cerrando IMA System API...")
+    log.info("🛑 Cerrando ITAS API...")
     await engine.dispose()
     log.info("✅ Conexiones cerradas")
 
@@ -40,7 +48,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version="1.0.0",
-    description="Sistema Inteligente para las Ferias del IMA - Panamá",
+    description="Sistema Inteligente para las Ferias del ITAS - Panamá",
     docs_url="/docs" if settings.DEBUG else None,
     redoc_url="/redoc" if settings.DEBUG else None,
     lifespan=lifespan,

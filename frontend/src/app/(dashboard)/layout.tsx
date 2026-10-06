@@ -5,7 +5,7 @@ import { ProtectedLayout } from "@/components/layout/ProtectedLayout";
 // ─── VIEWPORT & COLOR DE TEMA ─────────────────────────────
 
 export const viewport: Viewport = {
-  themeColor: "#3D5A1E",
+  themeColor: "#1b4f72",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -15,8 +15,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: "IMA System — Panel de Control",
-    template: "%s — IMA System",
+    default: "ITAS — Panel de Control",
+    template: "%s — ITAS",
   },
   description: "Panel de administración y gestión para usuarios, ferias, inventario y pedidos de mercadeo agropecuario.",
   robots: {

@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import type { JSX } from "react";
 import { useAuthStore } from "@/stores/auth.store";
@@ -31,7 +32,7 @@ const NAV_ITEMS: NavItem[] = [
 // ─── ICONOS ────────────────────────────────────────────────
 
 function NavIcon({ name, active }: { name: string; active: boolean }) {
-  const className = `h-5 w-5 transition-transform duration-300 group-hover:scale-110 ${active ? "text-[#3D5A1E]" : "text-[#4A3728]/50 group-hover:text-[#4A3728]/75"}`;
+  const className = `h-5 w-5 transition-transform duration-300 group-hover:scale-110 ${active ? "text-[#1b4f72]" : "text-[#142b45]/50 group-hover:text-[#142b45]/75"}`;
 
   const icons: Record<string, JSX.Element> = {
     LayoutDashboard: (
@@ -104,18 +105,26 @@ export function Sidebar() {
     >
       {/* Header / Brand matching the top header */}
       <div 
-        className="flex items-center h-16 px-6 border-b border-neutral-200/60 bg-gradient-to-r from-[#253912] to-[#3D5A1E] text-white relative overflow-hidden"
+        className="flex items-center h-[76px] px-4 border-b border-[#2fd4a7]/20 bg-gradient-to-r from-[#0e1e33] via-[#142b45] to-[#1b4f72] text-white relative overflow-hidden"
       >
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(242,169,0,0.12),_transparent_60%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(47,212,167,0.18),_transparent_60%)]" />
         <div className="flex items-center gap-3 relative z-10">
-          <div className="w-[30px] h-[30px] rounded-lg bg-gradient-to-br from-[#F2A900] to-[#C78500] flex items-center justify-center text-[10px] font-black text-[#3D5A1E] shadow-md">
-            IMA
+<div className="relative flex items-center">
+            <div className="absolute -inset-x-2 -inset-y-1 rounded-xl bg-[#2fd4a7]/25 blur-md" />
+            <Image
+              src="/images/ITAS_logo.png"
+              alt="ITAS"
+              width={1254}
+              height={1254}
+              className="relative w-auto h-8 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.35)]"
+              priority
+            />
           </div>
           <div className="flex flex-col">
-            <span className="text-xs font-bold tracking-tight leading-none text-[#FDF8F0]">
-              IMA System
+            <span className="text-xs font-bold tracking-tight leading-none text-[#eef6f4]">
+              Abasto Social
             </span>
-            <span className="text-[8px] text-[#FDF8F0]/40 tracking-wider uppercase font-bold mt-1">
+            <span className="text-[8px] text-[#8fdcc9] tracking-wider uppercase font-bold mt-1">
               Mercadeo
             </span>
           </div>
@@ -132,8 +141,8 @@ export function Sidebar() {
               onClick={() => router.push(item.href)}
               className={`group relative flex items-center w-full gap-3.5 rounded-lg px-4 py-2.5 text-xs font-bold transition-all duration-300 ${
                 isActive 
-                  ? "text-[#3D5A1E]" 
-                  : "text-[#4A3728]/70 hover:text-[#4A3728] hover:bg-[#E8DDD0]/15"
+                  ? "text-[#1b4f72]" 
+                  : "text-[#142b45]/70 hover:text-[#142b45] hover:bg-[#e4f0ed]/15"
               }`}
             >
               {/* Sliding Active Pill */}
@@ -141,7 +150,7 @@ export function Sidebar() {
                 <motion.span
                   layoutId="sidebar-active-pill"
                   transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  className="absolute inset-0 bg-[#3D5A1E]/8 border-l-[3px] border-[#3D5A1E] rounded-r-lg rounded-l-none -z-10"
+                  className="absolute inset-0 bg-[#1b4f72]/8 border-l-[3px] border-[#1b4f72] rounded-r-lg rounded-l-none -z-10"
                 />
               )}
               <NavIcon name={item.icon} active={isActive} />
@@ -152,25 +161,25 @@ export function Sidebar() {
       </nav>
 
       {/* User profile footer section */}
-      <div className="border-t border-neutral-200/50 bg-[#FDF8F0]/30 px-4 py-4">
+      <div className="border-t border-neutral-200/50 bg-[#eef6f4]/30 px-4 py-4">
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 h-9 w-9 rounded-xl bg-gradient-to-br from-[#F2A900] to-[#C78500] flex items-center justify-center shadow-sm">
-            <span className="text-xs font-black text-[#3D5A1E]">
+          <div className="flex-shrink-0 h-9 w-9 rounded-xl bg-gradient-to-br from-[#2fd4a7] to-[#20917a] flex items-center justify-center shadow-sm">
+            <span className="text-xs font-black text-[#1b4f72]">
               {user?.full_name?.charAt(0).toUpperCase() ?? "U"}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-bold text-[#4A3728] truncate leading-tight">
+            <p className="text-xs font-bold text-[#142b45] truncate leading-tight">
               {user?.full_name ?? "Usuario"}
             </p>
-            <p className="text-[10px] font-semibold text-[#4A3728]/50 truncate capitalize mt-0.5 leading-none">
+            <p className="text-[10px] font-semibold text-[#142b45]/50 truncate capitalize mt-0.5 leading-none">
               {user?.role ?? ""}
             </p>
           </div>
           <button 
             onClick={handleLogout} 
             title="Cerrar sesión"
-            className="flex-shrink-0 p-2 rounded-lg text-[#4A3728]/50 hover:text-[#C94B32] hover:bg-[#C94B32]/5 border border-transparent hover:border-[#C94B32]/10 transition-all"
+            className="flex-shrink-0 p-2 rounded-lg text-[#142b45]/50 hover:text-[#C94B32] hover:bg-[#C94B32]/5 border border-transparent hover:border-[#C94B32]/10 transition-all"
           >
             <svg className="h-4.5 w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.7}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />

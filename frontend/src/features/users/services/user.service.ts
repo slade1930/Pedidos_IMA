@@ -6,6 +6,7 @@ import type {
   CreateUserPayload,
   UpdateUserPayload,
   AdminUpdateUserPayload,
+  ChangePasswordPayload,
   UsersResponse,
   UserFilters,
 } from "@/features/users/types/user.types";
@@ -62,6 +63,16 @@ export const userService = {
   async updateMe(data: UpdateUserPayload): Promise<User> {
     const response = await apiClient.put<User>("/users/me", data);
     return response.data;
+  },
+
+  /**
+   * Cambia la contraseña del usuario autenticado (FASE 1.6).
+   * Exige la contraseña actual en el cuerpo.
+   *
+   * POST /api/v1/users/change-password
+   */
+  async changePassword(data: ChangePasswordPayload): Promise<void> {
+    await apiClient.post("/users/change-password", data);
   },
 
   /**

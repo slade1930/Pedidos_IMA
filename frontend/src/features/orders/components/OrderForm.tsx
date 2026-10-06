@@ -49,7 +49,7 @@ function OrderItemsFields({ register, control, errors, isSubmitting, products }:
           type="button" 
           onClick={() => append({ product_id: "", quantity: 1 })}
           disabled={isSubmitting}
-          className="inline-flex items-center gap-1 border border-dashed border-[#5C8A3C]/30 text-[#3D5A1E] dark:text-[#5C8A3C] hover:bg-[#3D5A1E]/5 hover:border-[#3D5A1E]/55 rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200 disabled:opacity-50"
+          className="inline-flex items-center gap-1 border border-dashed border-[#2e7d9e]/30 text-[#1b4f72] dark:text-[#2e7d9e] hover:bg-[#1b4f72]/5 hover:border-[#1b4f72]/55 rounded-xl px-3 py-1.5 text-xs font-bold transition-all duration-200 disabled:opacity-50"
         >
           <svg className="w-3.5 h-3.5 mr-0.5 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -66,7 +66,7 @@ function OrderItemsFields({ register, control, errors, isSubmitting, products }:
         {fields.map((field: { id: string }, index: number) => (
           <div 
             key={field.id} 
-            className="flex items-end gap-3.5 p-4 bg-[#E8DDD0]/10 dark:bg-slate-900/30 rounded-2xl border border-[#E8DDD0]/25 dark:border-slate-800/80 shadow-inner"
+            className="flex items-end gap-3.5 p-4 bg-[#e4f0ed]/10 dark:bg-slate-900/30 rounded-2xl border border-[#e4f0ed]/25 dark:border-slate-800/80 shadow-inner"
           >
             {/* Producto select */}
             <div className="flex-1 space-y-1.5 relative group">
@@ -74,7 +74,7 @@ function OrderItemsFields({ register, control, errors, isSubmitting, products }:
               <div className="relative">
                 <select 
                   disabled={isSubmitting}
-                  className={`block w-full rounded-xl border bg-white/70 dark:bg-slate-950 px-3 py-2 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.015)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
+                  className={`block w-full rounded-xl border bg-white/70 dark:bg-slate-950 px-3 py-2 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.015)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:border-[#1b4f72] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
                     errors.items?.[index]?.product_id ? "border-rose-350 focus:border-rose-500" : "border-slate-200 dark:border-slate-800"
                   }`}
                   {...register(`items.${index}.product_id`)}
@@ -103,7 +103,7 @@ function OrderItemsFields({ register, control, errors, isSubmitting, products }:
                 min="1" 
                 max="10" 
                 disabled={isSubmitting}
-                className={`block w-full rounded-xl border bg-white/70 dark:bg-slate-950 px-3 py-2 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.015)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:border-[#3D5A1E] disabled:opacity-50 ${
+                className={`block w-full rounded-xl border bg-white/70 dark:bg-slate-950 px-3 py-2 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.015)] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:border-[#1b4f72] disabled:opacity-50 ${
                   errors.items?.[index]?.quantity ? "border-rose-350 focus:border-rose-500" : "border-slate-200 dark:border-slate-800"
                 }`}
                 {...register(`items.${index}.quantity`, { valueAsNumber: true })} 
@@ -173,11 +173,11 @@ export function OrderForm({
       className="space-y-6 bg-white/80 dark:bg-slate-950/70 p-6 md:p-8 rounded-3xl border border-slate-100 dark:border-slate-900/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] backdrop-blur-xl relative overflow-hidden transition-all duration-300"
     >
       {/* Ambient background glows */}
-      <div className="absolute top-0 right-0 -z-10 h-[150px] w-[150px] rounded-full bg-gradient-to-br from-[#5C8A3C]/5 to-violet-500/0 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -z-10 h-[150px] w-[150px] rounded-full bg-gradient-to-tr from-[#E8DDD0]/15 to-indigo-500/0 blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 -z-10 h-[150px] w-[150px] rounded-full bg-gradient-to-br from-[#2e7d9e]/5 to-violet-500/0 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 -z-10 h-[150px] w-[150px] rounded-full bg-gradient-to-tr from-[#e4f0ed]/15 to-indigo-500/0 blur-3xl pointer-events-none" />
 
       <div className="relative pb-2">
-        <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#4A3728] via-slate-800 to-indigo-900 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+        <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#142b45] via-slate-800 to-indigo-900 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
           Nueva Orden
         </h3>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 font-medium">
@@ -196,15 +196,15 @@ export function OrderForm({
 
       {/* Feria */}
       <div className="space-y-1.5 relative group">
-        <label htmlFor="fair_id" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+        <label htmlFor="fair_id" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
           Feria
         </label>
         <div className="relative">
           <select 
             id="fair_id" 
             disabled={isSubmitting}
-            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
-              errors.fair_id ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-505" : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
+              errors.fair_id ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-505" : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
             }`}
             {...register("fair_id")}
           >
@@ -224,15 +224,15 @@ export function OrderForm({
 
       {/* Método de pago */}
       <div className="space-y-1.5 relative group">
-        <label htmlFor="payment_method" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+        <label htmlFor="payment_method" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
           Método de pago
         </label>
         <div className="relative">
           <select 
             id="payment_method" 
             disabled={isSubmitting}
-            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
-              errors.payment_method ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-505" : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
+              errors.payment_method ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-505" : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
             }`}
             {...register("payment_method")}
           >
@@ -254,14 +254,14 @@ export function OrderForm({
 
       {/* Notas */}
       <div className="space-y-1.5 relative group">
-        <label htmlFor="notes" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+        <label htmlFor="notes" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
           Notas <span className="text-slate-400 font-normal lowercase italic">(opcional)</span>
         </label>
         <textarea 
           id="notes" 
           rows={2} 
           disabled={isSubmitting}
-          className="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-650 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 resize-none"
+          className="block w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-650 focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 resize-none"
           placeholder="Notas adicionales sobre la orden..."
           {...register("notes")} 
         />
@@ -282,7 +282,7 @@ export function OrderForm({
         <button 
           type="submit" 
           disabled={isSubmitting}
-          className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.15)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 group"
+          className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#1b4f72] to-[#2e7d9e] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.15)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 group"
         >
           <span className="relative z-10 flex items-center justify-center gap-2">
             {isSubmitting ? (
@@ -295,7 +295,7 @@ export function OrderForm({
               </>
             ) : "Crear Orden"}
           </span>
-          <span className="absolute inset-0 bg-gradient-to-r from-[#5C8A3C] to-[#3D5A1E] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"></span>
+          <span className="absolute inset-0 bg-gradient-to-r from-[#2e7d9e] to-[#1b4f72] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"></span>
         </button>
       </div>
     </form>

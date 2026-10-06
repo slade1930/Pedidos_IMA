@@ -13,7 +13,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from sqlalchemy.dialects.postgresql import UUID
+from app.core.types import UuidType
 
 from app.models.base_model import BaseModel
 
@@ -32,14 +32,14 @@ class Inventory(BaseModel):
 
     # Relaciones
     product_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        UuidType(),
         ForeignKey("products.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
     fair_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        UuidType(),
         ForeignKey("fairs.id", ondelete="CASCADE"),
         nullable=False,
         index=True,

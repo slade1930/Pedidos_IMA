@@ -26,15 +26,14 @@ export function useRegister() {
     mutationFn: (data: RegisterData) => authService.register(data),
 
     onSuccess: async (user, variables) => {
-      // Hacer login automático con las mismas credenciales
+      // Hacer login automático con las mismas credenciales (deja las cookies httpOnly)
       try {
-        const tokens = await authService.login({
+        await authService.login({
           email: variables.email,
           password: variables.password,
         });
 
-        tokenStorage.setAccessToken(tokens.access_token);
-        tokenStorage.setRefreshToken(tokens.refresh_token);
+        tokenStorage.markSessionActive();
 
         useAuthStore.setState({
           user,

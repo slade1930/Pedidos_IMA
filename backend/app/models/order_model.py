@@ -9,7 +9,6 @@ from sqlalchemy import (
     Enum as SAEnum,
     ForeignKey,
     Text,
-    Boolean,
     DateTime,
 )
 
@@ -19,7 +18,7 @@ from sqlalchemy.orm import (
     relationship,
 )
 
-from sqlalchemy.dialects.postgresql import UUID
+from app.core.types import UuidType
 
 from app.models.base_model import BaseModel
 
@@ -36,14 +35,14 @@ class Order(BaseModel):
 
     # Relaciones
     user_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        UuidType(),
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
 
     fair_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True),
+        UuidType(),
         ForeignKey("fairs.id", ondelete="CASCADE"),
         nullable=False,
         index=True,
@@ -86,22 +85,11 @@ class Order(BaseModel):
         nullable=True,
     )
 
-    # QR y pickup
-    qr_token: Mapped[str | None] = mapped_column(
-        String(500),
-        nullable=True,
-        unique=True,
-    )
-
-    qr_used: Mapped[bool] = mapped_column(
-        Boolean,
-        default=False,
-        nullable=False,
-    )
-
+    # Pickup
     pickup_code: Mapped[str | None] = mapped_column(
         String(5),
         nullable=True,
+        index=True,
     )
 
     picked_up_at: Mapped[datetime | None] = mapped_column(

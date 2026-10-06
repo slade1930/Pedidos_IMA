@@ -2,49 +2,29 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/stores/auth.store";
-import { RegisterForm } from "@/features/auth/components/RegisterForm";
-
-// ─── VARIANTES DE ANIMACIÓN ────────────────────────────────────────────────────
-
-const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 20, scale: 0.98 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 0.5,
-      ease: [0.22, 1, 0.36, 1] as [number, number, number, number],
-    },
-  },
-};
-
-const loaderVariants: Variants = {
-  hidden:  { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.2 } },
-  exit:    { opacity: 0, transition: { duration: 0.15 } },
-};
+import AuthSwitch from "@/components/ui/auth-switch";
+import {
+  TermsAcceptanceModal,
+  useTermsAcceptance,
+} from "@/components/features/TermsAcceptanceModal";
 
 // ─── LOADER ────────────────────────────────────────────────────────────────────
 
 function SessionLoader() {
   return (
-    <motion.div
-      key="session-loader"
-      variants={loaderVariants}
-      initial="hidden"
-      animate="visible"
-      exit="exit"
+    <div
       style={{
+        minHeight: "100dvh",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        justifyContent: "center",
         gap: "16px",
-        padding: "3rem 0",
+        background: "#eef6f4",
       }}
       role="status"
       aria-label="Verificando sesión"
@@ -56,33 +36,26 @@ function SessionLoader() {
             position: "absolute",
             inset: 0,
             borderRadius: "50%",
-            border: "2.5px solid rgba(61,90,30,0.12)",
+            border: "2.5px solid rgba(20,43,69,0.12)",
           }}
         />
-        <motion.div
+        <div
           aria-hidden="true"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 0.9, repeat: Infinity, ease: "linear" }}
           style={{
             position: "absolute",
             inset: 0,
             borderRadius: "50%",
             border: "2.5px solid transparent",
-            borderTopColor: "#F2A900",
-            borderRightColor: "rgba(242,169,0,0.3)",
+            borderTopColor: "#2fbf9b",
+            borderRightColor: "rgba(47,212,167,0.3)",
+            animation: "itas-spin 0.9s linear infinite",
           }}
         />
       </div>
-      <p
-        style={{
-          fontSize: "12px",
-          color: "rgba(74,55,40,0.45)",
-          letterSpacing: "0.04em",
-        }}
-      >
+      <p style={{ fontSize: "12px", color: "rgba(20,43,69,0.45)" }}>
         Verificando sesión…
       </p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -97,6 +70,9 @@ export default function RegisterPage() {
   const isInitialized   = useAuthStore((state) => state.isInitialized);
   const redirectTo      = searchParams.get("redirect") || "/shop";
 
+  const { accepted, accept, reject } = useTermsAcceptance();
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
+
   useEffect(() => {
     if (isInitialized && isAuthenticated) {
       router.replace(redirectTo);
@@ -105,114 +81,30 @@ export default function RegisterPage() {
   // ─────────────────────────────────────────────────────────────────────────
 
   if (!isInitialized) {
-    return (
-      <AnimatePresence mode="wait">
-        <SessionLoader />
-      </AnimatePresence>
-    );
+    return <SessionLoader />;
   }
 
-  if (isAuthenticated) {
-    return null;
-  }
+  if (isAuthenticated) return null;
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key="register-card"
-        variants={cardVariants}
-        initial="hidden"
-        animate="visible"
-      >
-        {/* Header semántico */}
-        <div style={{ marginBottom: "2rem" }}>
-          <p
-            style={{
-              fontSize: "11px",
-              color: "#F2A900",
-              letterSpacing: "0.1em",
-              textTransform: "uppercase",
-              fontWeight: 500,
-              marginBottom: "6px",
+    <>
+      <AnimatePresence>
+        {termsModalOpen && (
+          <TermsAcceptanceModal
+            onAccept={() => {
+              accept();
+              setTermsModalOpen(false);
             }}
-          >
-            Nuevo usuario
-          </p>
-          <h1
-            style={{
-              fontSize: "24px",
-              fontWeight: 500,
-              color: "#4A3728",
-              margin: 0,
-              lineHeight: 1.2,
-            }}
-          >
-            Crear cuenta
-          </h1>
-          <p
-            style={{
-              fontSize: "13px",
-              color: "rgba(74,55,40,0.5)",
-              marginTop: "6px",
-            }}
-          >
-            Regístrate para acceder a las ferias del IMA
-          </p>
-        </div>
-
-        {/* Card con glassmorphism */}
-        <div
-          style={{
-            background: "rgba(255,255,255,0.75)",
-            backdropFilter: "blur(12px)",
-            WebkitBackdropFilter: "blur(12px)",
-            border: "0.5px solid #E8DDD0",
-            borderRadius: "16px",
-            padding: "2rem",
-            boxShadow:
-              "0 1px 2px rgba(74,55,40,0.04), 0 4px 16px rgba(61,90,30,0.06)",
-          }}
-        >
-          {/* Shimmer Golden Corn */}
-          <div
-            aria-hidden="true"
-            style={{
-              height: "1px",
-              background:
-                "linear-gradient(90deg, transparent, rgba(242,169,0,0.5), transparent)",
-              marginBottom: "1.5rem",
-              borderRadius: "1px",
-            }}
+            onReject={reject}
           />
+        )}
+      </AnimatePresence>
 
-          <RegisterForm />
-        </div>
-
-        {/* Pie contextual */}
-        <p
-          style={{
-            marginTop: "1.25rem",
-            fontSize: "12px",
-            color: "rgba(74,55,40,0.4)",
-            textAlign: "center",
-            lineHeight: 1.6,
-          }}
-        >
-          ¿Ya tienes cuenta?{" "}
-          <a
-            href="/login"
-            style={{
-              color: "#3D5A1E",
-              fontWeight: 500,
-              textDecoration: "none",
-              borderBottom: "1.5px solid #F2A900",
-              paddingBottom: "1px",
-            }}
-          >
-            Inicia sesión →
-          </a>
-        </p>
-      </motion.div>
-    </AnimatePresence>
+      <AuthSwitch
+        initialMode="sign-up"
+        termsAccepted={accepted}
+        onRequireTerms={() => setTermsModalOpen(true)}
+      />
+    </>
   );
 }

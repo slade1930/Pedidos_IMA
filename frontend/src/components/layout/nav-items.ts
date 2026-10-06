@@ -64,6 +64,12 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ["admin", "client"],
   },
   {
+    label: "Notificaciones",
+    href: "/dashboard/notifications",
+    icon: "Bell",
+    roles: ["admin"],
+  },
+  {
     label: "Configuración",
     href: "/dashboard/settings",
     icon: "Settings",

@@ -12,11 +12,11 @@ interface PaymentStatusBadgeProps {
 const STATUS_CONFIG: Record<PaymentStatus, { label: string; className: string }> = {
   completed: {
     label: "Completado",
-    className: "bg-[#1B4314] text-[#4ADE80] border-2 border-[#22C55E]",
+    className: "bg-[#142b45] text-[#4ADE80] border-2 border-[#22C55E]",
   },
   pending: {
     label: "Pendiente",
-    className: "bg-[#45300B] text-[#FBBF24] border-2 border-[#FBBF24]",
+    className: "bg-[#45300B] text-[#2fd4a7] border-2 border-[#2fd4a7]",
   },
   processing: {
     label: "Procesando",

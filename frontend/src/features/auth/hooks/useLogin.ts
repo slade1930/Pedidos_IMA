@@ -25,12 +25,11 @@ export function useLogin() {
     mutationFn: (credentials: LoginCredentials) =>
       authService.login(credentials),
 
-    onSuccess: async (tokens) => {
-      // 1. Guardar tokens en storage
-      tokenStorage.setAccessToken(tokens.access_token);
-      tokenStorage.setRefreshToken(tokens.refresh_token);
+    onSuccess: async () => {
+      // FASE 1.1: login deja las cookies httpOnly; aquí solo marcamos la
+      // cookie ligera has_session y obtenemos el perfil del usuario.
+      tokenStorage.markSessionActive();
 
-      // 2. Obtener perfil del usuario
       try {
         const user = await authService.getMe();
         useAuthStore.setState({
@@ -38,7 +37,6 @@ export function useLogin() {
           isAuthenticated: true,
         });
       } catch {
-        // Si falla getMe, marcamos como autenticado con tokens
         useAuthStore.setState({
           isAuthenticated: true,
         });

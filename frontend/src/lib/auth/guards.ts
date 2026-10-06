@@ -13,10 +13,9 @@ interface AuthCheck {
 // ─── VERIFICACIÓN DE AUTENTICACIÓN ─────────────────────────
 
 export function checkAuth(): AuthCheck {
-  const accessToken = tokenStorage.getAccessToken();
-  const refreshToken = tokenStorage.getRefreshToken();
-
-  if (!accessToken && !refreshToken) {
+  // FASE 1.1: los tokens viven en cookies httpOnly (no legibles desde JS).
+  // La cookie ligera "has_session" es la señal de sesión para middlewares/guards.
+  if (!tokenStorage.hasSession()) {
     return { isAuthenticated: false, reason: "no_token" };
   }
 

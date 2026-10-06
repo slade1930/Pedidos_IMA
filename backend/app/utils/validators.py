@@ -1,6 +1,80 @@
 # app/utils/validators.py
+import base64
+import binascii
 import re
 from decimal import Decimal
+
+from app.core.config import settings
+
+# ─── FASE 3: subida de imágenes en base64 ────────────────────
+# Formatos raster aceptados (validados por bytes mágicos REALES,
+# nunca por extensión ni por el MIME declarado por el cliente).
+_IMAGE_MAGIC: tuple[tuple[bytes, str], ...] = (
+    (b"\x89PNG\r\n\x1a\n", "image/png"),
+    (b"\xff\xd8\xff", "image/jpeg"),
+    (b"GIF87a", "image/gif"),
+    (b"GIF89a", "image/gif"),
+)
+
+
+def detect_image_mime(raw: bytes) -> str | None:
+    """Devuelve el MIME real de los bytes o None si no es una imagen raster válida."""
+    if len(raw) >= 12 and raw[:4] == b"RIFF" and raw[8:12] == b"WEBP":
+        return "image/webp"
+    for magic, mime in _IMAGE_MAGIC:
+        if raw.startswith(magic):
+            return mime
+    return None
+
+
+def _image_too_big(max_bytes: int) -> str:
+    return f"La imagen supera el tamaño máximo de {max_bytes // (1024 * 1024)} MB"
+
+
+def validate_image_base64(value: str) -> tuple[str, str]:
+    """Valida una imagen en base64 y devuelve (base64_limpio, mime_real).
+
+    Reglas FASE 3:
+    - Tamaño máximo configurable (settings.MAX_IMAGE_BYTES, por defecto 10 MB).
+    - Solo raster: PNG, JPEG, WebP o GIF según bytes mágicos.
+    - SVG/XML rechazado explícitamente (los vectores permiten inyectar script).
+    """
+    # Prefijo opcional "data:image/png;base64,..." — nunca se confía en él
+    if value.startswith("data:"):
+        _, _, value = value.partition(",")
+
+    # No debería traer espacios/saltos, pero no estorba
+    cleaned = "".join(value.split())
+
+    max_bytes = settings.MAX_IMAGE_BYTES
+
+    # Cota barata ANTES de decodificar (evita alocar payloads gigantes)
+    max_encoded = (max_bytes // 3) * 4 + 4096
+    if len(cleaned) > max_encoded:
+        raise ValueError(_image_too_big(max_bytes))
+
+    try:
+        normalized = cleaned.replace("-", "+").replace("_", "/")
+        normalized += "=" * (-len(normalized) % 4)
+        raw = base64.b64decode(normalized, validate=True)
+    except (binascii.Error, ValueError):
+        raise ValueError("Imagen en base64 inválida")
+
+    if len(raw) > max_bytes:
+        raise ValueError(_image_too_big(max_bytes))
+
+    # Ningún raster empieza con "<": si lo hace, es texto (SVG/XML u otro)
+    head = raw[:1024].lstrip().lower()
+    if head.startswith(b"<"):
+        if b"<svg" in head:
+            raise ValueError("Las imágenes SVG no están permitidas")
+        raise ValueError("Formato de imagen no válido")
+
+    mime = detect_image_mime(raw)
+    if mime is None:
+        raise ValueError("Formato de imagen no válido: usa PNG, JPEG, WebP o GIF")
+
+    return cleaned, mime
 
 
 def validate_cedula_panama(cedula: str) -> bool:

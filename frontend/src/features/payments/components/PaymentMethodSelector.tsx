@@ -68,27 +68,27 @@ export function PaymentMethodSelector({
               whileTap={!disabled ? { scale: 0.98 } : {}}
               className={`flex flex-col items-center gap-2 rounded-2xl border-2 p-5 text-center transition-all ${
                 isSelected
-                  ? "border-[#FBBF24] bg-[#2D1A10] shadow-[0_0_20px_rgba(251,191,36,0.2)]"
-                  : "border-[#3A5F26]/55 bg-[#1E120C] hover:border-[#3A5F26] hover:bg-[#1E120C]/80"
+                  ? "border-[var(--itas-gold)] bg-[var(--itas-gold-light)]/20 shadow-[0_0_20px_rgba(var(--itas-gold-rgb),0.18)]"
+                  : "border-slate-200 bg-white hover:border-[var(--itas-green)]/50 hover:bg-slate-50"
               } ${disabled ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
             >
               {/* Icono del método */}
               <div className={`h-12 w-12 rounded-xl flex items-center justify-center text-2xl shadow-inner transition-colors ${
-                isSelected ? "bg-[#1E120C] border border-[#FBBF24]" : "bg-black/40 border border-[#3A5F26]/30"
+                isSelected ? "bg-[var(--itas-gold-light)]/40 border border-[var(--itas-gold)]" : "bg-slate-100 border border-slate-200"
               }`}>
                 {method.icon}
               </div>
 
               {/* Título de la opción */}
               <span className={`text-base font-extrabold tracking-tight transition-colors ${
-                isSelected ? "text-[#FBBF24]" : "text-white"
+                isSelected ? "text-[var(--itas-gold)]" : "text-slate-800"
               }`}>
                 {method.label}
               </span>
 
               {/* Descripción de la opción */}
               <span className={`text-xs font-semibold leading-relaxed transition-colors ${
-                isSelected ? "text-white" : "text-gray-300"
+                isSelected ? "text-slate-700" : "text-slate-500"
               }`}>
                 {method.description}
               </span>

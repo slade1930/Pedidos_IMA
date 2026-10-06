@@ -75,21 +75,21 @@ export function ExpandableTabs({
   tabs,
   activeTabPath,
   className,
-  activeColor = "text-[#FBBF24]",
+  activeColor = "text-[#2fd4a7]",
   onChange,
 }: ExpandableTabsProps) {
   const [hovered, setHovered] = React.useState<number | null>(null);
   const outsideClickRef = React.useRef<HTMLDivElement>(null);
 
   const Separator = () => (
-    <div className="mx-1 h-[20px] w-[1px] bg-[#3A5F26]/20" aria-hidden="true" />
+    <div className="mx-1 h-[20px] w-[1px] bg-[#1b4f72]/20" aria-hidden="true" />
   );
 
   return (
     <div
       ref={outsideClickRef}
       className={cn(
-        "flex items-center gap-1.5 rounded-xl border border-[#3A5F26]/12 bg-[#F9FAF9]/90 backdrop-blur-md p-1 shadow-sm",
+        "flex items-center gap-1.5 rounded-xl border border-[#1b4f72]/12 bg-[#eef6f4]/90 backdrop-blur-md p-1 shadow-sm",
         className
       )}
     >
@@ -115,11 +115,11 @@ export function ExpandableTabs({
             className={cn(
               "relative flex items-center rounded-lg py-1.5 text-xs font-bold transition-all duration-300 cursor-pointer select-none",
               isSelected
-                ? cn("bg-[#1E3A1E] text-white shadow-md")
-                : "text-[#1E3A1E]/80 hover:bg-[#3A5F26]/10 hover:text-[#1E3A1E]"
+                ? cn("bg-[#142b45] text-white shadow-md")
+                : "text-[#142b45]/80 hover:bg-[#1b4f72]/10 hover:text-[#142b45]"
             )}
           >
-            <Icon size={16} className={cn("transition-colors", isSelected ? "text-[#FBBF24]" : "text-[#1E3A1E]")} />
+            <Icon size={16} className={cn("transition-colors", isSelected ? "text-[#2fd4a7]" : "text-[#142b45]")} />
             <AnimatePresence initial={false}>
               {(isSelected || hovered === index) && (
                 <motion.span

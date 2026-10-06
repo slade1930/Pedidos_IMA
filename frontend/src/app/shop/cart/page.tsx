@@ -30,23 +30,23 @@ export default function CartPage() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-[#1E3A1E] min-h-screen"
+      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-[#142b45] min-h-screen"
     >
       <style>{`
         .yellow-btn {
-          background-color: #FBBF24;
-          color: #1E3A1E;
+          background-color: #2fd4a7;
+          color: #142b45;
           font-weight: 800;
           box-shadow: 0 4px 14px rgba(251, 191, 36, 0.3);
           transition: all 0.2s ease-in-out;
         }
         .yellow-btn:hover {
-          background-color: #F59E0B;
+          background-color: #2fbf9b;
           transform: translateY(-1px);
           box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
         }
         .green-btn {
-          background-color: #3A5F26;
+          background-color: #1b4f72;
           color: #FFFFFF;
           font-weight: 800;
           box-shadow: 0 4px 14px rgba(58, 95, 38, 0.15);
@@ -66,7 +66,7 @@ export default function CartPage() {
       {/* Botón Volver */}
       <button 
         onClick={() => router.push("/shop/products")} 
-        className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#1E3A1E]/70 hover:text-[#1E3A1E] transition-colors cursor-pointer mb-8"
+        className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#142b45]/70 hover:text-[#142b45] transition-colors cursor-pointer mb-8"
       >
         <ArrowLeft size={14} strokeWidth={3} />
         <span>Volver a la Tienda</span>
@@ -76,9 +76,9 @@ export default function CartPage() {
         <motion.div 
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="rounded-3xl border-2 border-[#3A5F26]/12 bg-white p-12 sm:p-20 text-center max-w-2xl mx-auto shadow-sm space-y-6 grain-bg"
+          className="rounded-3xl border-2 border-[#1b4f72]/12 bg-white p-12 sm:p-20 text-center max-w-2xl mx-auto shadow-sm space-y-6 grain-bg"
         >
-          <div className="mx-auto h-20 w-20 rounded-3xl bg-[#3A5F26]/8 flex items-center justify-center text-[#3A5F26] border-2 border-[#3A5F26]/10 shadow-inner">
+          <div className="mx-auto h-20 w-20 rounded-3xl bg-[#1b4f72]/8 flex items-center justify-center text-[#1b4f72] border-2 border-[#1b4f72]/10 shadow-inner">
             <motion.div
               animate={{ rotate: [0, -10, 10, 0] }}
               transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -87,7 +87,7 @@ export default function CartPage() {
             </motion.div>
           </div>
           <div className="space-y-2">
-            <h2 className="text-2xl font-black text-[#1E3A1E] tracking-tight">Tu carrito está vacío</h2>
+            <h2 className="text-2xl font-black text-[#142b45] tracking-tight">Tu carrito está vacío</h2>
             <p className="text-sm text-gray-500 font-semibold max-w-sm mx-auto leading-relaxed">
               Explora nuestro catálogo y agrega productos frescos de la canasta básica a tu compra.
             </p>
@@ -105,8 +105,8 @@ export default function CartPage() {
           
           {/* Columna Izquierda: Listado de Productos */}
           <div className="lg:col-span-8 space-y-6">
-            <div className="flex items-center justify-between border-b border-[#3A5F26]/10 pb-4">
-              <h1 className="text-3xl font-black tracking-tight text-[#1E3A1E]">
+            <div className="flex items-center justify-between border-b border-[#1b4f72]/10 pb-4">
+              <h1 className="text-3xl font-black tracking-tight text-[#142b45]">
                 Carrito de Compras
               </h1>
               <span className="text-xs font-black uppercase tracking-wider text-gray-400 bg-gray-100 px-3 py-1 rounded-full">
@@ -123,11 +123,11 @@ export default function CartPage() {
 
           {/* Columna Derecha: Resumen de Compra Sidebar */}
           <div className="lg:col-span-4 lg:sticky lg:top-24">
-            <div className="bg-white rounded-3xl border-2 border-[#3A5F26]/12 p-6 sm:p-8 space-y-6 shadow-sm relative overflow-hidden">
+            <div className="bg-white rounded-3xl border-2 border-[#1b4f72]/12 p-6 sm:p-8 space-y-6 shadow-sm relative overflow-hidden">
               {/* Decoración del Sidebar */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-[#FBBF24]/5 rounded-full blur-2xl pointer-events-none" />
+              <div className="absolute top-0 right-0 w-32 h-32 bg-[#2fd4a7]/5 rounded-full blur-2xl pointer-events-none" />
 
-              <h3 className="text-lg font-black tracking-tight border-b border-[#3A5F26]/10 pb-4">
+              <h3 className="text-lg font-black tracking-tight border-b border-[#1b4f72]/10 pb-4">
                 Resumen de Compra
               </h3>
 
@@ -141,9 +141,9 @@ export default function CartPage() {
                   <span className="text-green-600 font-extrabold">Gratis</span>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-[#3A5F26]/10">
-                  <span className="text-base font-black text-[#1E3A1E]">Total Estimado</span>
-                  <span className="text-3xl font-black text-[#1E3A1E] tracking-tight">{formatPrice(subtotal)}</span>
+                <div className="flex items-center justify-between pt-4 border-t border-[#1b4f72]/10">
+                  <span className="text-base font-black text-[#142b45]">Total Estimado</span>
+                  <span className="text-3xl font-black text-[#142b45] tracking-tight">{formatPrice(subtotal)}</span>
                 </div>
               </div>
 

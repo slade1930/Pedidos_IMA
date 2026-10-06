@@ -1,5 +1,4 @@
 # app/services/__init__.py
-from app.services.qr_service import QRService
 from app.services.notification_service import NotificationService
 from app.services.auth_service import AuthService
 from app.services.user_service import UserService
@@ -11,7 +10,6 @@ from app.services.order_service import OrderService
 from app.services.invoice_service import InvoiceService
 
 __all__ = [
-    "QRService",
     "NotificationService",
     "AuthService",
     "UserService",

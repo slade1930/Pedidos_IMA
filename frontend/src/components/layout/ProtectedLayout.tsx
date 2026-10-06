@@ -18,7 +18,7 @@ interface ProtectedLayoutProps {
 
 function LayoutLoader() {
   return (
-    <div className="flex h-screen items-center justify-center bg-[#FDF8F0]">
+    <div className="flex h-screen items-center justify-center bg-[#eef6f4]">
       <div className="flex flex-col items-center gap-4">
         <div style={{ position: "relative", width: "40px", height: "40px" }}>
           <div
@@ -37,12 +37,12 @@ function LayoutLoader() {
               inset: 0,
               borderRadius: "50%",
               border: "3px solid transparent",
-              borderTopColor: "#F2A900",
+              borderTopColor: "#2fbf9b",
               borderRightColor: "rgba(242,169,0,0.3)",
             }}
           />
         </div>
-        <p className="text-sm text-[#4A3728]/50 tracking-wide">Cargando IMA System...</p>
+        <p className="text-sm text-[#142b45]/50 tracking-wide">Cargando ITAS...</p>
       </div>
     </div>
   );
@@ -63,7 +63,7 @@ export function ProtectedLayout({ children }: ProtectedLayoutProps) {
 
   return (
     <AuthGuard allowedRoles={["admin", "staff"]} fallback={<LayoutLoader />}>
-      <div className="flex flex-col h-screen overflow-hidden bg-[#FDF8F0]">
+      <div className="flex flex-col h-screen overflow-hidden bg-[#eef6f4]">
         {/* Top Navbar */}
         <Header onMenuToggle={handleMenuToggle} />
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMyOrders } from "@/features/shop/hooks/useMyOrders";
+import { ReorderButton } from "@/features/shop/components/ReorderButton";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { OrderStatus } from "@/features/orders/types/order.types";
@@ -10,7 +11,8 @@ import {
   Receipt, 
   Calendar, 
   Coins, 
-  CalendarOff 
+  CalendarOff,
+  ShoppingCart
 } from "lucide-react";
 
 // ─── UTILITARIOS ───────────────────────────────────────────
@@ -33,6 +35,9 @@ function formatDate(dateString: string): string {
 
 function getStatusLabel(status: OrderStatus): string {
   switch (status) {
+    case "pending": return "Pendiente";
+    case "confirmed": return "Confirmada";
+    case "ready": return "Lista para Retiro";
     case "delivered": return "Entregada";
     case "cancelled": return "Cancelada";
     case "expired": return "Expirada";
@@ -45,6 +50,12 @@ function getStatusBadgeStyle(status: OrderStatus): string {
   switch (status) {
     case "delivered":
       return "bg-green-50 text-green-700 border border-green-200";
+    case "confirmed":
+      return "bg-blue-50 text-blue-700 border border-blue-200";
+    case "ready":
+      return "bg-emerald-50 text-emerald-800 border border-emerald-200";
+    case "pending":
+      return "bg-amber-50 text-amber-700 border border-amber-200";
     case "cancelled":
       return "bg-red-50 text-red-700 border border-red-200";
     case "expired":
@@ -59,13 +70,11 @@ export default function HistoryPage() {
   const { data: orders, isPending } = useMyOrders();
   const orderList = Array.isArray(orders) ? orders : [];
 
-  // Solo pedidos completados/cancelados/expirados
-  const historyOrders = orderList.filter(
-    (o) => ["delivered", "cancelled", "expired"].includes(o.status)
-  );
+  // 👈 CAMBIADO: mostrar TODOS los pedidos (activos y archivados), no solo los terminados
+  const historyOrders = orderList;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative text-[#1E3A1E] min-h-screen">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative text-[#142b45] min-h-screen">
       
       {/* Estilos CSS Locales para Efectos Premium */}
       <style>{`
@@ -89,17 +98,17 @@ export default function HistoryPage() {
       `}</style>
 
       {/* Luces de Fondo Decorativas */}
-      <div className="absolute top-10 left-10 w-72 h-72 bg-[#3A5F26]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#FBBF24]/3 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      <div className="absolute top-10 left-10 w-72 h-72 bg-[#1b4f72]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 right-10 w-96 h-96 bg-[#2fd4a7]/3 rounded-full blur-3xl pointer-events-none animate-pulse" />
 
       {/* Cabecera de Página */}
-      <div className="border-b border-[#3A5F26]/10 pb-6 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 relative z-10">
+      <div className="border-b border-[#1b4f72]/10 pb-6 mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4 relative z-10">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#3A5F26]/8 border border-[#3A5F26]/15 text-[#3A5F26] text-[10px] font-black uppercase tracking-widest mb-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1b4f72]/8 border border-[#1b4f72]/15 text-[#1b4f72] text-[10px] font-black uppercase tracking-widest mb-3">
             <History size={12} strokeWidth={2.5} />
             Mi Cuenta
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-[#1E3A1E] sm:text-4xl">
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#142b45] sm:text-4xl">
             Historial de Pedidos
           </h1>
           <p className="mt-2 text-xs text-gray-500 font-semibold leading-relaxed">
@@ -133,7 +142,7 @@ export default function HistoryPage() {
             animate={{ opacity: 1, scale: 1 }}
             className="glass-panel rounded-3xl border border-gray-200/60 p-12 text-center max-w-lg mx-auto shadow-sm space-y-5"
           >
-            <div className="mx-auto h-16 w-16 rounded-2xl bg-[#3A5F26]/8 flex items-center justify-center text-[#3A5F26] border border-[#3A5F26]/15">
+            <div className="mx-auto h-16 w-16 rounded-2xl bg-[#1b4f72]/8 flex items-center justify-center text-[#1b4f72] border border-[#1b4f72]/15">
               <CalendarOff size={24} strokeWidth={2} />
             </div>
             <div className="space-y-2">
@@ -145,7 +154,7 @@ export default function HistoryPage() {
             <div className="pt-2">
               <Link 
                 href="/shop/products" 
-                className="inline-flex items-center gap-1.5 text-xs font-black text-[#3A5F26] bg-[#3A5F26]/8 px-5 py-2.5 rounded-full tracking-widest uppercase border border-[#3A5F26]/12 hover:bg-[#3A5F26]/12 transition-colors"
+                className="inline-flex items-center gap-1.5 text-xs font-black text-[#1b4f72] bg-[#1b4f72]/8 px-5 py-2.5 rounded-full tracking-widest uppercase border border-[#1b4f72]/12 hover:bg-[#1b4f72]/12 transition-colors"
               >
                 Comenzar Compra
               </Link>
@@ -175,22 +184,22 @@ export default function HistoryPage() {
               >
                 <Link
                   href={`/shop/orders/${order.id}`}
-                  className="block bg-white rounded-3xl border border-gray-150 p-6 hover:border-[#3A5F26]/30 transition-all hover:shadow-lg premium-card-shadow relative overflow-hidden group"
+                  className="block bg-white rounded-3xl border border-gray-150 p-6 hover:border-[#1b4f72]/30 transition-all hover:shadow-lg premium-card-shadow relative overflow-hidden group"
                 >
                   {/* Línea lateral de interacción */}
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-[#FBBF24] transition-colors" />
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-[#2fd4a7] transition-colors" />
 
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="flex items-start gap-4">
                       {/* Icono de pedido */}
-                      <div className="h-10 w-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 group-hover:text-[#3A5F26] group-hover:bg-[#3A5F26]/5 group-hover:border-[#3A5F26]/20 transition-all flex-shrink-0">
+                      <div className="h-10 w-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center text-gray-500 group-hover:text-[#1b4f72] group-hover:bg-[#1b4f72]/5 group-hover:border-[#1b4f72]/20 transition-all flex-shrink-0">
                         <Receipt size={16} strokeWidth={2} />
                       </div>
                       
                       <div className="min-w-0">
                         <h3 className="text-xs font-black uppercase tracking-wider text-gray-900 flex items-center gap-1.5">
                           <span>Pedido</span>
-                          <span className="font-mono text-xs font-extrabold text-[#3A5F26]">{order.order_number}</span>
+                          <span className="font-mono text-xs font-extrabold text-[#1b4f72]">{order.order_number}</span>
                         </h3>
                         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-wider flex items-center gap-1 mt-1">
                           <Calendar size={11} className="text-gray-300" />
@@ -222,6 +231,15 @@ export default function HistoryPage() {
                         />
                       </div>
                     </div>
+                  </div>
+
+                  {/* Acción Volver a Pedir */}
+                  <div className="mt-4 pt-4 border-t border-[#1b4f72]/10 flex items-center justify-between gap-3">
+                    <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider flex items-center gap-1">
+                      <ShoppingCart size={11} />
+                      {order.items.length} producto(s)
+                    </p>
+                    <ReorderButton order={order} className="text-right" />
                   </div>
                 </Link>
               </motion.div>

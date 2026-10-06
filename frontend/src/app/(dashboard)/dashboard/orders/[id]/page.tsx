@@ -7,7 +7,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useOrder } from "@/features/orders/hooks/useOrder";
 import { OrderCard } from "@/features/orders/components/OrderCard";
-import { QRDisplay } from "@/features/orders/components/QRDisplay";
 import { orderService } from "@/features/orders/services/order.service";
 import type { OrderStatus, UpdateOrderStatusPayload } from "@/features/orders/types/order.types";
 
@@ -122,8 +121,14 @@ export default function OrderDetailPage() {
 
         <div>
           <div className="bg-white rounded-lg border border-gray-200 p-6">
-            <h3 className="text-sm font-semibold text-gray-900 mb-4">Código QR</h3>
-            <QRDisplay qrCode={order.qr_code} orderNumber={order.order_number} size="lg" downloadable />
+            <h3 className="text-sm font-semibold text-gray-900 mb-4">Código de Retiro</h3>
+            {order.pickup_code ? (
+              <p className="font-mono text-center text-3xl font-black tracking-widest text-indigo-600 py-4">
+                {order.pickup_code}
+              </p>
+            ) : (
+              <p className="text-sm text-gray-400 text-center py-4">—</p>
+            )}
           </div>
         </div>
       </div>

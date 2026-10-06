@@ -31,7 +31,7 @@ function getRoleBadgeClass(role: string): string {
     case "staff":
       return "bg-gradient-to-r from-blue-500/10 to-blue-600/15 border-blue-500/25 text-blue-700 shadow-sm";
     case "client":
-      return "bg-gradient-to-r from-[#4A3728]/5 to-[#4A3728]/12 border-[#4A3728]/20 text-[#4A3728] shadow-sm";
+      return "bg-gradient-to-r from-[#142b45]/5 to-[#142b45]/12 border-[#142b45]/20 text-[#142b45] shadow-sm";
     default:
       return "bg-gradient-to-r from-gray-500/10 to-gray-600/15 border-gray-500/25 text-gray-700 shadow-sm";
   }
@@ -61,7 +61,7 @@ export function UserCard({ user, onEdit, onDelete }: UserCardProps) {
       onMouseLeave={() => setIsHovered(false)}
       whileHover={{ y: -4 }}
       transition={{ type: "spring", stiffness: 400, damping: 25 }}
-      className="bg-gradient-to-br from-white/95 via-white/80 to-[#E8DDD0]/20 backdrop-blur-md rounded-2xl border border-[#E8DDD0]/40 overflow-hidden shadow-sm hover:shadow-md hover:shadow-[#4A3728]/5 transition-all duration-300 relative group"
+      className="bg-gradient-to-br from-white/95 via-white/80 to-[#e4f0ed]/20 backdrop-blur-md rounded-2xl border border-[#e4f0ed]/40 overflow-hidden shadow-sm hover:shadow-md hover:shadow-[#142b45]/5 transition-all duration-300 relative group"
       style={{
         boxShadow: isHovered
           ? "0 14px 34px -10px rgba(61, 90, 30, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6)"
@@ -79,12 +79,12 @@ export function UserCard({ user, onEdit, onDelete }: UserCardProps) {
 
       {/* Header Info */}
       <div className="px-6 pt-6 pb-4.5 flex items-center gap-4 relative z-10">
-        <div className="flex-shrink-0 h-13 w-13 rounded-full bg-gradient-to-br from-[#3D5A1E]/10 to-[#5C8A3C]/20 border border-white/40 flex items-center justify-center shadow-inner relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
+        <div className="flex-shrink-0 h-13 w-13 rounded-full bg-gradient-to-br from-[#1b4f72]/10 to-[#2e7d9e]/20 border border-white/40 flex items-center justify-center shadow-inner relative overflow-hidden group-hover:scale-105 transition-transform duration-300">
           <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/5 to-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          <span className="text-base font-black text-[#3D5A1E] tracking-tight">{user.full_name}</span>
+          <span className="text-base font-black text-[#1b4f72] tracking-tight">{user.full_name}</span>
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="text-base font-black text-[#4A3728] tracking-tight truncate leading-tight">{user.full_name}</h3>
+          <h3 className="text-base font-black text-[#142b45] tracking-tight truncate leading-tight">{user.full_name}</h3>
           <p className="text-xs font-semibold text-neutral-400/90 truncate mt-0.5">{user.email}</p>
         </div>
         <div className="flex-shrink-0">
@@ -95,26 +95,26 @@ export function UserCard({ user, onEdit, onDelete }: UserCardProps) {
       </div>
 
       {/* User Attributes Grid */}
-      <div className="px-6 py-4.5 border-t border-[#E8DDD0]/20 space-y-3 relative z-10 bg-white/30">
+      <div className="px-6 py-4.5 border-t border-[#e4f0ed]/20 space-y-3 relative z-10 bg-white/30">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-[#4A3728]/50 uppercase tracking-widest">Cédula</span>
-          <span className="text-xs font-bold text-[#4A3728]">{user.cedula}</span>
+          <span className="text-[10px] font-bold text-[#142b45]/50 uppercase tracking-widest">Cédula</span>
+          <span className="text-xs font-bold text-[#142b45]">{user.cedula}</span>
         </div>
 
         {user.phone && (
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold text-[#4A3728]/50 uppercase tracking-widest">Teléfono</span>
-            <span className="text-xs font-bold text-[#4A3728]">{user.phone}</span>
+            <span className="text-[10px] font-bold text-[#142b45]/50 uppercase tracking-widest">Teléfono</span>
+            <span className="text-xs font-bold text-[#142b45]">{user.phone}</span>
           </div>
         )}
 
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-[#4A3728]/50 uppercase tracking-widest">Estado</span>
-          <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${user.is_active ? "text-[#3D5A1E]" : "text-[#C94B32]"}`}>
+          <span className="text-[10px] font-bold text-[#142b45]/50 uppercase tracking-widest">Estado</span>
+          <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${user.is_active ? "text-[#1b4f72]" : "text-[#C94B32]"}`}>
             {user.is_active ? (
               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5C8A3C] opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3D5A1E] shadow-[0_0_6px_#3D5A1E]"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2e7d9e] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#1b4f72] shadow-[0_0_6px_#1b4f72]"></span>
               </span>
             ) : (
               <span className="relative flex h-2 w-2">
@@ -126,31 +126,31 @@ export function UserCard({ user, onEdit, onDelete }: UserCardProps) {
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-[#4A3728]/50 uppercase tracking-widest">Verificado</span>
-          <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${user.is_verified ? "text-[#3D5A1E]" : "text-[#C78500]"}`}>
-            <span className={`h-1.5 w-1.5 rounded-full ${user.is_verified ? "bg-[#3D5A1E] shadow-[0_0_4px_#3D5A1E]" : "bg-[#F2A900] shadow-[0_0_4px_#F2A900]"}`} />
+          <span className="text-[10px] font-bold text-[#142b45]/50 uppercase tracking-widest">Verificado</span>
+          <span className={`inline-flex items-center gap-1.5 text-xs font-bold ${user.is_verified ? "text-[#1b4f72]" : "text-[#20917a]"}`}>
+            <span className={`h-1.5 w-1.5 rounded-full ${user.is_verified ? "bg-[#1b4f72] shadow-[0_0_4px_#1b4f72]" : "bg-[#2fbf9b] shadow-[0_0_4px_#2fbf9b]"}`} />
             {user.is_verified ? "Sí" : "No"}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-[#4A3728]/50 uppercase tracking-widest">ID</span>
+          <span className="text-[10px] font-bold text-[#142b45]/50 uppercase tracking-widest">ID</span>
           <span className="text-[10px] font-mono font-semibold text-neutral-400 select-all">{user.id}</span>
         </div>
 
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-bold text-[#4A3728]/50 uppercase tracking-widest">Creado</span>
-          <span className="text-xs font-semibold text-[#4A3728]/85">{formatDateTime(user.created_at)}</span>
+          <span className="text-[10px] font-bold text-[#142b45]/50 uppercase tracking-widest">Creado</span>
+          <span className="text-xs font-semibold text-[#142b45]/85">{formatDateTime(user.created_at)}</span>
         </div>
       </div>
 
       {/* Action Bar Footer */}
       {(onEdit || onDelete) && (
-        <div className="px-6 py-3 border-t border-[#E8DDD0]/35 bg-[#E8DDD0]/10 flex items-center justify-end gap-1 relative z-10">
+        <div className="px-6 py-3 border-t border-[#e4f0ed]/35 bg-[#e4f0ed]/10 flex items-center justify-end gap-1 relative z-10">
           {onEdit && (
             <button 
               onClick={() => onEdit(user)}
-              className="rounded-xl px-3.5 py-1.5 text-xs font-bold text-[#3D5A1E] border border-transparent hover:bg-[#3D5A1E]/8 hover:border-[#3D5A1E]/30 bg-transparent transition-all duration-200"
+              className="rounded-xl px-3.5 py-1.5 text-xs font-bold text-[#1b4f72] border border-transparent hover:bg-[#1b4f72]/8 hover:border-[#1b4f72]/30 bg-transparent transition-all duration-200"
             >
               Editar
             </button>

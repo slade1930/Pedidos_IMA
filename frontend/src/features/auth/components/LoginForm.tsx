@@ -86,15 +86,15 @@ function getInputStyle(hasError: boolean, isFocused: boolean): React.CSSProperti
     paddingLeft: "42px",
     paddingRight: "16px",
     fontSize: "14px",
-    color: "#4A3728",
+    color: "#142b45",
     background: "#FFFFFF",
-    border: `1.5px solid ${hasError ? "#C94B32" : isFocused ? "#3D5A1E" : "#E8DDD0"}`,
+    border: `1.5px solid ${hasError ? "#C94B32" : isFocused ? "#1b4f72" : "#e4f0ed"}`,
     borderRadius: "10px",
     outline: "none",
     boxShadow: isFocused
       ? hasError
         ? "0 0 0 3px rgba(201,75,50,0.1)"
-        : "0 0 0 3px rgba(61,90,30,0.08)"
+        : "0 0 0 3px rgba(20,43,69,0.08)"
       : "none",
     transition: "border-color 0.2s, box-shadow 0.2s",
     boxSizing: "border-box",
@@ -172,19 +172,19 @@ function RegisterLink() {
   return (
     <>
       <style>{`
-        .ima-register-link {
-          color: #3D5A1E;
+        .itas-register-link {
+          color: #1b4f72;
           font-weight: 600;
           text-decoration: none;
-          border-bottom: 1.5px solid #F2A900;
+          border-bottom: 1.5px solid #2fbf9b;
           padding-bottom: 1px;
           transition: color 0.2s;
         }
-        .ima-register-link:hover {
-          color: #2D4A0E;
+        .itas-register-link:hover {
+          color: #1b4f72;
         }
       `}</style>
-      <a href="/register" className="ima-register-link">
+      <a href="/register" className="itas-register-link">
         Regístrate
       </a>
     </>
@@ -271,7 +271,7 @@ export function LoginForm() {
             display: "block",
             fontSize: "11px",
             fontWeight: 600,
-            color: "#4A3728",
+            color: "#142b45",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
             marginBottom: "6px",
@@ -287,7 +287,7 @@ export function LoginForm() {
               left: "13px",
               top: "50%",
               transform: "translateY(-50%)",
-              color: focusedField === "email" ? "#3D5A1E" : "#B8A99A",
+              color: focusedField === "email" ? "#1b4f72" : "#9db6ac",
               transition: "color 0.2s",
               pointerEvents: "none",
               display: "flex",
@@ -300,7 +300,7 @@ export function LoginForm() {
             type="email"
             autoComplete="email"
             disabled={isPending}
-            placeholder="correo@ima.gob.pa"
+            placeholder="correo@itas.gob.pa"
             style={getInputStyle(!!errors.email, focusedField === "email")}
             {...emailRegister}
             onFocus={() => setFocusedField("email")}
@@ -332,7 +332,7 @@ export function LoginForm() {
             display: "block",
             fontSize: "11px",
             fontWeight: 600,
-            color: "#4A3728",
+            color: "#142b45",
             letterSpacing: "0.06em",
             textTransform: "uppercase",
             marginBottom: "6px",
@@ -348,7 +348,7 @@ export function LoginForm() {
               left: "13px",
               top: "50%",
               transform: "translateY(-50%)",
-              color: focusedField === "password" ? "#3D5A1E" : "#B8A99A",
+              color: focusedField === "password" ? "#1b4f72" : "#9db6ac",
               transition: "color 0.2s",
               pointerEvents: "none",
               display: "flex",
@@ -388,7 +388,7 @@ export function LoginForm() {
               border: "none",
               cursor: "pointer",
               padding: "2px",
-              color: "#B8A99A",
+              color: "#9db6ac",
               display: "flex",
               alignItems: "center",
             }}
@@ -421,9 +421,9 @@ export function LoginForm() {
             width: "100%",
             height: "46px",
             background: isPending
-              ? "rgba(61,90,30,0.6)"
-              : "linear-gradient(135deg, #3D5A1E 0%, #4A6B2C 100%)",
-            color: "#FDF8F0",
+              ? "rgba(20,43,69,0.6)"
+              : "linear-gradient(135deg, #1b4f72 0%, #2e7d9e 100%)",
+            color: "#eef6f4",
             border: "none",
             borderRadius: "10px",
             fontSize: "14px",
@@ -437,7 +437,7 @@ export function LoginForm() {
             overflow: "hidden",
             boxShadow: isPending
               ? "none"
-              : "0 2px 8px rgba(61,90,30,0.3), 0 1px 2px rgba(61,90,30,0.2)",
+              : "0 2px 8px rgba(20,43,69,0.3), 0 1px 2px rgba(20,43,69,0.2)",
             transition: "background 0.2s, box-shadow 0.2s",
           }}
         >
@@ -460,7 +460,7 @@ export function LoginForm() {
                 right: 0,
                 bottom: 0,
                 background:
-                  "linear-gradient(90deg, transparent, rgba(242,169,0,0.18), transparent)",
+                  "linear-gradient(90deg, transparent, rgba(47,212,167,0.18), transparent)",
                 pointerEvents: "none",
               }}
             />
@@ -499,7 +499,7 @@ export function LoginForm() {
         style={{
           textAlign: "center",
           fontSize: "13px",
-          color: "rgba(74,55,40,0.5)",
+          color: "rgba(20,43,69,0.5)",
           marginTop: "4px",
         }}
       >

@@ -35,42 +35,53 @@
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.55 0.18 142);  /* IMA Green */
+  --primary: oklch(0.38 0.09 240);  /* ITAS Azul Océano */
   --primary-foreground: oklch(0.98 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: oklch(0.95 0.025 190);
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.98 0 0);
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
-  --ring: oklch(0.55 0.18 142);  /* IMA Green */
+  --ring: oklch(0.5 0.12 225);  /* ITAS Azul Océano */
   --radius: 0.75rem;
 
   /* Sidebar */
   --sidebar: oklch(0.98 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.55 0.18 142);
+  --sidebar-primary: oklch(0.38 0.09 240);
   --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent: oklch(0.96 0.02 190);
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.55 0.18 142);
+  --sidebar-ring: oklch(0.5 0.12 225);
 
   /* Charts */
-  --chart-1: oklch(0.55 0.18 142);
-  --chart-2: oklch(0.65 0.15 200);
-  --chart-3: oklch(0.7 0.12 45);
-  --chart-4: oklch(0.6 0.2 280);
-  --chart-5: oklch(0.7 0.18 350);
+  --chart-1: oklch(0.44 0.12 240);
+  --chart-2: oklch(0.55 0.13 230);
+  --chart-3: oklch(0.62 0.11 205);
+  --chart-4: oklch(0.68 0.13 172);
+  --chart-5: oklch(0.77 0.15 168);
 
-  /* IMA Custom */
-  --ima-green: oklch(0.55 0.18 142);
-  --ima-green-light: oklch(0.65 0.2 142);
-  --ima-sidebar-bg: oklch(0.12 0 0);
+  /* ITAS Custom */
+  --itas-green: oklch(0.38 0.09 240);
+  --itas-green-light: oklch(0.53 0.12 230);
+  --itas-green-rgb: 27 79 114;
+  --itas-gold: oklch(0.76 0.16 168);
+  --itas-gold-light: oklch(0.84 0.11 170);
+  --itas-gold-rgb: 47 212 167;
+  --itas-soft-green: oklch(0.93 0.03 190);
+  --itas-soft-gold: oklch(0.95 0.02 180);
+  --itas-card-sheen: oklch(0.96 0.02 180);
+  --itas-card: oklch(0.99 0.005 190 / 0.72);
+  --itas-sidebar-bg: oklch(0.16 0.045 255);
+  --itas-surface: oklch(0.95 0.012 180);
+  --itas-coffee: oklch(0.22 0.05 255);
+  --itas-cream: oklch(0.955 0.014 176);
 }
 
 .dark {
@@ -81,34 +92,45 @@
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.18 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.65 0.2 142);  /* IMA Green Dark */
-  --primary-foreground: oklch(0.15 0 0);
+  --primary: oklch(0.78 0.15 168);  /* ITAS Esmeralda Claro */
+  --primary-foreground: oklch(0.16 0.04 250);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: oklch(0.3 0.05 235);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.65 0.2 142);
+  --ring: oklch(0.78 0.15 168);
 
   /* Sidebar Dark */
-  --sidebar: oklch(0.12 0 0);
+  --sidebar: oklch(0.14 0.04 255);
   --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.65 0.2 142);
-  --sidebar-primary-foreground: oklch(0.15 0 0);
-  --sidebar-accent: oklch(0.18 0 0);
+  --sidebar-primary: oklch(0.78 0.15 168);
+  --sidebar-primary-foreground: oklch(0.16 0.04 250);
+  --sidebar-accent: oklch(0.24 0.04 235);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.65 0.2 142);
+  --sidebar-ring: oklch(0.78 0.15 168);
 
-  /* IMA Custom Dark */
-  --ima-green: oklch(0.65 0.2 142);
-  --ima-green-light: oklch(0.75 0.22 142);
-  --ima-sidebar-bg: oklch(0.08 0 0);
+  /* ITAS Custom Dark */
+  --itas-green: oklch(0.62 0.12 235);
+  --itas-green-light: oklch(0.72 0.12 225);
+  --itas-green-rgb: 52 141 173;
+  --itas-gold: oklch(0.82 0.14 166);
+  --itas-gold-light: oklch(0.9 0.08 168);
+  --itas-gold-rgb: 96 220 180;
+  --itas-soft-green: oklch(0.2 0.05 230);
+  --itas-soft-gold: oklch(0.22 0.04 170);
+  --itas-card-sheen: oklch(0.26 0.03 230);
+  --itas-card: oklch(0.22 0.03 235 / 0.6);
+  --itas-sidebar-bg: oklch(0.1 0.03 255);
+  --itas-surface: oklch(0.17 0.03 235);
+  --itas-coffee: oklch(0.85 0.04 230);
+  --itas-cream: oklch(0.2 0.02 200);
 }
 
 @layer base {
@@ -166,21 +188,184 @@
     text-wrap: balance;
   }
 
-  /* Gradients */
-  .gradient-primary {
-    background: linear-gradient(
-      135deg,
-      hsl(var(--primary)) 0%,
-      hsl(var(--primary-foreground) / 0.8) 100%
-    );
-  }
-
+  /* Gradientes premium */
   .gradient-ima {
     background: linear-gradient(
       135deg,
-      var(--ima-green) 0%,
-      var(--ima-green-light) 100%
+      var(--itas-green) 0%,
+      var(--itas-green-light) 45%,
+      var(--itas-gold) 100%
     );
+  }
+
+  .gradient-itas-soft {
+    background: linear-gradient(
+      135deg,
+      var(--itas-soft-green) 0%,
+      var(--itas-card-sheen) 100%
+    );
+  }
+
+  .gradient-gold {
+    background: linear-gradient(
+      135deg,
+      var(--itas-gold) 0%,
+      var(--itas-gold-light) 100%
+    );
+  }
+
+  .text-gradient-gold {
+    background: linear-gradient(135deg, var(--itas-gold) 0%, var(--itas-gold-light) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  .text-gradient-green {
+    background: linear-gradient(135deg, var(--itas-green-light) 0%, var(--itas-green) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Sombras premium */
+  .shadow-card {
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.1);
+  }
+
+  .shadow-card-hover {
+    box-shadow: 0 4px 6px -2px rgba(16, 24, 40, 0.06), 0 12px 24px -6px rgba(16, 24, 40, 0.12);
+  }
+
+  .shadow-panel {
+    box-shadow: 0 1px 3px rgba(16, 24, 40, 0.06), 0 20px 40px -12px rgba(16, 24, 40, 0.18);
+  }
+
+  .shadow-glow-green {
+    box-shadow: 0 8px 30px -8px rgba(var(--itas-green-rgb), 0.55);
+  }
+
+  .shadow-glow-gold {
+    box-shadow: 0 8px 30px -6px rgba(var(--itas-gold-rgb), 0.6);
+  }
+
+  /* Bordes decorativos */
+  .border-gradient {
+    border: 1.5px solid transparent;
+    background:
+      linear-gradient(var(--itas-card), var(--itas-card)) padding-box,
+      linear-gradient(135deg, var(--itas-green), var(--itas-gold)) border-box;
+  }
+
+  /* Scrollbar premium */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: color-mix(in oklch, var(--itas-green) 35%, transparent);
+    border-radius: 9999px;
+  }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: color-mix(in oklch, var(--itas-green) 60%, transparent);
+  }
+
+  /* Animaciones */
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .animate-pulse-soft {
+    animation: pulseSoft 2.5s ease-in-out infinite;
+  }
+  @keyframes pulseSoft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .animate-shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .animate-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+    animation: shimmer 2.5s infinite;
+  }
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
+  }
+
+  /* Aurora — fondo dinámico con deriva lenta */
+  .itas-aurora {
+    background:
+      radial-gradient(42% 55% at 18% 22%, rgba(242,169,0,0.20) 0%, transparent 70%),
+      radial-gradient(45% 60% at 82% 78%, rgba(92,138,60,0.28) 0%, transparent 70%),
+      radial-gradient(38% 48% at 65% 18%, rgba(253,248,240,0.10) 0%, transparent 70%);
+    background-size: 220% 220%, 200% 200%, 180% 180%;
+    background-position: 0% 0%, 100% 100%, 50% 0%;
+    animation: aurora-drift 22s ease-in-out infinite alternate;
+  }
+  @keyframes aurora-drift {
+    0% {
+      background-position: 0% 0%, 100% 100%, 50% 0%;
+    }
+    50% {
+      background-position: 100% 40%, 20% 80%, 80% 40%;
+    }
+    100% {
+      background-position: 40% 90%, 60% 10%, 10% 90%;
+    }
+  }
+
+  /* Orbes flotantes con deriva orgánica */
+  .animate-drift-slow {
+    animation: drift-slow 16s ease-in-out infinite;
+  }
+  .animate-drift-slower {
+    animation: drift-slow 24s ease-in-out infinite reverse;
+  }
+  @keyframes drift-slow {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    33%      { transform: translate3d(28px, -22px, 0) scale(1.07); }
+    66%      { transform: translate3d(-22px, 18px, 0) scale(0.94); }
+  }
+
+  /* Rotación lenta (anillos, halos) */
+  .animate-spin-slow {
+    animation: spin-slow 14s linear infinite;
+  }
+  .animate-spin-slower {
+    animation: spin-slow 30s linear infinite reverse;
+  }
+  @keyframes spin-slow {
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes itas-spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Halo de pulso para el anillo de marca */
+  .animate-pulse-ring {
+    animation: pulse-ring 3.2s ease-out infinite;
+  }
+  @keyframes pulse-ring {
+    0%   { transform: scale(0.92); opacity: 0.55; }
+    70%  { transform: scale(1.12); opacity: 0; }
+    100% { transform: scale(1.12); opacity: 0; }
   }
 
   /* Glass morphism */
@@ -198,11 +383,25 @@
     border: 1px solid oklch(1 0 0 / 0.05);
   }
 
+  /* Card de autenticación con borde degradado */
+  .itas-auth-card {
+    border: 1.5px solid transparent;
+    border-radius: 18px;
+    background:
+      linear-gradient(var(--itas-card), var(--itas-card)) padding-box,
+      linear-gradient(135deg, var(--itas-green-light), var(--itas-gold) 55%, var(--itas-green)) border-box;
+    box-shadow:
+      0 1px 2px rgba(74, 55, 40, 0.04),
+      0 16px 40px -12px rgba(61, 90, 30, 0.22);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+
   /* Sidebar */
   .sidebar-gradient {
     background: linear-gradient(
       180deg,
-      var(--ima-sidebar-bg) 0%,
+      var(--itas-sidebar-bg) 0%,
       oklch(0.05 0 0) 100%
     );
   }
@@ -284,3 +483,183 @@
   0% { width: 0%; }
   100% { width: 100%; }
 }
+
+/* ══ Carousel ═══════════════════════════════════════════════
+   A row of cards that drift at rest, give under the pointer,
+   and can be thrown. Three motions on three nested elements,
+   one transform each — see the note in Carousel.tsx for why
+   they cannot share a node.
+
+   Bencho's design tokens are mapped to THIS project's tokens,
+   locally on the component root so nothing leaks out:
+     --bg         → the project ground (var(--background))
+     --font-ui    → the project UI font (var(--font-sans))
+     --ink-rgb    → the ITAS navy every page here is printed
+                    in (#142b45 → 20 43 69)
+     --shadow-rgb → same ink, shared by the card's throw
+     --lift/--sway→ the drift amplitudes, set per card by the
+                    component; these are just the CSS fallbacks */
+.car {
+  position: relative;
+  font-family: var(--font-ui);
+  --bg: var(--background);
+  --font-ui: var(--font-sans);
+  --ink-rgb: 20 43 69;
+  --shadow-rgb: 20 43 69;
+  --lift: 4px;
+  --sway: 1deg;
+}
+
+/* ── fitted to the phone, still the same geometry ───────────
+   The stage is fixed at 476x340 on purpose (see the note in
+   Carousel.tsx), which is wider than a phone. Rather than
+   re-arithmetic the ring for small screens, the whole stage is
+   scaled down — identical proportions, identical feel — and
+   the flex centers it so nothing clips off the edge. */
+.car-fit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  overflow-x: clip;
+}
+
+.car-fit > .car {
+  transform: scale(var(--fit, 1));
+  transform-origin: center;
+}
+
+/* ── the phone fit: the fixed 476px stage (see the maths in
+   Carousel.tsx) scaled so it always fits the screen. One step
+   for common phones, another for the smallest ones — at 0.58
+   the ring is 276px, comfortable in the ~288px a 320px phone
+   leaves after page padding. */
+@media (max-width: 640px) {
+  .car-fit > .car {
+    --fit: 0.72;
+  }
+}
+
+@media (max-width: 400px) {
+  .car-fit > .car {
+    --fit: 0.58;
+  }
+}
+
+/* ── the frame is only a frame ─────────────────────────────
+   No background, no clip, no mask. This was a box that cut
+   the cards at its edges, and before that a mask that faded
+   them out there, and both were answers to the question of
+   what happens to a card when it runs out of block. The cards
+   are on a ring now and never reach an edge, so the question
+   is gone and so is everything that was answering it.
+
+   Which also means nothing here forces `transform-style:
+   flat` any more — overflow and mask both did, and both were
+   safe only because the perspective sits two levels down on
+   `.car-float`. It no longer has to be. */
+.car-track {
+  position: absolute;
+  inset: 0;
+  touch-action: pan-y;
+  cursor: grab;}
+
+.car-track[data-held="true"] {
+  cursor: grabbing;}
+
+.car-track:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px rgba(var(--ink-rgb), 0.4);}
+
+/* the slot holds WHERE on the ring and the card's own resting
+   ANGLE, written per frame by the component — so it carries no
+   transition of its own, or the easing and the drag would
+   re-interpolate against each other and what you would see is
+   the transition rather than the finger */
+.car-slot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center;}
+
+/* ── the drift ──────────────────────────────────────────────
+   Keyframes rather than a loop: a rAF per card would be a
+   permanent loop for motion nobody is watching, and a wall
+   holding several of these blocks would run a dozen. This
+   runs on the compositor and pauses itself when the tab
+   hides. The period is set per card and deliberately does not
+   divide into its neighbours' — that is what stops the row
+   breathing in unison.
+
+   The perspective lives HERE, not on the track: on the track
+   a card at the edge of the row would tilt toward the middle
+   of the stage rather than toward the finger on it. Each card
+   is its own object being touched and wants its own vanishing
+   point. */
+.car-float {
+  width: 100%;
+  height: 100%;
+  perspective: 760px;
+  animation: car-bob 5s ease-in-out infinite;}
+
+.car-card {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  /* no transition: the tilt is sprung in the component, and a
+     transition on top would be a second opinion about how this
+     card settles */}
+
+.car-sheen {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;}
+
+/* ── the caption ───────────────────────────────────────────
+   ITAS addition: names the card and its place. It fades out
+   as the card recedes (the transform is what the ring writes,
+   so the label scaling is free) and never takes a pointer,
+   so the tilt reads the pointer straight through it. */
+.car-cap {
+  position: absolute;
+  z-index: 2;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 26px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  border-radius: inherit;
+  background: linear-gradient(to top, rgba(9, 14, 28, 0.72), rgba(9, 14, 28, 0) 75%);
+  pointer-events: none;}
+
+.car-cap-name {
+  color: #fff;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.15;
+  text-shadow: 0 1px 4px rgba(9, 14, 28, 0.55);}
+
+.car-cap-meta {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-shadow: 0 1px 3px rgba(9, 14, 28, 0.55);}
+
+@media (prefers-reduced-motion: reduce) {
+  .car-float { animation: none; }
+}
+
+@keyframes car-bob {
+  0%, 100% {
+    transform: translateY(calc(var(--lift, 4px) * -1)) rotate(calc(var(--sway, 1deg) * -1));
+  }
+  50% {
+    transform: translateY(var(--lift, 4px)) rotate(var(--sway, 1deg));
+  }}

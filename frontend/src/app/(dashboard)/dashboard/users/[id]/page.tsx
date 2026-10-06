@@ -10,6 +10,7 @@ import { UserCard } from "@/features/users/components/UserCard";
 import { UserForm } from "@/features/users/components/UserForm";
 import { userService } from "@/features/users/services/user.service";
 import type { UpdateUserPayload, AdminUpdateUserPayload } from "@/features/users/types/user.types";
+import { AuthGuard } from "@/features/auth/components/AuthGuard";
 
 // ─── COMPONENTE ────────────────────────────────────────────
 
@@ -99,7 +100,8 @@ export default function UserDetailPage() {
 
   // ─── RENDER ─────────────────────────────────────────
   return (
-    <div className="space-y-6">
+    <AuthGuard allowedRoles={["admin"]} redirectTo="/dashboard">
+      <div className="space-y-6">
       <div className="flex items-center gap-3">
         <button onClick={() => router.push("/dashboard/users")}
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-700 transition-colors">
@@ -163,5 +165,6 @@ export default function UserDetailPage() {
         </div>
       )}
     </div>
+    </AuthGuard>
   );
 }

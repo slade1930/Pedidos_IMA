@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useOrder } from "@/features/orders/hooks/useOrder";
 import { OrderCard } from "@/features/orders/components/OrderCard";
 import { OrderConfirmation } from "@/features/shop/components/OrderConfirmation";
+import { ReorderButton } from "@/features/shop/components/ReorderButton";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { orderService } from "@/features/orders/services/order.service";
 import { 
   FileDown, 
   User, 
@@ -61,8 +63,6 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 
   const { data: order, isPending, isError } = useOrder(orderId);
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
   const handleCopyCode = () => {
     if (order?.pickup_code) {
       navigator.clipboard.writeText(order.pickup_code);
@@ -75,10 +75,10 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
     return (
       <div className="flex flex-col items-center justify-center py-24 space-y-4">
         <div className="relative flex items-center justify-center">
-          <div className="h-16 w-16 animate-spin rounded-full border-4 border-[#3A5F26] border-t-transparent" />
-          <div className="absolute h-8 w-8 rounded-full bg-[#1E3A1E]/10 animate-ping" />
+          <div className="h-16 w-16 animate-spin rounded-full border-4 border-[#1b4f72] border-t-transparent" />
+          <div className="absolute h-8 w-8 rounded-full bg-[#142b45]/10 animate-ping" />
         </div>
-        <p className="text-xs font-black uppercase tracking-widest text-[#3A5F26]/70 animate-pulse">
+        <p className="text-xs font-black uppercase tracking-widest text-[#1b4f72]/70 animate-pulse">
           Cargando detalles de tu pedido...
         </p>
       </div>
@@ -135,7 +135,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
   const currentStep = getStepIndex(order.status);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative text-[#1E3A1E] space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative text-[#142b45] space-y-8">
       {/* Estilos CSS Locales para Diseño Premium */}
       <style>{`
         .premium-shadow {
@@ -147,11 +147,11 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           border: 1px solid rgba(58, 95, 38, 0.06);
         }
         .gold-stamp-gradient {
-          background: linear-gradient(135deg, #1E3A1E, #122412);
+          background: linear-gradient(135deg, #142b45, #0e1e33);
           border: 1px solid rgba(251, 191, 36, 0.35);
         }
         .gold-glow-border {
-          border: 2px dashed #FBBF24;
+          border: 2px dashed #2fd4a7;
           box-shadow: 0 0 25px rgba(251, 191, 36, 0.12);
         }
         .pulse-gold {
@@ -176,15 +176,15 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
       `}</style>
 
       {/* Luces de Fondo Decorativas */}
-      <div className="absolute top-0 left-1/4 w-72 h-72 bg-[#3A5F26]/4 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-[#FBBF24]/3 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-72 h-72 bg-[#1b4f72]/4 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-20 right-1/4 w-96 h-96 bg-[#2fd4a7]/3 rounded-full blur-3xl pointer-events-none" />
 
       {/* Cabecera / Botón Atrás + Título */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div className="space-y-1">
           <button
             onClick={() => router.push("/shop/history")}
-            className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-[#3A5F26] hover:text-[#1E3A1E] transition-colors mb-2"
+            className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-[#1b4f72] hover:text-[#142b45] transition-colors mb-2"
           >
             <ChevronLeft size={16} strokeWidth={2.5} />
             <span>Volver al Historial</span>
@@ -193,21 +193,23 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
             Detalle del Pedido
           </h1>
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-            IMA Panamá — Ref: {order.order_number}
+            ITAS Panamá — Ref: {order.order_number}
           </p>
         </div>
 
         {/* Acciones Rápidas */}
         <div className="flex items-center gap-3">
-          <a
-            href={`${apiUrl}/api/v1/orders/${order.id}/invoice`}
-            target="_blank"
-            rel="noopener noreferrer"
+          <ReorderButton order={order} className="hidden sm:block" />
+          <button
+            onClick={() =>
+              orderService.downloadInvoice(order.id, `factura-${order.order_number}.pdf`)
+            }
+            type="button"
             className="flex items-center justify-center gap-2 rounded-2xl border border-gray-200 px-5 py-3 text-xs font-black uppercase tracking-widest text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-all bg-white shadow-sm"
           >
             <FileDown size={14} strokeWidth={2.5} />
             <span>Descargar Factura</span>
-          </a>
+          </button>
         </div>
       </div>
 
@@ -232,11 +234,11 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-[#3A5F26]/10 pb-4">
+            <div className="flex items-center justify-between border-b border-[#1b4f72]/10 pb-4">
               <span className="text-xs font-black uppercase tracking-widest text-gray-400">
                 Progreso del Envío / Retiro
               </span>
-              <span className="text-xs font-black uppercase tracking-widest text-[#3A5F26] bg-[#3A5F26]/10 px-3 py-1 rounded-full">
+              <span className="text-xs font-black uppercase tracking-widest text-[#1b4f72] bg-[#1b4f72]/10 px-3 py-1 rounded-full">
                 {steps[currentStep]?.label ?? "Procesando"}
               </span>
             </div>
@@ -249,7 +251,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                   initial={{ width: "0%" }}
                   animate={{ width: `${(currentStep / 3) * 100}%` }}
                   transition={{ duration: 0.8, ease: "easeInOut" }}
-                  className="h-full bg-gradient-to-r from-[#3A5F26] to-[#FBBF24] rounded-full"
+                  className="h-full bg-gradient-to-r from-[#1b4f72] to-[#2fd4a7] rounded-full"
                 />
               </div>
 
@@ -269,9 +271,9 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                         transition={isActive ? { repeat: Infinity, duration: 2, ease: "easeInOut" } : undefined}
                         className={`h-11 w-11 rounded-full flex items-center justify-center transition-all ${
                           isCompleted
-                            ? "bg-[#3A5F26] text-white shadow-lg shadow-[#3A5F26]/20"
+                            ? "bg-[#1b4f72] text-white shadow-lg shadow-[#1b4f72]/20"
                             : isActive
-                            ? "bg-gradient-to-tr from-[#3A5F26] to-[#558b38] text-white shadow-lg shadow-[#3A5F26]/30 border-2 border-white"
+                            ? "bg-gradient-to-tr from-[#1b4f72] to-[#558b38] text-white shadow-lg shadow-[#1b4f72]/30 border-2 border-white"
                             : "bg-white text-gray-400 border border-gray-200"
                         }`}
                       >
@@ -284,7 +286,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 
                       {/* Texto */}
                       <div className="space-y-0.5">
-                        <p className={`text-xs font-black uppercase tracking-wider ${isActive ? "text-[#1E3A1E]" : isCompleted ? "text-gray-700" : "text-gray-400"}`}>
+                        <p className={`text-xs font-black uppercase tracking-wider ${isActive ? "text-[#142b45]" : isCompleted ? "text-gray-700" : "text-gray-400"}`}>
                           {step.label}
                         </p>
                         <p className="text-[10px] text-gray-400 font-bold hidden sm:block">
@@ -315,12 +317,12 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           </div>
 
           {/* Banner de Garantía / Comercio Justo */}
-          <div className="glass-panel rounded-3xl p-6 flex flex-col sm:flex-row items-center gap-4 border border-[#3A5F26]/10">
-            <div className="h-12 w-12 rounded-2xl bg-[#3A5F26]/10 flex items-center justify-center text-[#3A5F26] flex-shrink-0">
+          <div className="glass-panel rounded-3xl p-6 flex flex-col sm:flex-row items-center gap-4 border border-[#1b4f72]/10">
+            <div className="h-12 w-12 rounded-2xl bg-[#1b4f72]/10 flex items-center justify-center text-[#1b4f72] flex-shrink-0">
               <Store size={22} />
             </div>
             <div className="text-center sm:text-left space-y-0.5">
-              <h4 className="text-xs font-black uppercase tracking-widest text-[#1E3A1E]">Apoyando la Producción Nacional</h4>
+              <h4 className="text-xs font-black uppercase tracking-widest text-[#142b45]">Apoyando la Producción Nacional</h4>
               <p className="text-xs text-gray-500 font-semibold leading-relaxed">
                 Este pedido impulsa directamente a los productores locales panameños. Al comprar en las ferias libres, obtienes frescura garantizada y fomentas el comercio justo en el país.
               </p>
@@ -343,20 +345,20 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
               onClick={handleCopyCode}
             >
               {/* Pulso de fondo */}
-              <div className="absolute inset-0 bg-[#FBBF24] pulse-gold pointer-events-none" />
+              <div className="absolute inset-0 bg-[#2fd4a7] pulse-gold pointer-events-none" />
               <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none" />
 
               <div className="relative z-10 space-y-3">
-                <span className="text-[10px] text-[#FBBF24] font-black uppercase tracking-widest flex items-center justify-center gap-1.5">
+                <span className="text-[10px] text-[#2fd4a7] font-black uppercase tracking-widest flex items-center justify-center gap-1.5">
                   <MapPin size={12} /> Código de Retiro Autorizado
                 </span>
 
                 <div className="gold-glow-border rounded-2xl p-5 bg-black/45 flex flex-col items-center justify-center relative">
                   {/* Cortes de boleto laterales */}
-                  <div className="ticket-cutout-left" style={{ backgroundColor: "#1e3a1e", left: "-9px" }} />
-                  <div className="ticket-cutout-right" style={{ backgroundColor: "#1e3a1e", right: "-9px" }} />
+                  <div className="ticket-cutout-left" style={{ backgroundColor: "#142b45", left: "-9px" }} />
+                  <div className="ticket-cutout-right" style={{ backgroundColor: "#142b45", right: "-9px" }} />
 
-                  <p className="text-4xl sm:text-5xl font-black tracking-widest text-[#FBBF24] font-mono leading-none">
+                  <p className="text-4xl sm:text-5xl font-black tracking-widest text-[#2fd4a7] font-mono leading-none">
                     {order.pickup_code}
                   </p>
 
@@ -387,8 +389,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
           {/* DATOS DEL CLIENTE */}
           {(order.customer_name || order.customer_cedula) && (
             <div className="glass-panel rounded-3xl p-5 space-y-4 premium-shadow">
-              <div className="flex items-center gap-2 border-b border-[#3A5F26]/10 pb-3">
-                <div className="h-7 w-7 rounded-lg bg-[#3A5F26]/10 flex items-center justify-center text-[#3A5F26]">
+              <div className="flex items-center gap-2 border-b border-[#1b4f72]/10 pb-3">
+                <div className="h-7 w-7 rounded-lg bg-[#1b4f72]/10 flex items-center justify-center text-[#1b4f72]">
                   <User size={14} />
                 </div>
                 <h3 className="text-xs font-black uppercase tracking-widest text-gray-900">
@@ -419,8 +421,8 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
 
           {/* RESUMEN FINANCIERO ADICIONAL */}
           <div className="glass-panel rounded-3xl p-5 space-y-4 premium-shadow">
-            <div className="flex items-center gap-2 border-b border-[#3A5F26]/10 pb-3">
-              <div className="h-7 w-7 rounded-lg bg-[#3A5F26]/10 flex items-center justify-center text-[#3A5F26]">
+            <div className="flex items-center gap-2 border-b border-[#1b4f72]/10 pb-3">
+              <div className="h-7 w-7 rounded-lg bg-[#1b4f72]/10 flex items-center justify-center text-[#1b4f72]">
                 <Receipt size={14} />
               </div>
               <h3 className="text-xs font-black uppercase tracking-widest text-gray-900">
@@ -436,7 +438,7 @@ export function OrderDetail({ orderId }: OrderDetailProps) {
                 </span>
               </div>
               <div className="flex justify-between items-center pt-3 border-t border-dashed border-gray-200">
-                <span className="text-[#3A5F26] uppercase tracking-wider">Importe Total</span>
+                <span className="text-[#1b4f72] uppercase tracking-wider">Importe Total</span>
                 <span className="text-lg font-black text-gray-900 font-mono">
                   {formatPrice(order.total_amount)}
                 </span>

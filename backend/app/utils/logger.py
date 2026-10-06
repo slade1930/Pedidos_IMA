@@ -22,7 +22,7 @@ def setup_logger() -> None:
 
     # Archivo general
     logger.add(
-        "logs/ima_system.log",
+        "logs/itas_system.log",
         level="INFO",
         format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {name}:{line} | {message}",
         rotation="10 MB",
@@ -38,6 +38,19 @@ def setup_logger() -> None:
         rotation="5 MB",
         retention="60 days",
         compression="zip",
+    )
+
+    # FASE 3: auditoría de seguridad — solo eventos [AUDIT]
+    # Archivo propio, rotación diaria, retención 90 días, comprimido.
+    # Los eventos llegan desde app/core/security_audit.py (audit_log).
+    logger.add(
+        "logs/security-audit.log",
+        level="INFO",
+        format="{time:YYYY-MM-DD HH:mm:ss} | {message}",
+        rotation="1 day",
+        retention="90 days",
+        compression="zip",
+        filter=lambda record: "[AUDIT]" in record["message"],
     )
 
 

@@ -18,7 +18,7 @@ interface UserBadgeProps {
 const ROLE_STYLES: Record<UserRole, string> = {
   admin: "bg-gradient-to-r from-purple-500/10 to-purple-600/15 border-purple-500/25 text-purple-700 shadow-sm",
   staff: "bg-gradient-to-r from-blue-500/10 to-blue-600/15 border-blue-500/25 text-blue-700 shadow-sm",
-  client: "bg-gradient-to-r from-[#4A3728]/5 to-[#4A3728]/12 border-[#4A3728]/20 text-[#4A3728] shadow-sm",
+  client: "bg-gradient-to-r from-[#142b45]/5 to-[#142b45]/12 border-[#142b45]/20 text-[#142b45] shadow-sm",
 };
 
 const SIZE_STYLES = {
@@ -44,13 +44,13 @@ export function UserBadge({ variant, role, isActive, size = "md" }: UserBadgePro
     return (
       <span 
         className={`inline-flex items-center gap-1.5 leading-none uppercase ${SIZE_STYLES[size]} ${
-          isUserActive ? "text-[#3D5A1E]" : "text-[#C94B32]"
+          isUserActive ? "text-[#1b4f72]" : "text-[#C94B32]"
         }`}
       >
         {isUserActive ? (
           <span className={`relative flex ${dotSize}`}>
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5C8A3C] opacity-75"></span>
-            <span className={`relative inline-flex rounded-full ${dotSize} bg-[#3D5A1E] shadow-[0_0_6px_#3D5A1E]`}></span>
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2e7d9e] opacity-75"></span>
+            <span className={`relative inline-flex rounded-full ${dotSize} bg-[#1b4f72] shadow-[0_0_6px_#1b4f72]`}></span>
           </span>
         ) : (
           <span className={`relative flex ${dotSize}`}>

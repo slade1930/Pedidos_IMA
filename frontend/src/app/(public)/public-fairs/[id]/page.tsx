@@ -126,7 +126,7 @@ export default function PublicFairPage() {
       {/* Footer informativo */}
       <div className="text-center py-4">
         <p className="text-xs text-gray-400">
-          Esta es una página pública de IMA System.{" "}
+          Esta es una página pública de ITAS.{" "}
           <a href="/login" className="text-indigo-600 hover:text-indigo-500">
             Inicia sesión
           </a>{" "}

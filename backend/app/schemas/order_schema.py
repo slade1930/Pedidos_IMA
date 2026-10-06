@@ -1,6 +1,7 @@
 # app/schemas/order_schema.py
 from typing import Optional, Any
 from decimal import Decimal
+from datetime import datetime
 import uuid
 
 from pydantic import (
@@ -23,7 +24,7 @@ class OrderItemCreateSchema(BaseModel):
     quantity: int = Field(
         default=1,
         ge=1,
-        le=10,
+        le=100,
     )
 
 
@@ -44,8 +45,8 @@ class OrderCreateSchema(BaseModel):
         if not items:
             raise ValueError("El pedido debe tener al menos un producto")
 
-        if len(items) > 10:
-            raise ValueError("Máximo 10 productos por pedido")
+        if len(items) > 100:
+            raise ValueError("Máximo 100 productos por pedido")
 
         product_ids = [item.product_id for item in items]
 
@@ -104,10 +105,6 @@ class OrderResponseSchema(BaseModel):
 
     payment_status: Optional[str] = None
 
-    qr_code: Optional[str] = None
-
-    qr_used: bool = False
-
     pickup_code: Optional[str] = None
 
     customer_name: Optional[str] = None
@@ -118,14 +115,15 @@ class OrderResponseSchema(BaseModel):
 
     items: list[OrderItemResponseSchema] = Field(default_factory=list)
 
+    created_at: Optional[datetime] = None
+
+    updated_at: Optional[datetime] = None
+
     @model_validator(mode="before")
     @classmethod
     def extract_fields(cls, data: Any) -> Any:
-        """Mapea qr_token → qr_code y extrae datos del usuario"""
+        """Extrae datos del usuario anidado para la respuesta."""
         if isinstance(data, dict):
-            if "qr_token" in data and data["qr_token"] is not None:
-                data["qr_code"] = data["qr_token"]
-
             user = data.get("user")
             if user and hasattr(user, "full_name"):
                 data["customer_name"] = user.full_name
@@ -147,3 +145,10 @@ class PdaRestrictionSchema(BaseModel):
     last_fair_name: str
     days_remaining: int
     next_available_date: str
+
+
+class PdaStatusSchema(BaseModel):
+    """Estado de elegibilidad de compra de un ciudadano (control de beneficios)"""
+
+    can_purchase: bool
+    restriction: Optional[PdaRestrictionSchema] = None

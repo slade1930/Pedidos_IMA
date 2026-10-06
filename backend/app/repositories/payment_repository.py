@@ -9,6 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.base_repository import BaseRepository
 from app.models.payment_model import Payment
+from app.models.order_model import Order
 from app.core.constants import PaymentStatus
 
 
@@ -26,7 +27,9 @@ class PaymentRepository(BaseRepository[Payment]):
         result = await self.db.execute(
             select(Payment)
             .where(Payment.is_active.is_(True))
-            .options(selectinload(Payment.order))
+            .options(
+                selectinload(Payment.order).selectinload(Order.user),
+            )
             .order_by(Payment.created_at.desc())
             .offset(skip)
             .limit(limit)
@@ -53,7 +56,7 @@ class PaymentRepository(BaseRepository[Payment]):
                 Payment.is_active.is_(True),
             )
             .options(
-                selectinload(Payment.order),
+                selectinload(Payment.order).selectinload(Order.user),
             )
         )
 

@@ -6,6 +6,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useProduct } from "@/features/products/hooks/useProduct";
 import { useCartStore } from "@/stores/cart.store";
+import { useAuthStore } from "@/stores/auth.store";
+import { usePdaRestriction } from "@/features/shop/hooks/usePdaRestriction";
+import { PdaRestrictionCard } from "@/features/shop/components/PdaRestrictionCard";
 import type { Product } from "@/features/products/types/product.types";
 import { motion } from "framer-motion";
 import { ArrowLeft, Plus, Minus, ShoppingCart } from "lucide-react";
@@ -67,6 +70,9 @@ export function ProductDetail({ productId }: ProductDetailProps) {
   const { data: product, isPending, isError } = useProduct(productId);
   const addItem = useCartStore((state) => state.addItem);
   const getProductQuantity = useCartStore((state) => state.getProductQuantity);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { data: pdaStatus } = usePdaRestriction();
+  const restriction = isAuthenticated && pdaStatus && !pdaStatus.can_purchase ? pdaStatus.restriction : null;
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -75,13 +81,21 @@ export function ProductDetail({ productId }: ProductDetailProps) {
     if (!product) return;
     setErrorMsg(null);
 
+    if (restriction) {
+      setErrorMsg(
+        `Control de beneficios activo: podrás comprar de nuevo el ${new Date(restriction.next_available_date).toLocaleDateString("es-PA")}.`
+      );
+      return;
+    }
+
     const result = addItem({
       product_id: product.id,
       product_name: product.name,
       quantity,
       unit_price: product.price,
       max_per_user: product.max_per_user,
-      stock: product.max_per_user,
+      stock: availableStock,
+      image_url: imageUrl,
     });
 
     if (result.success) {
@@ -92,9 +106,12 @@ export function ProductDetail({ productId }: ProductDetailProps) {
     }
   };
 
+  // 👈 NUEVO: stock real de inventario (fallback a max_per_user)
+  const availableStock = product ? (product.available_stock ?? product.max_per_user) : 0;
   const cartQty = product ? getProductQuantity(product.id) : 0;
-  const maxAvailable = product ? product.max_per_user - cartQty : 0;
-  const isOutOfStock = maxAvailable <= 0;
+  const effectiveLimit = product ? Math.min(availableStock, product.max_per_user) : 0;
+  const maxAvailable = effectiveLimit - cartQty;
+  const isOutOfStock = maxAvailable <= 0 || availableStock <= 0;
   const imageUrl = product ? getImageUrl(product.image_url) : ""; // 👈 URL corregida
 
   // ─── LOADING ────────────────────────────────────────
@@ -119,7 +136,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
   if (isError || !product) {
     return (
       <div className="max-w-4xl mx-auto text-center py-20 space-y-4">
-        <h2 className="text-2xl font-black text-[#1E3A1E]">Producto no encontrado</h2>
+        <h2 className="text-2xl font-black text-[#142b45]">Producto no encontrado</h2>
         <p className="text-gray-500 font-medium">El producto que buscas no existe o no está disponible.</p>
         <button 
           onClick={() => router.back()} 
@@ -137,18 +154,18 @@ export function ProductDetail({ productId }: ProductDetailProps) {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="max-w-4xl mx-auto space-y-6 text-[#1E3A1E]"
+      className="max-w-4xl mx-auto space-y-6 text-[#142b45]"
     >
       <style>{`
         .yellow-btn {
-          background-color: #FBBF24;
-          color: #1E3A1E;
+          background-color: #2fd4a7;
+          color: #142b45;
           font-weight: 800;
           box-shadow: 0 4px 14px rgba(251, 191, 36, 0.35);
           transition: all 0.2s ease-in-out;
         }
         .yellow-btn:hover {
-          background-color: #F59E0B;
+          background-color: #2fbf9b;
           transform: translateY(-1px);
           box-shadow: 0 6px 20px rgba(245, 158, 11, 0.45);
         }
@@ -158,7 +175,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
         .green-badge {
           background-color: rgba(58, 95, 38, 0.08);
           border: 1px solid rgba(58, 95, 38, 0.2);
-          color: #1E3A1E;
+          color: #142b45;
         }
         .info-card {
           background-color: #FFFFFF;
@@ -168,7 +185,7 @@ export function ProductDetail({ productId }: ProductDetailProps) {
 
       <button 
         onClick={() => router.back()} 
-        className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#1E3A1E]/70 hover:text-[#1E3A1E] transition-colors cursor-pointer"
+        className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-wider text-[#142b45]/70 hover:text-[#142b45] transition-colors cursor-pointer"
       >
         <ArrowLeft size={14} strokeWidth={3} />
         <span>Volver al Catálogo</span>
@@ -177,11 +194,11 @@ export function ProductDetail({ productId }: ProductDetailProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         
         {/* Imagen del Producto */}
-        <div className="aspect-square bg-white border-2 border-[#3A5F26]/12 rounded-3xl p-3 shadow-md flex items-center justify-center overflow-hidden">
+        <div className="aspect-square bg-white border-2 border-[#1b4f72]/12 rounded-3xl p-3 shadow-md flex items-center justify-center overflow-hidden">
           {imageUrl ? ( // 👈 Usar URL corregida
             <img src={imageUrl} alt={product.name} className="h-full w-full object-cover rounded-2xl" />
           ) : (
-            <div className="h-full w-full bg-[#1E3A1E]/5 rounded-2xl flex items-center justify-center">
+            <div className="h-full w-full bg-[#142b45]/5 rounded-2xl flex items-center justify-center">
               <svg className="h-20 w-20 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
               </svg>
@@ -206,32 +223,36 @@ export function ProductDetail({ productId }: ProductDetailProps) {
             </span>
           </div>
 
-          <div className="text-4xl font-black tracking-tight text-[#1E3A1E]">
+          <div className="text-4xl font-black tracking-tight text-[#142b45]">
             {formatPrice(product.price)}
           </div>
 
           {product.description && (
             <div className="space-y-1.5">
-              <h3 className="text-xs font-black uppercase tracking-widest text-[#3A5F26]">Descripción</h3>
+              <h3 className="text-xs font-black uppercase tracking-widest text-[#1b4f72]">Descripción</h3>
               <p className="text-sm text-gray-600 leading-relaxed font-medium">{product.description}</p>
             </div>
           )}
 
           <div className="info-card rounded-2xl p-4 space-y-3 shadow-sm">
-            <div className="flex items-center justify-between text-xs font-bold border-b border-[#3A5F26]/10 pb-2">
+            <div className="flex items-center justify-between text-xs font-bold border-b border-[#1b4f72]/10 pb-2">
               <span className="text-gray-500">Estado de Disponibilidad</span>
-              <span className={maxAvailable > 0 ? "text-green-600" : "text-red-600"}>
-                {maxAvailable > 0 ? "✓ DISPONIBLE EN FERIA" : "✕ AGOTADO"}
-              </span>
+              {isOutOfStock ? (
+                <span className="text-red-600 font-black">✕ AGOTADO</span>
+              ) : (
+                <span className="text-green-600">
+                  ✓ DISPONIBLE · Quedan {availableStock}
+                </span>
+              )}
             </div>
-            <div className="flex items-center justify-between text-xs font-bold border-b border-[#3A5F26]/10 pb-2">
+            <div className="flex items-center justify-between text-xs font-bold border-b border-[#1b4f72]/10 pb-2">
               <span className="text-gray-500">Cantidad Máxima por Usuario</span>
               <span className="text-gray-900 font-extrabold">{product.max_per_user} unidades</span>
             </div>
             {cartQty > 0 && (
               <div className="flex items-center justify-between text-xs font-bold">
                 <span className="text-gray-500">Agregados en tu Carrito</span>
-                <span className="text-[#3A5F26] font-black">{cartQty} unidades</span>
+                <span className="text-[#1b4f72] font-black">{cartQty} unidades</span>
               </div>
             )}
           </div>
@@ -246,9 +267,16 @@ export function ProductDetail({ productId }: ProductDetailProps) {
             </motion.div>
           )}
 
-          <div className="flex items-center gap-4 pt-4 border-t-2 border-[#3A5F26]/12">
+          {restriction && (
+            <PdaRestrictionCard
+              restriction={restriction}
+              hint="Ya realizaste tu compra del mes. No puedes añadir productos ni procesar un nuevo pago hasta que se libere tu próximo cupo."
+            />
+          )}
+
+          <div className="flex items-center gap-4 pt-4 border-t-2 border-[#1b4f72]/12">
             
-            <div className="flex items-center gap-2 bg-white border-2 border-[#3A5F26]/20 rounded-2xl p-1 shadow-sm">
+            <div className="flex items-center gap-2 bg-white border-2 border-[#1b4f72]/20 rounded-2xl p-1 shadow-sm">
               <button
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 disabled={isOutOfStock}

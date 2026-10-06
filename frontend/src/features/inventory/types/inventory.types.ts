@@ -5,6 +5,7 @@
 export interface InventoryItem {
   id: string;
   product_id: string;
+  product_name?: string;  // 👈 NUEVO
   fair_id: string;
   total_stock: number;
   reserved_stock: number;

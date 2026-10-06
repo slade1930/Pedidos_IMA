@@ -63,7 +63,7 @@ export const useUIStore = create<UIState>()(
       },
     }),
     {
-      name: "ima-ui",
+      name: "itas-ui",
       partialize: (state) => ({
         sidebarState: state.sidebarState,
         theme: state.theme,

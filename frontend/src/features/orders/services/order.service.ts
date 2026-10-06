@@ -23,11 +23,14 @@ export const orderService = {
     if (filters?.search) params.set("search", filters.search);
     if (filters?.status) params.set("status", filters.status);
     if (filters?.fair_id) params.set("fair_id", filters.fair_id);
+    if (filters?.date_from) params.set("date_from", filters.date_from);  // 👈 NUEVO
+    if (filters?.date_to) params.set("date_to", filters.date_to);        // 👈 NUEVO
     if (filters?.skip !== undefined) params.set("skip", String(filters.skip));
     if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
 
     const queryString = params.toString();
-    const endpoint = queryString ? `/orders?${queryString}` : "/orders";
+    // Sin trailing slash: coincide con la ruta del backend /orders (evita redirect 307).
+    const endpoint = queryString ? `/orders?${queryString}` : `/orders`;
 
     const response = await apiClient.get<OrdersResponse>(endpoint);
     return response.data;
@@ -70,22 +73,56 @@ export const orderService = {
   },
 
   /**
-   * Descarga un reporte PDF con todas las órdenes.
-   * Usa apiClient con responseType blob para recibir el PDF correctamente.
+   * Descarga un reporte PDF con filtros opcionales.
    * 
    * GET /api/v1/orders/report
    */
-  async downloadOrdersReport(): Promise<void> {
-    // Usar apiClient con responseType: 'blob' para recibir el PDF
-    const response = await apiClient.get("/orders/report", {
+  async downloadOrdersReport(filters?: {
+    fair_id?: string;
+    date_from?: string;
+    date_to?: string;
+  }): Promise<void> {
+    const params = new URLSearchParams();
+    
+    if (filters?.fair_id) params.set("fair_id", filters.fair_id);
+    if (filters?.date_from) params.set("date_from", filters.date_from);
+    if (filters?.date_to) params.set("date_to", filters.date_to);
+    
+    const queryString = params.toString();
+    const endpoint = queryString ? `/orders/report?${queryString}` : "/orders/report";
+
+    const response = await apiClient.get(endpoint, {
       responseType: "blob",
     });
 
-    // Crear URL temporal y descargar
     const url = window.URL.createObjectURL(response.data);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `reporte-ordenes-ima-${new Date().toISOString().split("T")[0]}.pdf`;
+    link.download = `reporte-ordenes-itas-${new Date().toISOString().split("T")[0]}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
+
+  /**
+   * Descarga la factura (PDF) de una orden como blob.
+   *
+   * FASE 1.4: se usa axios con withCredentials para enviar la cookie
+   * httpOnly "itas_access" (un <a href> nativo no la envía de forma fiable
+   * y puede fallar la descarga al requerir autenticación).
+   *
+   * GET /api/v1/orders/{id}/invoice
+   */
+  async downloadInvoice(orderId: string, downloadName: string): Promise<void> {
+    const response = await apiClient.get(`/orders/${orderId}/invoice`, {
+      responseType: "blob",
+    });
+
+    const url = window.URL.createObjectURL(response.data);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = downloadName;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

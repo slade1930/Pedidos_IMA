@@ -147,14 +147,14 @@ function ImageUploadField({
           onClick={() => fileInputRef.current?.click()}
           className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${
             isDragging
-              ? "border-[#5C8A3C] bg-[#5C8A3C]/5 scale-[1.02]"
-              : "border-slate-300 dark:border-slate-700 hover:border-[#5C8A3C]/60 dark:hover:border-[#5C8A3C] hover:bg-slate-50 dark:hover:bg-slate-900/30"
+              ? "border-[#2e7d9e] bg-[#2e7d9e]/5 scale-[1.02]"
+              : "border-slate-300 dark:border-slate-700 hover:border-[#2e7d9e]/60 dark:hover:border-[#2e7d9e] hover:bg-slate-50 dark:hover:bg-slate-900/30"
           }`}
         >
           <div className="flex flex-col items-center gap-3">
             <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
               isDragging
-                ? "bg-[#5C8A3C]/10 text-[#5C8A3C] scale-110"
+                ? "bg-[#2e7d9e]/10 text-[#2e7d9e] scale-110"
                 : "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
             }`}>
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -196,17 +196,17 @@ function FairSelector({ register, errors, isSubmitting }: any) {
 
   return (
     <div className="space-y-1.5 relative group">
-      <label htmlFor="fair_id" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+      <label htmlFor="fair_id" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
         Feria
       </label>
       <div className="relative">
         <select 
           id="fair_id" 
           disabled={isSubmitting}
-          className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
+          className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
             errors.fair_id 
               ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-500 focus:ring-rose-500/10" 
-              : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+              : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
           }`}
           {...register("fair_id")}
         >
@@ -264,17 +264,17 @@ function ProductFormFields({
       <div className="grid grid-cols-2 gap-4">
         {/* Nombre de Producto */}
         <div className="space-y-1.5 relative group">
-          <label htmlFor="name" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+          <label htmlFor="name" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
             Nombre del producto
           </label>
           <input 
             id="name" 
             type="text" 
             disabled={isSubmitting}
-            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 ${
+            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 ${
               errors.name 
                 ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-500 focus:ring-rose-500/10" 
-                : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+                : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
             }`}
             placeholder='Ej: Tomate'
             {...register("name")} 
@@ -289,17 +289,17 @@ function ProductFormFields({
 
         {/* SKU */}
         <div className="space-y-1.5 relative group">
-          <label htmlFor="sku" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+          <label htmlFor="sku" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
             SKU
           </label>
           <input 
             id="sku" 
             type="text" 
             disabled={isSubmitting}
-            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 ${
+            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 ${
               errors.sku 
                 ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-500 focus:ring-rose-500/10" 
-                : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+                : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
             }`}
             placeholder="Ej: TOM-001"
             {...register("sku")} 
@@ -315,17 +315,17 @@ function ProductFormFields({
 
       {/* Descripción */}
       <div className="space-y-1.5 relative group">
-        <label htmlFor="description" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+        <label htmlFor="description" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
           Descripción <span className="text-slate-400 font-normal lowercase italic">(opcional)</span>
         </label>
         <textarea 
           id="description" 
           rows={3} 
           disabled={isSubmitting}
-          className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 resize-none ${
+          className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 resize-none ${
             errors.description 
               ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-500 focus:ring-rose-500/10" 
-              : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+              : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
           }`}
           placeholder="Descripción del producto..."
           {...register("description")} 
@@ -341,21 +341,21 @@ function ProductFormFields({
       {/* Precio & Max. por usuario */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5 relative group">
-          <label htmlFor="price" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+          <label htmlFor="price" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
             Precio
           </label>
           <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#4A3728] dark:text-slate-350 font-bold">$</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-[#142b45] dark:text-slate-350 font-bold">$</span>
             <input 
               id="price" 
               type="number" 
               step="0.01" 
               min="0.01" 
               disabled={isSubmitting}
-              className={`block w-full rounded-xl border pl-8 pr-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 ${
+              className={`block w-full rounded-xl border pl-8 pr-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 ${
                 errors.price 
                   ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-500 focus:ring-rose-500/10" 
-                  : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+                  : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
               }`}
               placeholder="5.99"
               {...register("price", { valueAsNumber: true })} 
@@ -370,7 +370,7 @@ function ProductFormFields({
         </div>
 
         <div className="space-y-1.5 relative group">
-          <label htmlFor="max_per_user" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+          <label htmlFor="max_per_user" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
             Máx. por usuario
           </label>
           <input 
@@ -378,10 +378,10 @@ function ProductFormFields({
             type="number" 
             min="1" 
             disabled={isSubmitting}
-            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 ${
+            className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out placeholder:text-slate-400 dark:placeholder:text-slate-600 focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 ${
               errors.max_per_user 
                 ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-500 focus:ring-rose-500/10" 
-                : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+                : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
             }`}
             placeholder="1"
             {...register("max_per_user", { valueAsNumber: true })} 
@@ -398,17 +398,17 @@ function ProductFormFields({
       {/* Unidad & Categoría */}
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-1.5 relative group">
-          <label htmlFor="unit" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+          <label htmlFor="unit" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
             Unidad
           </label>
           <div className="relative">
             <select 
               id="unit" 
               disabled={isSubmitting}
-              className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
+              className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
                 errors.unit 
                   ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-500 focus:ring-rose-500/10" 
-                  : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+                  : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
               }`}
               {...register("unit")}
             >
@@ -433,17 +433,17 @@ function ProductFormFields({
         </div>
 
         <div className="space-y-1.5 relative group">
-          <label htmlFor="category" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#3D5A1E] transition-colors">
+          <label htmlFor="category" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-550 group-focus-within:text-[#1b4f72] transition-colors">
             Categoría
           </label>
           <div className="relative">
             <select 
               id="category" 
               disabled={isSubmitting}
-              className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#3D5A1E]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
+              className={`block w-full rounded-xl border bg-slate-50/50 dark:bg-slate-900/30 px-4 py-3 pr-10 text-sm shadow-[0_2px_8px_rgba(0,0,0,0.02)] transition-all duration-300 ease-out focus:outline-none focus:ring-4 focus:ring-[#1b4f72]/10 focus:bg-white dark:focus:bg-slate-950 focus:scale-[1.005] disabled:opacity-50 appearance-none text-slate-700 dark:text-slate-350 ${
                 errors.category 
                   ? "border-rose-350 dark:border-rose-900/50 focus:border-rose-500 focus:ring-rose-500/10" 
-                  : "border-slate-200 dark:border-slate-800 focus:border-[#3D5A1E]"
+                  : "border-slate-200 dark:border-slate-800 focus:border-[#1b4f72]"
               }`}
               {...register("category")}
             >
@@ -482,13 +482,13 @@ function ProductFormFields({
               className="peer sr-only"
               {...register("is_active")} 
             />
-            <div className="h-5 w-5 rounded-lg border border-slate-350 dark:border-slate-700 bg-white dark:bg-slate-950 peer-checked:bg-[#3D5A1E] dark:peer-checked:bg-[#5C8A3C] peer-checked:border-[#3D5A1E] dark:peer-checked:border-[#5C8A3C] transition-all duration-300 flex items-center justify-center shadow-sm peer-focus-visible:ring-4 peer-focus-visible:ring-[#3D5A1E]/10">
+            <div className="h-5 w-5 rounded-lg border border-slate-350 dark:border-slate-700 bg-white dark:bg-slate-950 peer-checked:bg-[#1b4f72] dark:peer-checked:bg-[#2e7d9e] peer-checked:border-[#1b4f72] dark:peer-checked:border-[#2e7d9e] transition-all duration-300 flex items-center justify-center shadow-sm peer-focus-visible:ring-4 peer-focus-visible:ring-[#1b4f72]/10">
               <svg className="w-3.5 h-3.5 text-white scale-0 peer-checked:scale-100 transition-transform duration-300 ease-out" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
             </div>
           </div>
-          <label htmlFor="is_active" className="text-sm font-semibold text-slate-700 dark:text-slate-350 group-hover/cb:text-[#3D5A1E] dark:group-hover/cb:text-[#5C8A3C] cursor-pointer transition-colors selection:bg-transparent">
+          <label htmlFor="is_active" className="text-sm font-semibold text-slate-700 dark:text-slate-350 group-hover/cb:text-[#1b4f72] dark:group-hover/cb:text-[#2e7d9e] cursor-pointer transition-colors selection:bg-transparent">
             Producto activo
           </label>
         </div>
@@ -534,11 +534,11 @@ function CreateProductFormContent({
       onSubmit={handleSubmit(onFormSubmit)} 
       className="space-y-6 bg-white/80 dark:bg-slate-950/70 p-6 md:p-8 rounded-3xl border border-slate-100 dark:border-slate-900/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-xl relative overflow-hidden transition-all duration-300 hover:shadow-[0_20px_60px_rgba(92,138,60,0.06)] dark:hover:shadow-[0_20px_60px_rgba(92,138,60,0.12)]"
     >
-      <div className="absolute top-0 right-0 -z-10 h-[200px] w-[200px] rounded-full bg-gradient-to-br from-[#5C8A3C]/5 to-violet-500/0 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -z-10 h-[200px] w-[200px] rounded-full bg-gradient-to-tr from-[#E8DDD0]/20 to-indigo-500/0 blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 -z-10 h-[200px] w-[200px] rounded-full bg-gradient-to-br from-[#2e7d9e]/5 to-violet-500/0 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 -z-10 h-[200px] w-[200px] rounded-full bg-gradient-to-tr from-[#e4f0ed]/20 to-indigo-500/0 blur-3xl pointer-events-none" />
 
       <div className="relative pb-2">
-        <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#4A3728] via-slate-800 to-indigo-900 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+        <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#142b45] via-slate-800 to-indigo-900 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
           Nuevo Producto
         </h3>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 font-medium">
@@ -578,7 +578,7 @@ function CreateProductFormContent({
         <button 
           type="submit" 
           disabled={isSubmitting}
-          className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.15)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 group"
+          className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#1b4f72] to-[#2e7d9e] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.15)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 group"
         >
           <span className="relative z-10 flex items-center justify-center gap-2">
             {isSubmitting ? (
@@ -591,7 +591,7 @@ function CreateProductFormContent({
               </>
             ) : "Crear Producto"}
           </span>
-          <span className="absolute inset-0 bg-gradient-to-r from-[#5C8A3C] to-[#3D5A1E] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"></span>
+          <span className="absolute inset-0 bg-gradient-to-r from-[#2e7d9e] to-[#1b4f72] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"></span>
         </button>
       </div>
     </form>
@@ -657,11 +657,11 @@ function EditProductFormContent({
       onSubmit={handleSubmit(onFormSubmit)} 
       className="space-y-6 bg-white/80 dark:bg-slate-950/70 p-6 md:p-8 rounded-3xl border border-slate-100 dark:border-slate-900/60 shadow-[0_8px_30px_rgb(0,0,0,0.02)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)] backdrop-blur-xl relative overflow-hidden transition-all duration-300 hover:shadow-[0_20px_60px_rgba(92,138,60,0.06)] dark:hover:shadow-[0_20px_60px_rgba(92,138,60,0.12)]"
     >
-      <div className="absolute top-0 right-0 -z-10 h-[200px] w-[200px] rounded-full bg-gradient-to-br from-[#5C8A3C]/5 to-violet-500/0 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -z-10 h-[200px] w-[200px] rounded-full bg-gradient-to-tr from-[#E8DDD0]/20 to-indigo-500/0 blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 -z-10 h-[200px] w-[200px] rounded-full bg-gradient-to-br from-[#2e7d9e]/5 to-violet-500/0 blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 -z-10 h-[200px] w-[200px] rounded-full bg-gradient-to-tr from-[#e4f0ed]/20 to-indigo-500/0 blur-3xl pointer-events-none" />
 
       <div className="relative pb-2">
-        <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#4A3728] via-slate-800 to-indigo-900 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
+        <h3 className="text-xl font-bold tracking-tight bg-gradient-to-r from-[#142b45] via-slate-800 to-indigo-900 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
           Editar Producto
         </h3>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 font-medium">
@@ -702,7 +702,7 @@ function EditProductFormContent({
         <button 
           type="submit" 
           disabled={isSubmitting}
-          className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.15)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 group"
+          className="relative overflow-hidden rounded-xl bg-gradient-to-r from-[#1b4f72] to-[#2e7d9e] px-6 py-3 text-sm font-bold text-white shadow-[0_4px_20px_rgba(92,138,60,0.15)] hover:shadow-[0_4px_25px_rgba(92,138,60,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 transition-all duration-300 group"
         >
           <span className="relative z-10 flex items-center justify-center gap-2">
             {isSubmitting ? (
@@ -715,7 +715,7 @@ function EditProductFormContent({
               </>
             ) : "Guardar Cambios"}
           </span>
-          <span className="absolute inset-0 bg-gradient-to-r from-[#5C8A3C] to-[#3D5A1E] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"></span>
+          <span className="absolute inset-0 bg-gradient-to-r from-[#2e7d9e] to-[#1b4f72] opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out"></span>
         </button>
       </div>
     </form>

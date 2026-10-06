@@ -19,7 +19,7 @@ export function PaymentSuccess({ message, submessage }: PaymentSuccessProps) {
     x: Math.random() * 400 - 200,
     y: Math.random() * -300 - 50,
     size: Math.random() * 8 + 6,
-    color: i % 3 === 0 ? "#3A5F26" : i % 3 === 1 ? "#FBBF24" : "#22C55E",
+    color: i % 3 === 0 ? "#1b4f72" : i % 3 === 1 ? "#2fd4a7" : "#22C55E",
     delay: Math.random() * 0.4,
     rotation: Math.random() * 360,
   }));
@@ -61,7 +61,7 @@ export function PaymentSuccess({ message, submessage }: PaymentSuccessProps) {
       </div>
 
       {/* Glow de fondo */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-[#3A5F26]/8 rounded-full blur-3xl pointer-events-none animate-pulse" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-48 h-48 bg-[#1b4f72]/8 rounded-full blur-3xl pointer-events-none animate-pulse" />
 
       {/* Círculo del Checkmark con anillos concéntricos */}
       <div className="relative mx-auto h-28 w-28 flex items-center justify-center">
@@ -69,20 +69,20 @@ export function PaymentSuccess({ message, submessage }: PaymentSuccessProps) {
         <motion.div 
           animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0, 0.3] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-0 rounded-full border-2 border-[#3A5F26]/30"
+          className="absolute inset-0 rounded-full border-2 border-[#1b4f72]/30"
         />
         {/* Anillo interior animado */}
         <motion.div 
           animate={{ scale: [1, 1.18, 1], opacity: [0.5, 0, 0.5] }}
           transition={{ duration: 2.5, delay: 0.5, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-2 rounded-full border border-[#FBBF24]/40"
+          className="absolute inset-2 rounded-full border border-[#2fd4a7]/40"
         />
         {/* Círculo central */}
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: "spring", stiffness: 200, damping: 15 }}
-          className="h-20 w-20 rounded-full bg-gradient-to-tr from-[#1E3A1E] to-[#3A5F26] flex items-center justify-center text-[#FBBF24] shadow-xl shadow-[#3A5F26]/30 relative z-10"
+          className="h-20 w-20 rounded-full bg-gradient-to-tr from-[#142b45] to-[#1b4f72] flex items-center justify-center text-[#2fd4a7] shadow-xl shadow-[#1b4f72]/30 relative z-10"
         >
           {/* Checkmark animado */}
           <motion.div
@@ -110,9 +110,9 @@ export function PaymentSuccess({ message, submessage }: PaymentSuccessProps) {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-xs text-[#3A5F26] font-extrabold uppercase tracking-widest flex items-center justify-center gap-1.5"
+          className="text-xs text-[#1b4f72] font-extrabold uppercase tracking-widest flex items-center justify-center gap-1.5"
         >
-          <ShieldCheck size={14} className="text-[#3A5F26]" /> Transacción Completada
+          <ShieldCheck size={14} className="text-[#1b4f72]" /> Transacción Completada
         </motion.p>
 
         <motion.p 
@@ -137,7 +137,7 @@ export function PaymentSuccess({ message, submessage }: PaymentSuccessProps) {
             initial={{ width: "0%" }}
             animate={{ width: "100%" }}
             transition={{ duration: 1.8, ease: "linear" }}
-            className="absolute top-0 left-0 bottom-0 bg-[#3A5F26]"
+            className="absolute top-0 left-0 bottom-0 bg-[#1b4f72]"
           />
         </div>
         <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest flex items-center justify-center gap-1">
@@ -152,7 +152,7 @@ export function PaymentSuccess({ message, submessage }: PaymentSuccessProps) {
         transition={{ delay: 1 }}
         className="text-[9px] text-gray-400 font-bold uppercase tracking-widest pt-6 flex items-center justify-center gap-1"
       >
-        Gracias por apoyar al productor nacional <Heart size={8} className="text-red-500 fill-red-500" /> IMA
+        Gracias por apoyar al productor nacional <Heart size={8} className="text-red-500 fill-red-500" /> ITAS
       </motion.div>
     </div>
   );

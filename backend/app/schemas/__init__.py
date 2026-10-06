@@ -44,3 +44,14 @@ from app.schemas.payment_schema import (
     PaymentUpdateSchema,
     PaymentResponseSchema,
 )
+from app.schemas.dashboard_schema import (
+    DashboardStatsSchema,
+    DashboardTotalsSchema,
+    MonthlyRevenuePoint,
+)
+from app.schemas.notification_schema import (
+    NotificationCreateSchema,
+    NotificationUpdateSchema,
+    NotificationResponseSchema,
+    UnreadCountSchema,
+)

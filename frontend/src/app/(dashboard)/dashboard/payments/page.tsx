@@ -27,7 +27,7 @@ type CreatePaymentFormValues = z.infer<typeof createPaymentSchema>;
 
 // ─── CONSTANTES ────────────────────────────────────────────
 
-const PAGE_SIZE = 10;
+const PAGE_SIZE = 100;
 
 const STATUS_OPTIONS: { value: string; label: string }[] = [
   { value: "", label: "Todos los estados" },
@@ -143,56 +143,56 @@ export default function PaymentsPage() {
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="space-y-6 text-white"
+      className="space-y-6"
     >
-      {/* Estilos CSS personalizados de la paleta Chocolate, Verde, Amarillo y Blanco */}
+      {/* Estilos CSS personalizados de la paleta ITAS (verde, dorado, blanco) */}
       <style>{`
         .chocolate-panel {
-          background-color: #2D1A10; /* Chocolate oscuro */
-          border: 2px solid #3A5F26; /* Verde */
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+          background-color: #ffffff;
+          border: 1px solid #e2e8f0;
+          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
         }
         .premium-select {
           appearance: none;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23FBBF24'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23A16207'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
           background-repeat: no-repeat;
           background-position: right 14px center;
           background-size: 16px;
           padding-right: 42px;
         }
         .yellow-btn {
-          background-color: #FBBF24; /* Amarillo */
-          color: #1E120C; /* Chocolate oscuro */
+          background-color: var(--itas-gold);
+          color: #ffffff;
           font-weight: 700;
-          box-shadow: 0 4px 14px rgba(251, 191, 36, 0.4);
+          box-shadow: 0 4px 14px rgba(var(--itas-gold-rgb), 0.4);
           transition: all 0.2s ease-in-out;
         }
         .yellow-btn:hover {
-          background-color: #F59E0B;
+          background-color: #20917a;
           transform: translateY(-1px);
-          box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5);
+          box-shadow: 0 6px 20px rgba(var(--itas-gold-rgb), 0.5);
         }
         .yellow-btn:active {
           transform: translateY(1px);
         }
         .chocolate-input {
-          background-color: #1E120C;
-          border: 2px solid #3A5F26;
-          color: #FFFFFF;
+          background-color: #ffffff;
+          border: 1px solid #e2e8f0;
+          color: #0f172a;
         }
         .chocolate-input:focus {
-          border-color: #FBBF24;
+          border-color: var(--itas-green);
           outline: none;
         }
       `}</style>
 
       {/* Cabecera */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b-2 border-[#3A5F26] pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 border-b-2 border-[var(--itas-green)] pb-6">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-white">
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
             Pagos
           </h1>
-          <p className="mt-2 text-sm text-gray-200 font-medium">
+          <p className="mt-2 text-sm text-slate-500 dark:text-gray-200 font-medium">
             Supervisa, registra y gestiona las transacciones de pago del sistema.
           </p>
         </div>
@@ -202,7 +202,7 @@ export default function PaymentsPage() {
           onClick={openCreateModal}
           className="yellow-btn inline-flex items-center justify-center rounded-xl px-5 py-3 text-sm cursor-pointer"
         >
-          <svg className="h-5 w-5 mr-2 stroke-[3px] text-[#1E120C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <svg className="h-5 w-5 mr-2 stroke-[3px] text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
           </svg>
           Registrar Pago
@@ -213,7 +213,7 @@ export default function PaymentsPage() {
       <div className="chocolate-panel p-5 rounded-2xl flex flex-col lg:flex-row gap-4">
         <form onSubmit={handleSearchSubmit} className="flex-1">
           <div className="relative">
-            <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#FBBF24]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+            <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[var(--itas-gold)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
             </svg>
             <input 
@@ -221,17 +221,17 @@ export default function PaymentsPage() {
               value={searchInput} 
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Buscar por orden o referencia..."
-              className="chocolate-input block w-full rounded-xl pl-12 pr-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] transition-all" 
+              className="chocolate-input block w-full rounded-xl pl-12 pr-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[var(--itas-gold)] transition-all" 
             />
           </div>
         </form>
         <select 
           value={statusFilter} 
           onChange={(e) => { setStatusFilter(e.target.value); setSkip(0); }}
-          className="premium-select chocolate-input rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] transition-all cursor-pointer sm:w-56"
+          className="premium-select chocolate-input rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--itas-gold)] transition-all cursor-pointer sm:w-56"
         >
           {STATUS_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value} className="bg-[#1E120C] text-white">{opt.label}</option>
+            <option key={opt.value} value={opt.value} className="bg-white text-slate-800">{opt.label}</option>
           ))}
         </select>
       </div>
@@ -241,23 +241,23 @@ export default function PaymentsPage() {
         {isPending && (
           <div className="animate-pulse space-y-4">
             {Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="h-20 bg-[#2D1A10]/50 border-2 border-[#3A5F26]/30 rounded-xl" />
+              <div key={i} className="h-20 bg-slate-200/60 dark:bg-[#142b45]/50 border border-[var(--itas-green)]/30 rounded-xl" />
             ))}
           </div>
         )}
 
         {isError && !isPending && (
-          <div className="rounded-2xl border-2 border-red-600 bg-red-950/80 p-8 text-center shadow-lg">
-            <p className="text-red-200 font-bold text-lg">Error al cargar pagos</p>
-            <p className="text-sm text-red-300 mt-2 font-medium">
+          <div className="rounded-2xl border-2 border-red-600 bg-red-50 dark:bg-red-950/80 p-8 text-center shadow-lg">
+            <p className="text-red-700 dark:text-red-200 font-bold text-lg">Error al cargar pagos</p>
+            <p className="text-sm text-red-500 dark:text-red-300 mt-2 font-medium">
               {(error as { message?: string })?.message || "Intenta nuevamente"}
             </p>
           </div>
         )}
 
         {!isPending && !isError && payments.length === 0 && (
-          <div className="rounded-2xl border-2 border-[#3A5F26] bg-[#2D1A10] p-12 text-center shadow-lg">
-            <p className="text-white font-bold text-lg">No se encontraron pagos registrados</p>
+          <div className="rounded-2xl border border-[var(--itas-green)]/30 bg-white/80 p-12 text-center shadow-card">
+            <p className="text-slate-700 dark:text-white font-bold text-lg">No se encontraron pagos registrados</p>
           </div>
         )}
 
@@ -268,29 +268,29 @@ export default function PaymentsPage() {
 
       {/* Paginación */}
       {!isPending && !isError && payments.length > 0 && (
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t-2 border-[#3A5F26]/30">
-          <p className="text-sm text-white font-bold">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t-2 border-[var(--itas-green)]/30">
+          <p className="text-sm text-slate-700 dark:text-white font-bold">
             Mostrando{" "}
-            <span className="text-[#FBBF24]">{skip + 1}</span>
+            <span className="text-[var(--itas-gold)]">{skip + 1}</span>
             {" "}-{" "}
-            <span className="text-[#FBBF24]">{Math.min(skip + PAGE_SIZE, totalItems)}</span>
+            <span className="text-[var(--itas-gold)]">{Math.min(skip + PAGE_SIZE, totalItems)}</span>
             {" "}de{" "}
-            <span className="text-[#FBBF24]">{totalItems}</span> pagos
+            <span className="text-[var(--itas-gold)]">{totalItems}</span> pagos
           </p>
 
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setSkip((p) => Math.max(0, p - PAGE_SIZE))}
               disabled={skip <= 0 || isFetching}
-              className="rounded-xl border-2 border-[#3A5F26] bg-[#2D1A10] px-4 py-2 text-sm font-bold text-[#FBBF24] hover:bg-[#1E120C] hover:border-[#FBBF24] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="rounded-xl border border-[var(--itas-green)]/40 bg-white dark:bg-[#142b45] px-4 py-2 text-sm font-bold text-[var(--itas-gold)] hover:bg-slate-100 dark:hover:bg-[#0e1e33] dark:hover:border-[var(--itas-gold)] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
             >
               Anterior
             </button>
-            <span className="text-sm text-white font-bold px-2">Página {page} de {totalPages}</span>
+            <span className="text-sm text-slate-700 dark:text-white font-bold px-2">Página {page} de {totalPages}</span>
             <button 
               onClick={() => setSkip((p) => Math.min((totalPages - 1) * PAGE_SIZE, p + PAGE_SIZE))}
               disabled={skip >= (totalPages - 1) * PAGE_SIZE || isFetching}
-              className="rounded-xl border-2 border-[#3A5F26] bg-[#2D1A10] px-4 py-2 text-sm font-bold text-[#FBBF24] hover:bg-[#1E120C] hover:border-[#FBBF24] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
+              className="rounded-xl border border-[var(--itas-green)]/40 bg-white dark:bg-[#142b45] px-4 py-2 text-sm font-bold text-[var(--itas-gold)] hover:bg-slate-100 dark:hover:bg-[#0e1e33] dark:hover:border-[var(--itas-gold)] disabled:opacity-30 disabled:cursor-not-allowed transition-all cursor-pointer"
             >
               Siguiente
             </button>
@@ -313,42 +313,42 @@ export default function PaymentsPage() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative chocolate-panel rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-8 text-white"
+              className="relative chocolate-panel rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto p-8 text-slate-800 dark:text-white"
             >
               <button 
                 onClick={closeModal}
-                className="absolute top-4 right-4 p-2 rounded-lg text-white hover:bg-white/10 border-2 border-white/20 transition-all duration-200" 
+                className="absolute top-4 right-4 p-2 rounded-lg text-slate-500 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 border-2 border-slate-200 dark:border-white/20 transition-all duration-200" 
                 aria-label="Cerrar"
               >
-                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                <svg className="h-5 w-5 text-slate-500 dark:text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
 
               <form onSubmit={handleSubmit(handleCreateSubmit)} className="space-y-5">
                 <div>
-                  <h3 className="text-xl font-bold tracking-tight text-[#FBBF24]">Registrar Pago</h3>
-                  <p className="mt-1.5 text-sm text-white">Registra un nuevo pago para una orden activa</p>
+                  <h3 className="text-xl font-bold tracking-tight text-[var(--itas-gold)]">Registrar Pago</h3>
+                  <p className="mt-1.5 text-sm text-slate-500 dark:text-white">Registra un nuevo pago para una orden activa</p>
                 </div>
 
                 {serverError && (
-                  <div className="rounded-xl bg-red-950/80 border-2 border-red-600 p-4">
-                    <p className="text-sm text-red-200 font-bold">{serverError}</p>
+                  <div className="rounded-xl bg-red-50 dark:bg-red-950/80 border-2 border-red-600 p-4">
+                    <p className="text-sm text-red-700 dark:text-red-200 font-bold">{serverError}</p>
                   </div>
                 )}
 
                 <div className="space-y-2">
-                  <label htmlFor="order_id" className="block text-sm font-bold text-white">Orden</label>
+                  <label htmlFor="order_id" className="block text-sm font-bold text-slate-700 dark:text-white">Orden</label>
                   <select 
                     id="order_id" 
                     disabled={createMutation.isPending}
-                    className={`premium-select chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all cursor-pointer ${formErrors.order_id ? "border-red-500" : ""}`}
+                    className={`premium-select chocolate-input block w-full rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-[var(--itas-gold)] disabled:opacity-50 transition-all cursor-pointer ${formErrors.order_id ? "border-red-500" : ""}`}
                     value={selectedOrderId}
                     onChange={(e) => handleOrderChange(e.target.value)}
                   >
-                    <option value="" className="bg-[#1E120C] text-white">Selecciona una orden</option>
+                    <option value="" className="bg-white text-slate-800">Selecciona una orden</option>
                     {orders.map((order: { id: string; order_number: string; total_amount: number }) => (
-                      <option key={order.id} value={order.id} className="bg-[#1E120C] text-white">
+                      <option key={order.id} value={order.id} className="bg-white text-slate-800">
                         Orden {order.order_number} - {new Intl.NumberFormat("es-PA", { style: "currency", currency: "USD" }).format(order.total_amount)}
                       </option>
                     ))}
@@ -357,21 +357,21 @@ export default function PaymentsPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="amount" className="block text-sm font-bold text-white">Monto</label>
+                  <label htmlFor="amount" className="block text-sm font-bold text-slate-700 dark:text-white">Monto</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base font-bold text-[#FBBF24]">$</span>
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-base font-bold text-[var(--itas-gold)]">$</span>
                     <input 
                       id="amount" 
                       type="number" 
                       step="0.01" 
                       min="0.01" 
                       disabled={createMutation.isPending}
-                      className={`chocolate-input block w-full rounded-xl pl-9 pr-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all ${formErrors.amount ? "border-red-500" : ""}`}
+                      className={`chocolate-input block w-full rounded-xl pl-9 pr-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[var(--itas-gold)] disabled:opacity-50 transition-all ${formErrors.amount ? "border-red-500" : ""}`}
                       placeholder="0.00"
                       {...register("amount", { valueAsNumber: true })} 
                     />
                   </div>
-                  {formErrors.amount && <p className="text-sm text-red-400 font-bold">{formErrors.amount.message}</p>}
+                  {formErrors.amount && <p className="text-sm text-red-500 dark:text-red-400 font-bold">{formErrors.amount.message}</p>}
                 </div>
 
                 <PaymentMethodSelector 
@@ -382,39 +382,39 @@ export default function PaymentsPage() {
                 />
 
                 <div className="space-y-2">
-                  <label htmlFor="reference_code" className="block text-sm font-bold text-white">
+                  <label htmlFor="reference_code" className="block text-sm font-bold text-slate-700 dark:text-white">
                     Referencia <span className="text-gray-400 font-normal">(opcional)</span>
                   </label>
                   <input 
                     id="reference_code" 
                     type="text" 
                     disabled={createMutation.isPending}
-                    className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all"
+                    className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[var(--itas-gold)] disabled:opacity-50 transition-all"
                     placeholder="Número de referencia o comprobante"
                     {...register("reference_code")} 
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="transaction_id" className="block text-sm font-bold text-white">
+                  <label htmlFor="transaction_id" className="block text-sm font-bold text-slate-700 dark:text-white">
                     ID de Transacción <span className="text-gray-400 font-normal">(opcional)</span>
                   </label>
                   <input 
                     id="transaction_id" 
                     type="text" 
                     disabled={createMutation.isPending}
-                    className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[#FBBF24] disabled:opacity-50 transition-all"
+                    className="chocolate-input block w-full rounded-xl px-4 py-3 text-sm placeholder-gray-400 focus:ring-2 focus:ring-[var(--itas-gold)] disabled:opacity-50 transition-all"
                     placeholder="ID de la transacción"
                     {...register("transaction_id")} 
                   />
                 </div>
 
-                <div className="flex justify-end gap-3 pt-4 border-t-2 border-[#3A5F26]/30">
+                <div className="flex justify-end gap-3 pt-4 border-t-2 border-[var(--itas-green)]/30">
                   <button 
                     type="button" 
                     onClick={closeModal} 
                     disabled={createMutation.isPending}
-                    className="rounded-xl border-2 border-white/30 px-5 py-2.5 text-sm font-medium text-white hover:bg-white/10 disabled:opacity-50 transition-all cursor-pointer"
+                    className="rounded-xl border-2 border-slate-300 dark:border-white/30 px-5 py-2.5 text-sm font-medium text-slate-600 dark:text-white hover:bg-slate-100 dark:hover:bg-white/10 disabled:opacity-50 transition-all cursor-pointer"
                   >
                     Cancelar
                   </button>

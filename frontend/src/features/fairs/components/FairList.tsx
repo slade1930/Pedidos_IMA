@@ -71,7 +71,7 @@ function getGradientColors(status: FairStatus): { from: string; to: string } {
     case "active":
       return { from: "#10b981", to: "#06b6d4" };
     case "upcoming":
-      return { from: "#f59e0b", to: "#ec4899" };
+      return { from: "#2fbf9b", to: "#ec4899" };
     case "paused":
       return { from: "#f97316", to: "#ef4444" };
     case "finished":

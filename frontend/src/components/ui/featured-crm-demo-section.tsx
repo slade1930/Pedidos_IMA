@@ -33,10 +33,10 @@ export default function FeaturedCrmDemoSection() {
     <div className="max-w-7xl mx-auto bg-transparent text-black dark:text-white">
       {/* Header */}
       <header className="text-left py-6">
-        <span className="inline-block rounded-full border border-[#3D5A1E]/15 bg-[#3D5A1E]/[0.04] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#3D5A1E] leading-none mb-3">
-          Integración IMA
+        <span className="inline-block rounded-full border border-[#1b4f72]/15 bg-[#1b4f72]/[0.04] px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-[#1b4f72] leading-none mb-3">
+          Integración ITAS
         </span>
-        <h2 className="text-4xl font-black tracking-tight text-[#4A3728]">
+        <h2 className="text-4xl font-black tracking-tight text-[#142b45]">
           Potenciando el Agro Panameño <br />con Soluciones Tecnológicas.
         </h2>
       </header>
@@ -44,7 +44,7 @@ export default function FeaturedCrmDemoSection() {
       {/* Templates Grid */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-4 h-full items-stretch">
         {/* Main video/image card */}
-        <Card className="lg:col-span-2 bg-[#E8DDD0]/20 dark:bg-zinc-800 p-2 overflow-hidden relative mb-4 lg:mb-0 flex flex-col min-h-[350px] rounded-3xl border border-gray-150">
+        <Card className="lg:col-span-2 bg-[#e4f0ed]/20 dark:bg-zinc-800 p-2 overflow-hidden relative mb-4 lg:mb-0 flex flex-col min-h-[350px] rounded-3xl border border-gray-150">
           <CardContent className="p-0 relative flex-grow group rounded-2xl overflow-hidden h-full">
             {isPlaying ? (
               <video
@@ -59,7 +59,7 @@ export default function FeaturedCrmDemoSection() {
               <div className="relative w-full h-full min-h-[330px]">
                 <img
                   src="https://images.unsplash.com/photo-1595974482597-4b8da8879bc5?q=80&w=1200&auto=format&fit=crop"
-                  alt="IMA Agro Technology Video Thumbnail"
+                  alt="ITAS Agro Technology Video Thumbnail"
                   className="object-cover rounded-2xl transition-transform duration-700 group-hover:scale-105 w-full h-full absolute inset-0"
                 />
                 
@@ -68,7 +68,7 @@ export default function FeaturedCrmDemoSection() {
 
                 {/* Info Text */}
                 <div className="absolute bottom-6 left-6 right-6 text-white z-10">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-[#FBBF24]">Video de Operaciones</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest text-[#2fd4a7]">Video de Operaciones</span>
                   <h3 className="text-xl font-extrabold tracking-tight mt-1">Cómo Funciona la Logística de Ferias Libres</h3>
                 </div>
 
@@ -89,14 +89,14 @@ export default function FeaturedCrmDemoSection() {
           {crmFeatures.map((feature, i) => (
             <div
               key={i}
-              className="flex flex-col border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-3xl p-5 hover:shadow-lg hover:border-[#3D5A1E]/20 cursor-pointer transition-all duration-300 group shadow-sm justify-between"
+              className="flex flex-col border border-gray-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-3xl p-5 hover:shadow-lg hover:border-[#1b4f72]/20 cursor-pointer transition-all duration-300 group shadow-sm justify-between"
             >
-              <div className="h-9 w-9 rounded-xl bg-[#3D5A1E]/8 flex items-center justify-center text-[#3D5A1E] font-black text-xs">
+              <div className="h-9 w-9 rounded-xl bg-[#1b4f72]/8 flex items-center justify-center text-[#1b4f72] font-black text-xs">
                 {`0${i + 1}`}
               </div>
 
               <div className="mt-4 space-y-1">
-                <h3 className="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-zinc-100 group-hover:text-[#3D5A1E] transition-colors">
+                <h3 className="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-zinc-100 group-hover:text-[#1b4f72] transition-colors">
                   {feature.title}
                 </h3>
                 <p className="text-[11px] text-gray-400 font-semibold leading-relaxed">
@@ -120,13 +120,13 @@ export default function FeaturedCrmDemoSection() {
             { name: "Mastercard", subtitle: "Pagos globales y débito", domain: "mastercard.com" },
             { name: "Stripe", subtitle: "Procesador de pagos digital", domain: "stripe.com" },
             { name: "MIDA Panamá", subtitle: "Ministerio de Desarrollo Agropecuario", domain: "mida.gob.pa" },
-            { name: "IMA Panamá", subtitle: "Instituto de Mercadeo Agropecuario", domain: "ima.gob.pa" },
+            { name: "ITAS Panamá", subtitle: "Iniciativa Tecnológica de Abasto Social", domain: "itas.gob.pa" },
             { name: "Panamá Digital", subtitle: "Autoridad de Innovación AIG", domain: "aig.gob.pa" },
             { name: "Banco Nacional", subtitle: "Soporte financiero estatal", domain: "banconal.com.pa" },
           ].map((integration) => (
             <div
               key={integration.name}
-              className="p-3.5 flex items-center gap-3 bg-white hover:bg-gray-50 border border-gray-100 rounded-3xl transition-all shadow-sm group hover:border-[#3D5A1E]/10"
+              className="p-3.5 flex items-center gap-3 bg-white hover:bg-gray-50 border border-gray-100 rounded-3xl transition-all shadow-sm group hover:border-[#1b4f72]/10"
             >
               <div className="w-10 h-10 object-contain rounded-xl bg-white border border-gray-100 p-1 flex items-center justify-center overflow-hidden flex-shrink-0 group-hover:scale-105 transition-transform">
                 <img

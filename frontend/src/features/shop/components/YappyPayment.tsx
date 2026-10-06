@@ -22,7 +22,7 @@ interface YappyPaymentProps {
 // ─── CONSTANTES ────────────────────────────────────────────
 
 const YAPPY_PHONE = "6798-7745";
-const YAPPY_NAME = "IMA System";
+const YAPPY_NAME = "ITAS";
 
 // ─── UTILITARIOS ───────────────────────────────────────────
 
@@ -176,7 +176,7 @@ export function YappyPayment({ amount, onSuccess, onBack }: YappyPaymentProps) {
             <div className="flex justify-between items-start gap-4">
               <div className="min-w-0">
                 <span className="text-[9px] text-white/60 font-black uppercase tracking-wider block">Número de Directorio</span>
-                <span className="text-2xl font-black tracking-widest text-[#FBBF24] font-mono block mt-0.5">{YAPPY_PHONE}</span>
+                <span className="text-2xl font-black tracking-widest text-[#2fd4a7] font-mono block mt-0.5">{YAPPY_PHONE}</span>
                 <span className="text-[10px] text-white/70 font-semibold block mt-1">A nombre de: <span className="font-extrabold text-white">{YAPPY_NAME}</span></span>
               </div>
               

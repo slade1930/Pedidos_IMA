@@ -91,7 +91,7 @@ export const useNotificationStore = create<NotificationState>()(
       },
     }),
     {
-      name: "ima-notifications",
+      name: "itas-notifications",
       partialize: (state) => ({
         notifications: state.notifications,
         unreadCount: state.unreadCount,

@@ -10,6 +10,14 @@ from pydantic import (
 )
 
 from app.core.constants import FairStatus
+from app.utils.validators import validate_image_base64
+
+
+def _validate_image_field(v):
+    """FASE 3: valida tamaño (10 MB), formato raster y rechaza SVG."""
+    if v is None:
+        return v
+    return validate_image_base64(v)[0]
 
 
 class FairCreateSchema(BaseModel):
@@ -37,6 +45,11 @@ class FairCreateSchema(BaseModel):
     @classmethod
     def clean_strings(cls, v: str) -> str:
         return v.strip()
+
+    @field_validator("image_base64")
+    @classmethod
+    def validate_image(cls, v):
+        return _validate_image_field(v)
 
     @model_validator(mode="after")
     def validate_dates(self):
@@ -69,6 +82,11 @@ class FairUpdateSchema(BaseModel):
 
     # 👈 NUEVO: Imagen en Base64 para actualizar
     image_base64: Optional[str] = None
+
+    @field_validator("image_base64")
+    @classmethod
+    def validate_image(cls, v):
+        return _validate_image_field(v)
 
 
 class FairResponseSchema(BaseModel):

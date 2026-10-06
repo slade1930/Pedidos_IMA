@@ -36,14 +36,14 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
   const router = useRouter();
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-8 relative text-[#1E3A1E] space-y-8">
+    <div className="max-w-xl mx-auto px-4 py-8 relative text-[#142b45] space-y-8">
       {/* Estilos CSS Locales para Diseño Premium */}
       <style>{`
         .premium-shadow {
           box-shadow: 0 20px 40px -15px rgba(58, 95, 38, 0.15);
         }
         .gold-glow-border {
-          border: 2px dashed #FBBF24;
+          border: 2px dashed #2fd4a7;
           box-shadow: 0 0 25px rgba(251, 191, 36, 0.12);
         }
         .glass-panel {
@@ -52,8 +52,8 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
           border: 1px solid rgba(58, 95, 38, 0.08);
         }
         .gold-stamp-gradient {
-          background: linear-gradient(135deg, #1E3A1E, #122412);
-          border: 2px solid #FBBF24;
+          background: linear-gradient(135deg, #142b45, #0e1e33);
+          border: 2px solid #2fd4a7;
         }
         @keyframes pulse-gold {
           0%, 100% { opacity: 0.15; }
@@ -65,8 +65,8 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
       `}</style>
 
       {/* Luces de Fondo Decorativas */}
-      <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#3A5F26]/5 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-[#FBBF24]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#1b4f72]/5 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-[#2fd4a7]/5 rounded-full blur-3xl pointer-events-none" />
 
       {/* Cabecera / Estado de Éxito */}
       <motion.div 
@@ -88,7 +88,7 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
 
         <div className="space-y-2">
           <h1 className="text-3xl font-black tracking-tight text-gray-900">¡Pedido Confirmado!</h1>
-          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">IMA Panamá — Compra Registrada</p>
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">ITAS Panamá — Compra Registrada</p>
         </div>
 
         <p className="text-sm text-gray-500 font-semibold leading-relaxed max-w-sm mx-auto">
@@ -105,16 +105,16 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
           className="gold-stamp-gradient text-white rounded-3xl p-6 text-center relative overflow-hidden premium-shadow"
         >
           {/* Pulso de fondo */}
-          <div className="absolute inset-0 bg-[#FBBF24] glow-pulse pointer-events-none" />
+          <div className="absolute inset-0 bg-[#2fd4a7] glow-pulse pointer-events-none" />
           <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full blur-xl pointer-events-none" />
 
           <div className="relative z-10 space-y-3">
-            <span className="text-[10px] text-[#FBBF24] font-black uppercase tracking-widest flex items-center justify-center gap-1.5">
+            <span className="text-[10px] text-[#2fd4a7] font-black uppercase tracking-widest flex items-center justify-center gap-1.5">
               <MapPin size={12} /> Código de Retiro Autorizado
             </span>
             
             <div className="gold-glow-border rounded-2xl p-4.5 bg-black/35 flex flex-col items-center justify-center">
-              <p className="text-4xl sm:text-5xl font-black tracking-widest text-[#FBBF24] font-mono leading-none">
+              <p className="text-4xl sm:text-5xl font-black tracking-widest text-[#2fd4a7] font-mono leading-none">
                 {order.pickup_code}
               </p>
               
@@ -140,25 +140,25 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
         transition={{ delay: 0.3, duration: 0.5 }}
         className="glass-panel rounded-3xl p-6 shadow-sm space-y-4"
       >
-        <div className="flex items-center gap-2 border-b border-[#3A5F26]/10 pb-3 mb-1">
-          <Receipt size={16} className="text-[#3A5F26]" />
+        <div className="flex items-center gap-2 border-b border-[#1b4f72]/10 pb-3 mb-1">
+          <Receipt size={16} className="text-[#1b4f72]" />
           <h2 className="text-xs font-black uppercase tracking-widest text-gray-900">Resumen de la Transacción</h2>
         </div>
 
         <div className="space-y-3 text-xs font-bold">
           
           <div className="flex justify-between items-center py-1">
-            <span className="text-gray-500 flex items-center gap-1.5"><ShoppingBag size={13} className="text-[#3A5F26]" /> Orden de Compra</span>
+            <span className="text-gray-500 flex items-center gap-1.5"><ShoppingBag size={13} className="text-[#1b4f72]" /> Orden de Compra</span>
             <span className="font-mono text-gray-900 font-extrabold">{order.order_number}</span>
           </div>
 
           <div className="flex justify-between items-center py-1 border-t border-gray-100">
-            <span className="text-gray-500 flex items-center gap-1.5"><Calendar size={13} className="text-[#3A5F26]" /> Estado de Transacción</span>
+            <span className="text-gray-500 flex items-center gap-1.5"><Calendar size={13} className="text-[#1b4f72]" /> Estado de Transacción</span>
             <span className="text-green-700 font-extrabold bg-green-50 px-2 py-0.5 rounded-lg border border-green-200 uppercase text-[10px] tracking-wider">Confirmada</span>
           </div>
 
           <div className="flex justify-between items-center pt-3 border-t border-dashed border-gray-200">
-            <span className="text-[#3A5F26] uppercase tracking-wider flex items-center gap-1.5"><Store size={13} /> Importe Total Cobrado</span>
+            <span className="text-[#1b4f72] uppercase tracking-wider flex items-center gap-1.5"><Store size={13} /> Importe Total Cobrado</span>
             <span className="text-lg font-black text-gray-900 font-mono">{formatPrice(order.total_amount)}</span>
           </div>
 
@@ -176,7 +176,7 @@ export function OrderConfirmation({ order }: OrderConfirmationProps) {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => router.push("/shop/orders")}
-          className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-[#1E3A1E] to-[#3A5F26] px-8 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-[#1E3A1E]/15 hover:opacity-95 transition-all flex items-center justify-center gap-1.5"
+          className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-[#142b45] to-[#1b4f72] px-8 py-3.5 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-[#142b45]/15 hover:opacity-95 transition-all flex items-center justify-center gap-1.5"
         >
           <span>Ver Mis Pedidos</span>
           <ChevronRight size={14} strokeWidth={2.5} />

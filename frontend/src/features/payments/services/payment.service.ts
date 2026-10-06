@@ -27,7 +27,8 @@ export const paymentService = {
     if (filters?.limit !== undefined) params.set("limit", String(filters.limit));
 
     const queryString = params.toString();
-    const endpoint = queryString ? `/payments?${queryString}` : "/payments";
+    // Sin trailing slash: coincide con la ruta del backend /payments (evita redirect 307).
+    const endpoint = queryString ? `/payments?${queryString}` : `/payments`;
 
     const response = await apiClient.get<PaymentsResponse>(endpoint);
     return response.data;

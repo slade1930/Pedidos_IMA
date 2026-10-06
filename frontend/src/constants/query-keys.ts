@@ -94,6 +94,17 @@ export const queryKeys = {
     recentOrders: () =>
       [...queryKeys.dashboard.all, "recent-orders"] as const,
   },
+
+  // ─── NOTIFICATIONS ─────────────────────────────────
+  notifications: {
+    all: ["notifications"] as const,
+    mine: (limit?: number) =>
+      [...queryKeys.notifications.all, "mine", limit] as const,
+    unreadCount: () =>
+      [...queryKeys.notifications.all, "unread-count"] as const,
+    adminList: () =>
+      [...queryKeys.notifications.all, "admin"] as const,
+  },
 } as const;
 
 export default queryKeys;

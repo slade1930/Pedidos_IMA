@@ -17,11 +17,27 @@ class InventoryService:
         self.db = db
         self.inventory_repo = InventoryRepository(db)
 
-    async def get_all(self, skip: int = 0, limit: int = 10) -> list[Inventory]:
-        return await self.inventory_repo.get_all(skip, limit)
+    async def get_all(
+        self,
+        skip: int = 0,
+        limit: int = 100,
+        search: str = None,
+        fair_id: uuid.UUID = None,
+        low_stock: bool = False,
+    ) -> list[Inventory]:
+        return await self.inventory_repo.get_all(
+            skip=skip, limit=limit, search=search, fair_id=fair_id, low_stock=low_stock
+        )
 
-    async def get_total_count(self) -> int:
-        return await self.inventory_repo.get_total_count()
+    async def get_total_count(
+        self,
+        search: str = None,
+        fair_id: uuid.UUID = None,
+        low_stock: bool = False,
+    ) -> int:
+        return await self.inventory_repo.get_total_count(
+            search=search, fair_id=fair_id, low_stock=low_stock
+        )
 
     async def create(self, data: InventoryCreateSchema) -> Inventory:
         existing = await self.inventory_repo.get_by_product_and_fair(
@@ -49,11 +65,23 @@ class InventoryService:
                 detail="Inventario no encontrado",
             )
 
-        updated = await self.inventory_repo.update(
-            inventory_id, data.model_dump(exclude_none=True)
-        )
+        update_data = data.model_dump(exclude_none=True)
 
-        # Notificar si stock bajo
+        total_stock = update_data.get("total_stock")
+        if total_stock is not None:
+            # No permitir bajar el total por debajo de lo ya entregado (irreversible)
+            if total_stock < inventory.delivered_stock:
+                total_stock = inventory.delivered_stock
+                update_data["total_stock"] = total_stock
+
+        updated = await self.inventory_repo.update(inventory_id, update_data)
+
+        # Liberar reservas sobrantes si el nuevo total queda por debajo de lo reservado
+        if updated.reserved_stock > updated.total_stock:
+            updated.reserved_stock = updated.total_stock
+            await self.db.flush()
+            await self.db.refresh(updated)
+
         if updated.available_stock <= 10:
             await NotificationService.notify_low_stock(
                 product_name=str(updated.product_id),

@@ -5,6 +5,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useShopProducts } from "@/features/shop/hooks/useShopProducts";
+import { useDebounce } from "@/hooks/useDebounce";  // 👈 NUEVO
 import type { Product } from "@/features/products/types/product.types";
 import { InteractiveProductCard } from "@/components/ui/card-7";
 
@@ -52,7 +53,6 @@ function getCategoryLabel(category: string): string {
   }
 }
 
-// 👈 FUNCIÓN PARA CONSTRUIR URL COMPLETA DE IMAGEN
 function getImageUrl(imageUrl: string | null): string {
   if (!imageUrl) return "";
   if (imageUrl.startsWith("http")) return imageUrl;
@@ -65,7 +65,7 @@ function GridSkeleton() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {Array.from({ length: 8 }).map((_, i) => (
-        <div key={i} className="animate-pulse bg-[#2D1A10]/5 rounded-3xl border-2 border-[#3A5F26]/10 aspect-[9/12]" />
+        <div key={i} className="animate-pulse bg-[#142b45]/5 rounded-3xl border-2 border-[#1b4f72]/10 aspect-[9/12]" />
       ))}
     </div>
   );
@@ -74,12 +74,15 @@ function GridSkeleton() {
 // ─── COMPONENTE ────────────────────────────────────────────
 
 export function ProductCatalog({ fairId, onAddToCart }: ProductCatalogProps) {
-  const [search, setSearch] = useState("");
+  const [searchInput, setSearchInput] = useState("");       // 👈 Valor del input
   const [categoryFilter, setCategoryFilter] = useState("");
+
+  // 👈 Debounce: espera 300ms antes de buscar
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   const { data, isPending, isError } = useShopProducts({
     fair_id: fairId,
-    search: search || undefined,
+    search: debouncedSearch || undefined,                    // 👈 Usar debounced
     category: categoryFilter || undefined,
   });
 
@@ -87,7 +90,6 @@ export function ProductCatalog({ fairId, onAddToCart }: ProductCatalogProps) {
 
   return (
     <div className="space-y-8">
-      {/* Estilos CSS locales de la paleta Verde, Blanco y Amarillo para selectores */}
       <style>{`
         .premium-select {
           appearance: none;
@@ -107,22 +109,25 @@ export function ProductCatalog({ fairId, onAddToCart }: ProductCatalogProps) {
 
       {/* Filtros */}
       <div className="flex flex-col sm:flex-row gap-4">
+        {/* Buscador en tiempo real */}
         <div className="relative flex-1">
-          <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#3A5F26]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+          <svg className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-[#1b4f72]/60" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
           </svg>
           <input
             type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             placeholder="Buscar productos en el catálogo..."
-            className="block w-full rounded-2xl border-2 border-[#3A5F26]/20 bg-white pl-12 pr-4 py-3 text-sm text-[#1E3A1E] placeholder-gray-400 focus:outline-none focus:border-[#FBBF24] focus:ring-1 focus:ring-[#FBBF24] transition-all"
+            className="block w-full rounded-2xl border-2 border-[#1b4f72]/20 bg-white pl-12 pr-4 py-3 text-sm text-[#142b45] placeholder-gray-400 focus:outline-none focus:border-[#2fd4a7] focus:ring-1 focus:ring-[#2fd4a7] transition-all"
           />
         </div>
+        
+        {/* Selector de categoría */}
         <select
           value={categoryFilter}
           onChange={(e) => setCategoryFilter(e.target.value)}
-          className="premium-select rounded-2xl border-2 border-[#3A5F26]/20 bg-white px-4 py-3 text-sm text-[#1E3A1E] focus:outline-none focus:border-[#FBBF24] focus:ring-1 focus:ring-[#FBBF24] cursor-pointer sm:w-56 transition-all"
+          className="premium-select rounded-2xl border-2 border-[#1b4f72]/20 bg-white px-4 py-3 text-sm text-[#142b45] focus:outline-none focus:border-[#2fd4a7] focus:ring-1 focus:ring-[#2fd4a7] cursor-pointer sm:w-56 transition-all"
         >
           <option value="">Todas las categorías</option>
           <option value="vegetables">Vegetales</option>
@@ -147,7 +152,7 @@ export function ProductCatalog({ fairId, onAddToCart }: ProductCatalogProps) {
 
       {/* Empty */}
       {!isPending && !isError && products.length === 0 && (
-        <div className="rounded-2xl border-2 border-[#3A5F26]/12 bg-white p-12 text-center shadow-sm">
+        <div className="rounded-2xl border-2 border-[#1b4f72]/12 bg-white p-12 text-center shadow-sm">
           <p className="text-gray-500 font-bold text-base">No se encontraron productos disponibles</p>
           <p className="text-xs text-gray-400 mt-1.5">Intente buscando otra categoría o palabra clave</p>
         </div>
@@ -163,7 +168,8 @@ export function ProductCatalog({ fairId, onAddToCart }: ProductCatalogProps) {
                 categoryLabel={getCategoryLabel(product.category)}
                 unitLabel={getUnitLabel(product.unit)}
                 price={formatPrice(product.price)}
-                imageUrl={getImageUrl(product.image_url)} // 👈 URL corregida
+                imageUrl={getImageUrl(product.image_url)}
+                stock={product.available_stock}
                 onAddToCart={() => onAddToCart?.(product)}
               />
             </Link>

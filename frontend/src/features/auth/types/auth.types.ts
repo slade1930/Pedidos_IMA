@@ -40,10 +40,8 @@ export interface RegisterData {
 
 // ─── RESPUESTAS DEL BACKEND ───────────────────────────────
 
-/** Respuesta del backend en login y refresh */
-export interface TokenResponse {
-  access_token: string;
-  refresh_token: string;
+/** Respuesta del backend en login y refresh (FASE 1.1: tokens viajan en cookies httpOnly) */
+export interface SessionResponse {
   token_type: string;
 }
 
@@ -55,9 +53,6 @@ export interface ApiResponse<T> {
   timestamp: string;
   meta?: Record<string, unknown> | null;
 }
-
-/** Respuesta del backend al refrescar el token */
-export type RefreshTokenResponse = TokenResponse;
 
 /** Respuesta del backend al hacer logout */
 export interface LogoutResponse {

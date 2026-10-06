@@ -5,3 +5,9 @@ allowBuilds:
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+
+# Overrides migrados de package.json (pnpm 11 ya no lee "pnpm.overrides")
+overrides:
+  react-hook-form: 7.76.1
+  # CVE: seroval 1.5.6 (solid-js via @tanstack/react-query-devtools)
+  seroval: ^1.6.3

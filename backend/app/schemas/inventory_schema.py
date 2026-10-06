@@ -1,3 +1,4 @@
+# app/schemas/inventory_schema.py
 from typing import Optional
 import uuid
 
@@ -43,6 +44,8 @@ class InventoryResponseSchema(BaseModel):
 
     product_id: uuid.UUID
 
+    product_name: Optional[str] = None  # 👈 NUEVO
+
     fair_id: uuid.UUID
 
     total_stock: int
@@ -52,6 +55,8 @@ class InventoryResponseSchema(BaseModel):
     delivered_stock: int
 
     available_stock: int
+
+    low_stock_threshold: int = Field(default=25)
 
     is_available: bool
 

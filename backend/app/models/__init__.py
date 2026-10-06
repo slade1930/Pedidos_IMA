@@ -7,6 +7,7 @@ from app.models.inventory_model import Inventory
 from app.models.order_model import Order
 from app.models.order_item_model import OrderItem
 from app.models.payment_model import Payment
+from app.models.notification_model import Notification, UserNotification
 
 __all__ = [
     "User",
@@ -16,4 +17,6 @@ __all__ = [
     "Order",
     "OrderItem",
     "Payment",
+    "Notification",
+    "UserNotification",
 ]

@@ -7,6 +7,8 @@ from pydantic import (
     model_validator,
 )
 
+from app.utils.validators import validate_password_strength
+
 
 class TokenType(str, Enum):
     ACCESS = "access"
@@ -29,6 +31,15 @@ class TokenSchema(BaseModel):
     token_type: str = "bearer"
 
 
+class SessionSchema(BaseModel):
+    """Respuesta de login/refresh: los tokens viajan SOLO en cookies HttpOnly.
+
+    El body nunca expone access_token ni refresh_token (inaccesibles para JS).
+    """
+
+    token_type: str = "bearer"
+
+
 class TokenPayloadSchema(BaseModel):
 
     sub: str
@@ -40,7 +51,8 @@ class TokenPayloadSchema(BaseModel):
 
 class RefreshTokenSchema(BaseModel):
 
-    refresh_token: str
+    # Opcional: el refresh token puede venir aquí o en la cookie httpOnly "itas_refresh"
+    refresh_token: str | None = None
 
 
 class ChangePasswordSchema(BaseModel):
@@ -56,5 +68,9 @@ class ChangePasswordSchema(BaseModel):
 
         if self.new_password != self.confirm_password:
             raise ValueError("Passwords do not match")
+
+        ok, reason = validate_password_strength(self.new_password)
+        if not ok:
+            raise ValueError(f"La nueva contraseña no es segura: {reason}")
 
         return self

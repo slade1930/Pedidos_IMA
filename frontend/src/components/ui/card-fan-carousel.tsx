@@ -277,7 +277,7 @@ export default function SocialCards({ cards }: SocialCardsProps) {
           transition: border-color 0.3s;
         }
         .fan-card:hover {
-          border-color: #FBBF24;
+          border-color: #2fd4a7;
         }
         @media (max-width: 480px) {
           .fan-card { width: 5.5rem; height: 8.25rem; border-width: 1.5px; border-radius: 0.5rem; }

@@ -11,7 +11,7 @@ interface DashboardShellProps {
 export function DashboardShell({ children, header }: DashboardShellProps) {
   return (
     <div
-      className="flex flex-col h-[100dvh] overflow-hidden bg-gradient-to-b from-[#FFFDF9] via-[#FDF8F0] to-[#F6EFE5] relative"
+      className="flex flex-col h-[100dvh] overflow-hidden bg-gradient-to-b from-[#eef6f4] via-[#eef6f4] to-[#eef6f4] relative"
     >
       {/* Subtle background glow */}
       <div 
@@ -25,7 +25,7 @@ export function DashboardShell({ children, header }: DashboardShellProps) {
 
       {/* Top Navbar */}
       {header && (
-        <header className="sticky top-0 z-40 flex-shrink-0 shadow-sm shadow-[#4A3728]/[0.01]">
+        <header className="sticky top-0 z-40 flex-shrink-0 shadow-sm shadow-[#142b45]/[0.01]">
           {header}
         </header>
       )}

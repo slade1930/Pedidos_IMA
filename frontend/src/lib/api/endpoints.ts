@@ -85,8 +85,13 @@ export const ENDPOINTS = {
   // ─── NOTIFICATIONS ─────────────────────────────────
   NOTIFICATIONS: {
     LIST: `${V1}/notifications`,
+    UNREAD_COUNT: `${V1}/notifications/unread-count`,
     MARK_READ: (id: string) => `${V1}/notifications/${id}/read`,
     MARK_ALL_READ: `${V1}/notifications/read-all`,
+    ADMIN_LIST: `${V1}/notifications/admin`,
+    CREATE: `${V1}/notifications`,
+    UPDATE: (id: string) => `${V1}/notifications/${id}`,
+    DELETE: (id: string) => `${V1}/notifications/${id}`,
   },
 } as const;
 

@@ -9,6 +9,7 @@ from app.api.routes import (
     orders,
     payments,
     notifications,
+    dashboard,
 )
 
 api_router = APIRouter()
@@ -21,3 +22,4 @@ api_router.include_router(inventory.router)
 api_router.include_router(orders.router)
 api_router.include_router(payments.router)
 api_router.include_router(notifications.router)
+api_router.include_router(dashboard.router)

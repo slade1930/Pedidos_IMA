@@ -1,13 +1,16 @@
 # app/repositories/product_repository.py
+
 from typing import Optional
 import uuid
 
 from sqlalchemy import (
     select,
     func,
+    or_,
 )
 
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.repositories.base_repository import BaseRepository
 from app.models.product_model import Product
@@ -25,24 +28,74 @@ class ProductRepository(BaseRepository[Product]):
         self,
         skip: int = 0,
         limit: int = 10,
+        search: str = None,
+        category: str = None,
+        fair_id: uuid.UUID = None,
+        is_active: bool = True,
     ) -> list[Product]:
-
-        result = await self.db.execute(
+        
+        query = (
             select(Product)
-            .where(Product.is_active.is_(True))
-            .order_by(Product.name.asc())
-            .offset(skip)
-            .limit(limit)
+            .where(Product.is_active.is_(is_active))
+            .options(selectinload(Product.inventory))
         )
+        
+        if fair_id:
+            query = query.where(Product.fair_id == fair_id)
+        
+        if search:
+            query = query.where(
+                or_(
+                    Product.name.ilike(f"%{search}%"),
+                    Product.sku.ilike(f"%{search}%"),
+                )
+            )
+        
+        if category:
+            query = query.where(Product.category == category)
+        
+        query = query.order_by(Product.name.asc()).offset(skip).limit(limit)
 
+        result = await self.db.execute(query)
         return list(result.scalars().all())
 
-    async def get_total_count(self) -> int:
-
-        result = await self.db.execute(
-            select(func.count()).select_from(Product).where(Product.is_active.is_(True))
-        )
+    async def get_total_count(
+        self,
+        search: str = None,
+        category: str = None,
+        fair_id: uuid.UUID = None,
+        is_active: bool = True,
+    ) -> int:
+        
+        query = select(func.count()).select_from(Product).where(Product.is_active.is_(is_active))
+        
+        if fair_id:
+            query = query.where(Product.fair_id == fair_id)
+        
+        if search:
+            query = query.where(
+                or_(
+                    Product.name.ilike(f"%{search}%"),
+                    Product.sku.ilike(f"%{search}%"),
+                )
+            )
+        
+        if category:
+            query = query.where(Product.category == category)
+        
+        result = await self.db.execute(query)
         return result.scalar() or 0
+
+    async def get_by_id(
+        self,
+        product_id: uuid.UUID,
+    ) -> Optional[Product]:
+        result = await self.db.execute(
+            select(Product)
+            .where(Product.id == product_id, Product.is_active.is_(True))
+            .options(selectinload(Product.inventory))
+        )
+        return result.scalar_one_or_none()
 
     async def get_by_fair(
         self,
@@ -55,6 +108,7 @@ class ProductRepository(BaseRepository[Product]):
                 Product.fair_id == fair_id,
                 Product.is_active.is_(True),
             )
+            .options(selectinload(Product.inventory))
             .order_by(Product.name.asc())
         )
 

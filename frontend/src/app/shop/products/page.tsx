@@ -4,10 +4,25 @@ import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProductCatalog } from "@/features/shop/components/ProductCatalog";
 import { useCartStore } from "@/stores/cart.store";
-import { useFairs } from "@/features/fairs/hooks/useFairs";
+import { usePublicFairs } from "@/features/fairs/hooks/usePublicFairs";
+import { FairCarousel } from "@/features/fairs/components/FairCarousel";
 import type { Product } from "@/features/products/types/product.types";
+import type { Fair } from "@/features/fairs/types/fair.types";
 import { motion, AnimatePresence } from "framer-motion";
 import { Landmark, ShieldAlert, CheckCircle2, ArrowRight, Store, MapPin } from "lucide-react";
+import { useAuthStore } from "@/stores/auth.store";
+import { usePdaRestriction } from "@/features/shop/hooks/usePdaRestriction";
+import { PdaRestrictionCard } from "@/features/shop/components/PdaRestrictionCard";
+
+// ─── CONSTANTES ────────────────────────────────────────────
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+function getImageUrl(imageUrl: string | null | undefined): string {
+  if (!imageUrl) return "";
+  if (imageUrl.startsWith("http")) return imageUrl;
+  return `${API_URL}${imageUrl}`;
+}
 
 // ─── COMPONENTE ────────────────────────────────────────────
 
@@ -20,8 +35,13 @@ export default function ProductsPage() {
   const addItem = useCartStore((state) => state.addItem);
   const setFairId = useCartStore((state) => state.setFairId);
 
-  const { data: fairsData } = useFairs({ limit: 100 });
-  const fairs = Array.isArray(fairsData) ? fairsData : fairsData?.data ?? [];
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { data: pdaStatus } = usePdaRestriction();
+  const restriction = isAuthenticated && pdaStatus && !pdaStatus.can_purchase ? pdaStatus.restriction : null;
+
+  const { data: fairsData } = usePublicFairs();
+  const fairs: Fair[] = Array.isArray(fairsData) ? fairsData : [];
+  const selectedFair = fairs.find((fair) => fair.id === selectedFairId) ?? null;
 
   useEffect(() => {
     if (fairIdFromUrl) {
@@ -30,6 +50,18 @@ export default function ProductsPage() {
     }
   }, [fairIdFromUrl, setFairId]);
 
+  // Con el carrusel siempre hay una carta al frente: si la
+  // selección aún no existe, quedarse con la primera feria.
+  useEffect(() => {
+    if (!fairs.length) return;
+    const exists = fairs.some((fair) => fair.id === selectedFairId);
+    if (!exists) {
+      const first = fairs[0];
+      setSelectedFairId(first.id);
+      setFairId(first.id);
+    }
+  }, [fairs, selectedFairId, setFairId]);
+
   useEffect(() => {
     if (feedback) {
       const timer = setTimeout(() => setFeedback(null), 3000);
@@ -37,9 +69,30 @@ export default function ProductsPage() {
     }
   }, [feedback]);
 
+  const handleSelectFair = (fair: Fair) => {
+    setSelectedFairId(fair.id);
+    setFairId(fair.id);
+  };
+
   const handleAddToCart = (product: Product) => {
+    if (restriction) {
+      setFeedback({
+        message: `Control de beneficios activo: podrás comprar de nuevo el ${new Date(restriction.next_available_date).toLocaleDateString("es-PA")}.`,
+        type: "error",
+      });
+      return;
+    }
+
     if (!selectedFairId) {
       setFeedback({ message: "Selecciona una feria primero", type: "error" });
+      return;
+    }
+
+    const availableStock = product.available_stock ?? product.max_per_user;
+
+    // 👈 NUEVO: bloquear si el producto está agotado (stock = 0)
+    if (availableStock <= 0) {
+      setFeedback({ message: `"${product.name}" está agotado`, type: "error" });
       return;
     }
 
@@ -49,7 +102,8 @@ export default function ProductsPage() {
       quantity: 1,
       unit_price: product.price,
       max_per_user: product.max_per_user,
-      stock: product.max_per_user,
+      stock: availableStock,
+      image_url: getImageUrl(product.image_url),
     });
 
     if (result.success) {
@@ -64,7 +118,7 @@ export default function ProductsPage() {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-[#1E3A1E] min-h-screen"
+      className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 text-[#142b45] min-h-screen"
     >
       {/* Estilos CSS locales de la paleta Verde, Blanco y Amarillo */}
       <style>{`
@@ -116,47 +170,64 @@ export default function ProductsPage() {
         )}
       </AnimatePresence>
 
-      {/* Cabecera y Selector */}
-      <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-12 border-b border-[#3A5F26]/10 pb-8">
+      {/* Cabecera */}
+      <div className="flex items-start gap-8 mb-12 border-b border-[#1b4f72]/10 pb-8">
         <div className="max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#3A5F26]/8 border border-[#3A5F26]/15 text-[#3A5F26] text-xs font-extrabold tracking-wider uppercase mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1b4f72]/8 border border-[#1b4f72]/15 text-[#1b4f72] text-xs font-extrabold tracking-wider uppercase mb-3">
             <Store size={12} strokeWidth={2.5} />
-            IMA Panamá
+            ITAS Panamá
           </div>
-          <h1 className="text-4xl font-extrabold tracking-tight text-[#1E3A1E] sm:text-5xl">
+          <h1 className="text-4xl font-extrabold tracking-tight text-[#142b45] sm:text-5xl">
             Productos Disponibles
           </h1>
           <p className="mt-3 text-base text-gray-500 font-medium leading-relaxed">
             Explora y selecciona de forma directa los productos frescos del productor local habilitados para abastecer a tu comunidad.
           </p>
         </div>
-
-        {/* Selector de Feria */}
-        <div className="w-full lg:w-80">
-          <label htmlFor="fair-select" className="flex items-center gap-1.5 text-xs font-black text-[#1E3A1E] mb-2.5 uppercase tracking-widest">
-            <MapPin size={12} className="text-[#3A5F26]" />
-            Selecciona tu feria
-          </label>
-          <div className="relative">
-            <select
-              id="fair-select"
-              value={selectedFairId}
-              onChange={(e) => {
-                setSelectedFairId(e.target.value);
-                setFairId(e.target.value);
-              }}
-              className="premium-select block w-full rounded-2xl border-2 border-[#3A5F26]/20 bg-white px-5 py-4 text-sm font-semibold text-[#1E3A1E] focus:outline-none focus:border-[#FBBF24] focus:ring-1 focus:ring-[#FBBF24] cursor-pointer hover:border-[#3A5F26]/40 transition-all shadow-sm"
-            >
-              <option value="" className="text-gray-400 font-medium">Selecciona una feria libre</option>
-              {fairs.map((fair: { id: string; name: string }) => (
-                <option key={fair.id} value={fair.id} className="text-[#1E3A1E] font-medium">
-                  {fair.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
       </div>
+
+      {/* ══ Bloqueo por Control de Beneficios (PDA) ══════════════ */}
+      {restriction && (
+        <div className="mb-10 max-w-2xl mx-auto">
+          <PdaRestrictionCard
+            restriction={restriction}
+            hint="Ya realizaste tu compra del mes. No puedes añadir productos ni procesar un nuevo pago hasta que se libere tu próximo cupo."
+          />
+        </div>
+      )}
+
+      {/* ══ Selección de Feria (carousel) ═══════════════════════ */}
+      <section className="mb-12">
+        <div className="text-center mb-4">
+          <div className="inline-flex items-center gap-1.5 text-xs font-black text-[#142b45] uppercase tracking-widest">
+            <MapPin size={12} className="text-[#1b4f72]" />
+            Elige tu feria
+          </div>
+          <p className="mt-1.5 text-xs sm:text-sm text-gray-500 font-medium">
+            Desliza el carrusel para cambiar de feria.
+          </p>
+        </div>
+
+        <FairCarousel
+          fairs={fairs}
+          value={selectedFairId}
+          onChange={handleSelectFair}
+        />
+
+        {/* Feria al frente — la seleccionada */}
+        {selectedFair && (
+          <div className="mt-5 flex items-center justify-center gap-2.5 flex-wrap">
+            <span className="inline-flex items-center gap-2 rounded-full bg-[#2fd4a7]/15 border border-[#2fd4a7]/40 px-4 py-2 text-xs font-black text-[#142b45]">
+              <CheckCircle2 size={13} className="text-[#1b4f72]" strokeWidth={2.5} />
+              {selectedFair.name}
+            </span>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white border border-[#1b4f72]/15 px-4 py-2 text-xs font-semibold text-[#142b45]/70">
+              <MapPin size={11} className="text-[#1b4f72]" />
+              {selectedFair.location}
+            </span>
+          </div>
+        )}
+      </section>
 
       {/* Contenido principal */}
       <AnimatePresence mode="wait">
@@ -167,13 +238,13 @@ export default function ProductsPage() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.98, y: -15 }}
             transition={{ duration: 0.4, ease: "easeOut" }}
-            className="soft-glow-yellow rounded-3xl border-2 border-[#FBBF24]/30 bg-white p-12 sm:p-20 text-center max-w-2xl mx-auto shadow-sm space-y-6 relative overflow-hidden grain-bg"
+            className="soft-glow-yellow rounded-3xl border-2 border-[#2fd4a7]/30 bg-white p-12 sm:p-20 text-center max-w-2xl mx-auto shadow-sm space-y-6 relative overflow-hidden grain-bg"
           >
             {/* Círculo decorativo */}
-            <div className="absolute top-0 right-0 w-48 h-48 bg-[#FBBF24]/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#3A5F26]/5 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-48 h-48 bg-[#2fd4a7]/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-[#1b4f72]/5 rounded-full blur-3xl -ml-16 -mb-16 pointer-events-none" />
             
-            <div className="mx-auto h-20 w-20 rounded-3xl bg-[#3A5F26]/8 flex items-center justify-center text-[#3A5F26] border-2 border-[#3A5F26]/10 shadow-inner relative z-10">
+            <div className="mx-auto h-20 w-20 rounded-3xl bg-[#1b4f72]/8 flex items-center justify-center text-[#1b4f72] border-2 border-[#1b4f72]/10 shadow-inner relative z-10">
               <motion.div
                 animate={{ y: [0, -4, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
@@ -183,14 +254,18 @@ export default function ProductsPage() {
             </div>
             
             <div className="space-y-3 relative z-10">
-              <h3 className="text-2xl font-black text-[#1E3A1E] tracking-tight">Feria Requerida</h3>
+              <h3 className="text-2xl font-black text-[#142b45] tracking-tight">
+                {fairs.length === 0 ? "Sin ferias" : "Elige una feria"}
+              </h3>
               <p className="text-sm text-gray-500 font-semibold leading-relaxed max-w-md mx-auto px-2">
-                Para ver el catálogo de alimentos y precios locales, por favor selecciona tu feria más cercana usando el menú superior.
+                {fairs.length === 0
+                  ? "Aún no hay ferias habilitadas. Vuelve pronto para ver el catálogo disponible en tu provincia."
+                  : "Selecciona tu feria en el carrusel para ver el catálogo de alimentos y precios locales."}
               </p>
             </div>
 
             <div className="pt-2 relative z-10 flex justify-center">
-              <div className="inline-flex items-center gap-2 text-xs font-black text-[#3A5F26] bg-[#3A5F26]/8 px-4 py-2.5 rounded-full tracking-wider uppercase border border-[#3A5F26]/12">
+              <div className="inline-flex items-center gap-2 text-xs font-black text-[#1b4f72] bg-[#1b4f72]/8 px-4 py-2.5 rounded-full tracking-wider uppercase border border-[#1b4f72]/12">
                 Elegir Ubicación
                 <ArrowRight size={14} strokeWidth={2.5} />
               </div>

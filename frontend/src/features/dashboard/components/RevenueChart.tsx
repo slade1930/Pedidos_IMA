@@ -1,32 +1,65 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { motion, type Variants } from "framer-motion";
-import type { RevenueStats } from "@/features/dashboard/types/dashboard.types";
+import { useMemo } from "react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  Cell,
+  Legend,
+} from "recharts";
+import type { RevenuePeriod } from "@/features/dashboard/types/dashboard.types";
+
+// ─── UTILITARIOS ───────────────────────────────────────────
+
+export function formatMoney(n: number): string {
+  return new Intl.NumberFormat("es-PA", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+}
+
+export function formatMoneyCompact(n: number): string {
+  if (n >= 1000) {
+    return `$${(n / 1000).toFixed(1).replace(/\.0$/, "")}k`;
+  }
+  return `$${n.toFixed(0)}`;
+}
+
+// ─── PERÍODOS DISPONIBLES ──────────────────────────────────
+
+export const PERIODS: { value: RevenuePeriod; label: string }[] = [
+  { value: "month", label: "Este mes" },
+  { value: "6m", label: "6 meses" },
+  { value: "12m", label: "12 meses" },
+  { value: "year", label: "Año completo" },
+];
+
+// Genera lista de meses disponibles desde la serie
+export function getAvailableMonths(series: { period: string; label: string; amount: number; orders_count: number }[]): { value: string; label: string }[] {
+  return series
+    .filter(s => s.amount > 0 || true)
+    .map(s => ({ value: s.period, label: `${s.label} ${s.period.slice(0,4)}` }))
+    .reverse();
+}
 
 // ─── PROPS ─────────────────────────────────────────────────
 
 interface RevenueChartProps {
-  data?: RevenueStats;
-  isLoading?: boolean;
-}
-
-// ─── UTILITARIOS ───────────────────────────────────────────
-
-function formatPrice(price: number): string {
-  return new Intl.NumberFormat("es-PA", {
-    style: "currency",
-    currency: "USD",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
-function formatShortDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString("es-PA", {
-    month: "short",
-    day: "numeric",
-  });
+  series: { period: string; label: string; amount: number; orders_count: number }[];
+  period: RevenuePeriod;
+  onPeriodChange: (p: RevenuePeriod) => void;
+  selectedMonth?: string;
+  onMonthChange?: (month: string) => void;
+  loading?: boolean;
 }
 
 // ─── SKELETON ──────────────────────────────────────────────
@@ -34,224 +67,252 @@ function formatShortDate(dateString: string): string {
 function ChartSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <div className="h-4 w-28 bg-[#E8DDD0]/40 rounded animate-pulse" />
-        <div className="h-6 w-24 bg-[#E8DDD0]/50 rounded animate-pulse" />
+      <div className="flex justify-between">
+        <div className="h-4 w-40 bg-[#e4f0ed]/40 rounded animate-pulse" />
+        <div className="h-8 w-56 bg-[#e4f0ed]/30 rounded-full animate-pulse" />
       </div>
-      <div className="flex items-end gap-2.5 h-48 pt-4">
-        {Array.from({ length: 12 }).map((_, i) => (
-          <div
-            key={i}
-            className="flex-1 bg-gradient-to-t from-[#E8DDD0]/15 to-[#E8DDD0]/45 rounded-full animate-pulse"
-            style={{
-              height: `${20 + Math.sin(i * 0.8) * 35 + 40}%`,
-              animationDelay: `${i * 0.05}s`,
-            }}
-          />
-        ))}
-      </div>
-      <div className="flex justify-between px-1">
-        <div className="h-2 w-8 bg-[#E8DDD0]/30 rounded" />
-        <div className="h-2 w-8 bg-[#E8DDD0]/30 rounded" />
-        <div className="h-2 w-8 bg-[#E8DDD0]/30 rounded" />
-      </div>
+      <div className="h-64 rounded-2xl bg-[#e4f0ed]/20 animate-pulse" />
     </div>
   );
 }
 
-// ─── COMPONENTE ────────────────────────────────────────────
+// ─── TOOLTIP PERSONALIZADO ─────────────────────────────────
 
-export function RevenueChart({ data, isLoading = false }: RevenueChartProps) {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const [isHovered, setIsHovered] = useState(false);
-  const [hoveredBarIndex, setHoveredBarIndex] = useState<number | null>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+function ChartTooltip({ active, payload }: any) {
+  if (!active || !payload || payload.length === 0) return null;
 
-  if (isLoading) {
+  const point = payload[0]?.payload;
+  return (
+    <div className="rounded-xl border border-[#e4f0ed] bg-white/95 backdrop-blur px-3.5 py-2.5 shadow-lg shadow-[#142b45]/10">
+      <p className="text-[10px] font-black uppercase tracking-widest text-[#142b45]/50">
+        {point?.label} {point?.period?.slice(0, 4)}
+      </p>
+      <p className="mt-1 text-lg font-black text-[#1b4f72] font-mono tabular-nums">
+        {formatMoney(point?.amount ?? 0)}
+      </p>
+      {point?.orders_count > 0 && (
+        <p className="text-[11px] font-medium text-[#142b45]/50">
+          {point.orders_count} {point.orders_count === 1 ? "transacción" : "transacciones"}
+        </p>
+      )}
+    </div>
+  );
+}
+
+// ─── COMPONENTE PRINCIPAL ──────────────────────────────────
+
+export function RevenueChart({
+  series,
+  period,
+  onPeriodChange,
+  selectedMonth,
+  onMonthChange,
+  loading = false,
+}: RevenueChartProps) {
+  const data = useMemo(
+    () => (period === "year" ? series.filter((s) => s.period.endsWith("1") || true) : series),
+    [series, period]
+  );
+
+  if (loading) {
     return (
-      <div 
-        className="bg-white/80 backdrop-blur-md rounded-2xl border border-neutral-200/80 p-6 shadow-sm"
-        style={{ boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.5)" }}
-      >
+      <div className="rounded-3xl border border-[#e4f0ed] bg-white p-6 shadow-sm">
         <ChartSkeleton />
       </div>
     );
   }
 
-  const rawData = data?.data ?? [];
-  const totalRevenue = data?.total_revenue ?? 0;
+  const hasData = data.some((d) => d.amount > 0);
 
-  if (!data || rawData.length === 0) {
-    return (
-      <div 
-        className="bg-white/80 backdrop-blur-md rounded-2xl border border-neutral-200/80 p-6 shadow-sm"
-        style={{ boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.5)" }}
-      >
-        <h3 className="text-[10px] font-bold text-[#4A3728]/60 uppercase tracking-widest mb-5 leading-none">
-          Ingresos
-        </h3>
-        <div className="flex flex-col items-center justify-center py-10 px-4 text-center rounded-xl border border-dashed border-[#E8DDD0] bg-[#E8DDD0]/10">
-          <div className="flex items-center justify-center h-12 w-12 rounded-full bg-[#E8DDD0]/40 text-[#3D5A1E]/80 mb-3 relative">
-            <div className="absolute inset-0 rounded-full bg-[#3D5A1E]/10 animate-ping opacity-25" />
-            <svg className="h-6 w-6 relative z-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+  return (
+    <div className="rounded-3xl border border-[#e4f0ed] bg-white p-6 shadow-sm">
+      {/* Header */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <span className="text-[10px] font-black uppercase tracking-widest text-[#1b4f72]">
+            Evolución de ingresos
+          </span>
+          <h2 className="mt-1 text-lg font-extrabold tracking-tight text-[#142b45]">
+            Ingresos por período
+          </h2>
+        </div>
+
+        {/* Filtros de período + selector de mes */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap gap-1 rounded-full border border-[#e4f0ed] bg-[#eef6f4] p-1">
+            {PERIODS.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => onPeriodChange(p.value)}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-all ${
+                  period === p.value
+                    ? "bg-[#1b4f72] text-white shadow-sm"
+                    : "text-[#142b45]/60 hover:text-[#142b45]"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+          
+          {/* Selector de mes específico */}
+          {onMonthChange && (
+            <div className="flex items-center gap-1.5 rounded-full border border-[#e4f0ed] bg-[#eef6f4] px-2 py-1">
+              <span className="text-xs font-medium text-[#142b45]/70">Mes:</span>
+              <select
+                value={selectedMonth || ""}
+                onChange={(e) => onMonthChange(e.target.value)}
+                className="text-xs font-semibold text-[#142b45] bg-transparent border-none focus:outline-none rounded px-1 py-0.5 appearance-none cursor-pointer"
+              >
+                <option value="">Todos</option>
+                {getAvailableMonths(series).map((m) => (
+                  <option key={m.value} value={m.value}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Gráfica */}
+      {hasData ? (
+        <div className="mt-6 h-72 w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 10, right: 5, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#1b4f72" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="#1b4f72" stopOpacity={0.02} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e4f0ed" strokeOpacity={0.6} vertical={false} />
+              <XAxis
+                dataKey="label"
+                tick={{ fill: "#8aa39a", fontSize: 11, fontWeight: 600 }}
+                axisLine={false}
+                tickLine={false}
+                interval="preserveStartEnd"
+              />
+              <YAxis
+                tickFormatter={formatMoneyCompact}
+                tick={{ fill: "#8aa39a", fontSize: 11, fontWeight: 600 }}
+                axisLine={false}
+                tickLine={false}
+                width={52}
+              />
+              <Tooltip content={<ChartTooltip />} cursor={{ stroke: "#2fbf9b", strokeWidth: 1.5, strokeDasharray: "4 4" }} />
+              <Area
+                type="monotone"
+                dataKey="amount"
+                stroke="#1b4f72"
+                strokeWidth={2.5}
+                fill="url(#revenueGrad)"
+                dot={{ r: 3, fill: "#2fbf9b", stroke: "#1b4f72", strokeWidth: 1.5 }}
+                activeDot={{ r: 6 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      ) : (
+        <div className="mt-6 flex flex-col items-center justify-center rounded-2xl border border-dashed border-[#e4f0ed] bg-[#eef6f4] py-16 text-center">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#1b4f72]/10 text-[#1b4f72]">
+            <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18 9 11.25l4.306 4.306a11.95 11.95 0 0 1 5.814-5.518l2.74-1.22m0 0-5.94-2.281m5.94 2.28-2.28 5.941" />
             </svg>
           </div>
-          <p className="text-sm font-semibold text-[#4A3728]">No hay datos de ingresos</p>
-          <p className="text-[11px] text-[#4A3728]/50 mt-1 max-w-[200px]">Los registros de transacciones aparecerán aquí una vez procesados.</p>
+          <p className="mt-4 text-sm font-bold text-[#142b45]">Sin ingresos en este período</p>
+          <p className="mt-1 max-w-xs text-xs text-[#142b45]/50">
+            Cuando se completen transacciones, verás aquí la evolución de los ingresos.
+          </p>
         </div>
+      )}
+    </div>
+  );
+}
+
+// ─── GRÁFICA DE DISTRIBUCIÓN (ÓRDENES POR ESTADO) ──────────
+
+const STATUS_COLORS: Record<string, string> = {
+  pending: "#2fbf9b",
+  confirmed: "#2e7d9e",
+  ready: "#1b4f72",
+  delivered: "#3B82F6",
+  cancelled: "#C94B32",
+  expired: "#9CA3AF",
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  pending: "Pendiente",
+  confirmed: "Confirmada",
+  ready: "Lista",
+  delivered: "Entregada",
+  cancelled: "Cancelada",
+  expired: "Expirada",
+};
+
+export function OrdersDistributionChart({ data }: { data: Record<string, number> }) {
+  const rows = useMemo(
+    () =>
+      Object.entries(data)
+        .map(([status, count]) => ({
+          status,
+          name: STATUS_LABELS[status] ?? status,
+          count,
+          color: STATUS_COLORS[status] ?? "#9CA3AF",
+        }))
+        .sort((a, b) => b.count - a.count),
+    [data]
+  );
+
+  const total = rows.reduce((acc, r) => acc + r.count, 0);
+
+  if (total === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1b4f72]/10 text-[#1b4f72]">
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+          </svg>
+        </div>
+        <p className="mt-3 text-sm font-semibold text-[#142b45]/70">Sin órdenes</p>
       </div>
     );
   }
 
-  const maxAmount = Math.max(...rawData.map((d) => d.amount), 1);
-  const bars = rawData.slice(-12);
-
-  const containerVariants: Variants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: { staggerChildren: 0.02 },
-    },
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    setMousePosition({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
-
   return (
-    <div 
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        setHoveredBarIndex(null);
-      }}
-      className="bg-gradient-to-br from-white/95 via-[#3D5A1E]/[0.01] to-[#3D5A1E]/[0.07] backdrop-blur-md rounded-2xl border border-[#3D5A1E]/15 p-6 shadow-sm hover:shadow-md hover:shadow-[#4A3728]/5 transition-all duration-300 relative overflow-hidden"
-      style={{ 
-        boxShadow: isHovered
-          ? "0 14px 34px -10px rgba(61, 90, 30, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.6)"
-          : "0 1px 3px 0 rgba(0, 0, 0, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.3)"
-      }}
-    >
-      {/* Interactive Cursor Spotlight Glow */}
-      <span
-        className="absolute inset-0 rounded-2xl pointer-events-none transition-opacity duration-500 z-0"
-        style={{
-          opacity: isHovered ? 1 : 0,
-          background: `radial-gradient(220px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(92, 138, 60, 0.08), transparent 85%)`,
-        }}
-      />
-
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6 relative z-10">
-        <div className="flex items-center gap-2">
-          {/* Active status pulse dot */}
-          <div className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5C8A3C] opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#3D5A1E]"></span>
-          </div>
-          <h3 className="text-[10px] font-bold text-[#4A3728]/60 uppercase tracking-widest leading-none">
-            Ingresos
-          </h3>
-        </div>
-        <p className="text-2xl font-black text-[#3D5A1E] bg-gradient-to-br from-[#3D5A1E] to-[#1F330A] bg-clip-text text-transparent tracking-tight leading-none">
-          {formatPrice(totalRevenue)}
-        </p>
-      </div>
-
-      {/* Outer wrapper to contain relative absolute grids */}
-      <div className="relative h-48 w-full mt-4">
-        {/* Gridlines in background */}
-        <div className="absolute inset-x-0 bottom-6 top-2 flex flex-col justify-between pointer-events-none opacity-40 z-0">
-          <div className="border-b border-dashed border-[#3D5A1E]/10 w-full" />
-          <div className="border-b border-dashed border-[#3D5A1E]/10 w-full" />
-          <div className="border-b border-dashed border-[#3D5A1E]/10 w-full" />
-          <div className="border-b border-[#3D5A1E]/15 w-full" />
-        </div>
-
-        {/* Animated bars */}
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="flex items-end gap-1.5 sm:gap-2.5 h-full relative z-10 w-full"
-        >
-          {bars.map((point, index) => {
-            const heightPercent = (point.amount / maxAmount) * 100;
-            const isCurrentlyHovered = hoveredBarIndex === index;
-            const isAnyBarHovered = hoveredBarIndex !== null;
-
-            return (
-              <div 
-                key={index} 
-                className="flex-1 flex flex-col items-center gap-1.5 min-w-0 h-full justify-end relative group/bar"
-                onMouseEnter={() => setHoveredBarIndex(index)}
-                onMouseLeave={() => setHoveredBarIndex(null)}
-              >
-                {/* Custom Floating Tooltip */}
-                <div 
-                  className={`absolute bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none transition-all duration-300 z-30 ${
-                    isCurrentlyHovered ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-1 scale-95'
-                  }`}
-                >
-                  <div className="bg-[#4A3728]/95 backdrop-blur-md text-[#E8DDD0] px-2.5 py-1.2 rounded-lg text-[10px] font-bold font-mono tracking-tight shadow-md border border-[#E8DDD0]/10 flex flex-col items-center gap-0.5 whitespace-nowrap">
-                    <span className="text-[#82B25F]">{formatPrice(point.amount)}</span>
-                    <span className="text-white/40 text-[8px] font-sans uppercase tracking-wider">{formatShortDate(point.date)}</span>
-                    {/* Tooltip Arrow */}
-                    <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#4A3728]/95" />
-                  </div>
-                </div>
-
-                {/* Bar capsule structure */}
-                <div className="w-full flex-1 flex items-end relative">
-                  <motion.div
-                    initial={{ scaleY: 0 }}
-                    animate={{ scaleY: 1 }}
-                    transition={{ type: "spring", stiffness: 85, damping: 16, delay: index * 0.025 }}
-                    style={{ 
-                      height: `${Math.max(heightPercent, 4)}%`,
-                      originY: 1
-                    }}
-                    className={`w-full bg-gradient-to-t from-[#3D5A1E] via-[#5C8A3C] to-[#82B25F] transition-all duration-300 rounded-t-full relative overflow-hidden shadow-[0_2px_8px_rgba(61,90,30,0.08)] ${
-                      isCurrentlyHovered 
-                        ? 'shadow-[0_4px_16px_rgba(61,90,30,0.25)] filter brightness-110 scale-x-105' 
-                        : isAnyBarHovered 
-                        ? 'opacity-40 scale-x-90' 
-                        : ''
-                    }`}
-                  >
-                    {/* Glowing LED highlight at the tip of the bar */}
-                    <div className="absolute top-0 inset-x-0 h-[2.5px] bg-gradient-to-r from-white/30 via-white/70 to-white/30 shadow-[0_1px_4px_rgba(255,255,255,0.7)]" />
-                    {/* Glossy reflection layer */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent pointer-events-none" />
-                    {/* Pulse animation overlay for hovered bar */}
-                    {isCurrentlyHovered && (
-                      <div className="absolute inset-0 bg-white/5 animate-pulse" />
-                    )}
-                  </motion.div>
-                </div>
-
-                {/* Styled date tag */}
-                <span className={`text-[9px] font-bold transition-all duration-300 uppercase font-mono tracking-wider truncate w-full text-center leading-none mt-1.5 ${
-                  isCurrentlyHovered 
-                    ? 'text-[#3D5A1E] scale-105 font-extrabold' 
-                    : isAnyBarHovered 
-                    ? 'text-neutral-400/40' 
-                    : 'text-neutral-400/80'
-                }`}>
-                  {formatShortDate(point.date)}
-                </span>
-              </div>
-            );
-          })}
-        </motion.div>
+    <div className="flex h-64 flex-col gap-4">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={rows} layout="vertical" margin={{ top: 0, right: 10, left: 10, bottom: 0 }}>
+          <XAxis type="number" hide />
+          <YAxis
+            type="category"
+            dataKey="name"
+            tick={{ fill: "#142b45", fontSize: 11, fontWeight: 600 }}
+            axisLine={false}
+            tickLine={false}
+            width={85}
+          />
+          <Tooltip
+            cursor={{ fill: "rgba(232,221,208,0.3)" }}
+            formatter={(value: any, name: any) => [`${value}`, "Órdenes"]}
+            contentStyle={{
+              borderRadius: 12,
+              border: "1px solid #e4f0ed",
+              fontSize: 12,
+              fontWeight: 600,
+            }}
+          />
+          <Bar dataKey="count" radius={[0, 8, 8, 0]} barSize={22}>
+            {rows.map((r) => (
+              <Cell key={r.status} fill={r.color} />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+      <div className="text-center text-xs font-bold text-[#142b45]/50">
+        {total} {total === 1 ? "orden" : "órdenes"} en total
       </div>
     </div>
   );

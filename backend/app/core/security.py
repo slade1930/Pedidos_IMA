@@ -1,4 +1,6 @@
 # app/core/security.py
+import uuid
+
 from datetime import datetime, timedelta, timezone
 from typing import Optional, Any
 from jose import JWTError, jwt
@@ -23,19 +25,37 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 # --- JWT Tokens ---
 
 
+def _new_jti() -> str:
+    return uuid.uuid4().hex
+
+
 def create_access_token(subject: Any, expires_delta: Optional[timedelta] = None) -> str:
-    expire = datetime.now(timezone.utc) + (
+    now = datetime.now(timezone.utc)
+    expire = now + (
         expires_delta or timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    payload = {"sub": str(subject), "exp": expire, "type": "access"}
+    payload = {
+        "sub": str(subject),
+        "jti": _new_jti(),
+        "iat": now,
+        "exp": expire,
+        "type": "access",
+    }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 
 def create_refresh_token(subject: Any) -> str:
-    expire = datetime.now(timezone.utc) + timedelta(
+    now = datetime.now(timezone.utc)
+    expire = now + timedelta(
         days=settings.REFRESH_TOKEN_EXPIRE_DAYS
     )
-    payload = {"sub": str(subject), "exp": expire, "type": "refresh"}
+    payload = {
+        "sub": str(subject),
+        "jti": _new_jti(),
+        "iat": now,
+        "exp": expire,
+        "type": "refresh",
+    }
     return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
 

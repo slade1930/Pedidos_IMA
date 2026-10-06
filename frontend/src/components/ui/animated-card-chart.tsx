@@ -92,8 +92,8 @@ interface Visual3Props {
 }
 
 export function Visual3({
-  mainColor = "#3A5F26",
-  secondaryColor = "#FBBF24",
+  mainColor = "#1b4f72",
+  secondaryColor = "#2fd4a7",
   gridColor = "#80808010",
 }: Visual3Props) {
   const [hovered, setHovered] = useState(false);

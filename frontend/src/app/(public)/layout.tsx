@@ -7,10 +7,10 @@ import type { ReactNode } from "react";
 
 export const metadata: Metadata = {
   title: {
-    default: "IMA System — Información Pública",
-    template: "%s — IMA System",
+    default: "ITAS — Información Pública",
+    template: "%s — ITAS",
   },
-  description: "Información pública de ferias y eventos de IMA System",
+  description: "Información pública de ferias y eventos de ITAS",
 };
 
 // ─── LAYOUT ────────────────────────────────────────────────
@@ -37,7 +37,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center">
           <a href="/" className="text-lg font-bold text-gray-900">
-            IMA System
+            ITAS
           </a>
           <span className="ml-3 text-sm text-gray-500">
             Información Pública
@@ -53,7 +53,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
       {/* Footer público simple */}
       <footer className="bg-white border-t border-gray-200 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm text-gray-500">
-          &copy; {new Date().getFullYear()} IMA System. Todos los derechos reservados.
+          &copy; {new Date().getFullYear()} ITAS. Todos los derechos reservados.
         </div>
       </footer>
     </div>

@@ -35,11 +35,11 @@ def generate_invoice_pdf(order_data: dict) -> bytes:
         "Title",
         parent=styles["Title"],
         fontSize=20,
-        textColor=colors.HexColor("#1a5276"),
+        textColor=colors.HexColor("#1b4f72"),
     )
-    elements.append(Paragraph("Instituto de Mercadeo Agropecuario", title_style))
+    elements.append(Paragraph("Iniciativa Tecnológica de Abasto Social", title_style))
     elements.append(Paragraph("Factura Digital", styles["Heading2"]))
-    elements.append(HRFlowable(width="100%", color=colors.HexColor("#1a5276")))
+    elements.append(HRFlowable(width="100%", color=colors.HexColor("#1b4f72")))
     elements.append(Spacer(1, 12))
 
     # Info del pedido
@@ -82,7 +82,7 @@ def generate_invoice_pdf(order_data: dict) -> bytes:
     table.setStyle(
         TableStyle(
             [
-                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1a5276")),
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#1b4f72")),
                 ("TEXTCOLOR", (0, 0), (-1, 0), colors.whitesmoke),
                 ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
                 ("ALIGN", (1, 0), (-1, -1), "CENTER"),
@@ -93,7 +93,7 @@ def generate_invoice_pdf(order_data: dict) -> bytes:
                     "ROWBACKGROUNDS",
                     (0, 1),
                     (-1, -2),
-                    [colors.white, colors.HexColor("#eaf4fb")],
+                    [colors.white, colors.HexColor("#e4f0ed")],
                 ),
             ]
         )
@@ -106,7 +106,7 @@ def generate_invoice_pdf(order_data: dict) -> bytes:
     elements.append(HRFlowable(width="100%", color=colors.grey))
     elements.append(
         Paragraph(
-            "Este documento es una factura digital válida del IMA - Panamá",
+            "Este documento es una factura digital válida del ITAS - Panamá",
             styles["Normal"],
         )
     )

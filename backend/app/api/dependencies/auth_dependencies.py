@@ -1,5 +1,5 @@
 # app/api/dependencies/auth_dependencies.py
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
@@ -8,14 +8,28 @@ from app.repositories.user_repository import UserRepository
 from app.models.user_model import User
 from app.core.constants import UserRole
 
-bearer_scheme = HTTPBearer()
+bearer_scheme = HTTPBearer(auto_error=False)
+
+ACCESS_COOKIE = "itas_access"
 
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    request: Request,
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_db),
 ) -> User:
-    token = credentials.credentials
+    # Prioridad: access token en cookie httpOnly (FASE 1.1) > Bearer header
+    # (retrocompatibilidad con clientes antiguos / PDA externo)
+    token = request.cookies.get(ACCESS_COOKIE)
+    if not token and credentials is not None:
+        token = credentials.credentials
+
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No autenticado",
+        )
+
     payload = decode_token(token)
 
     if not payload or not verify_token_type(payload, "access"):

@@ -71,8 +71,8 @@ function CreateUserFormContent({
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-      <div className="border-b border-[#E8DDD0]/30 pb-4">
-        <h3 className="text-lg font-black text-[#4A3728] tracking-tight">Nuevo Usuario</h3>
+      <div className="border-b border-[#e4f0ed]/30 pb-4">
+        <h3 className="text-lg font-black text-[#142b45] tracking-tight">Nuevo Usuario</h3>
         <p className="mt-1 text-xs text-neutral-400 font-medium">
           Completa los datos para crear un nuevo usuario
         </p>
@@ -96,13 +96,13 @@ function CreateUserFormContent({
         />
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-5 border-t border-[#E8DDD0]/30">
+      <div className="flex items-center justify-end gap-3 pt-5 border-t border-[#e4f0ed]/30">
         {onCancel && (
           <button 
             type="button" 
             onClick={onCancel} 
             disabled={isSubmitting}
-            className="rounded-xl border border-[#E8DDD0] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#4A3728] bg-white/60 hover:bg-[#E8DDD0]/20 disabled:opacity-40 disabled:hover:bg-white/60 transition-all duration-200 shadow-sm"
+            className="rounded-xl border border-[#e4f0ed] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#142b45] bg-white/60 hover:bg-[#e4f0ed]/20 disabled:opacity-40 disabled:hover:bg-white/60 transition-all duration-200 shadow-sm"
           >
             Cancelar
           </button>
@@ -110,7 +110,7 @@ function CreateUserFormContent({
         <button 
           type="submit" 
           disabled={isSubmitting}
-          className="rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] hover:from-[#2D4A0E] hover:to-[#3D5A1E] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-[0_2px_8px_rgba(61,90,30,0.15)] hover:shadow-[0_4px_16px_rgba(61,90,30,0.25)]"
+          className="rounded-xl bg-gradient-to-r from-[#1b4f72] to-[#2e7d9e] hover:from-[#1b4f72] hover:to-[#1b4f72] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-[0_2px_8px_rgba(61,90,30,0.15)] hover:shadow-[0_4px_16px_rgba(61,90,30,0.25)]"
         >
           {isSubmitting ? "Creando..." : "Crear Usuario"}
         </button>
@@ -169,8 +169,8 @@ function EditUserFormContent({
 
   return (
     <form onSubmit={handleSubmit(onFormSubmit)} className="space-y-6">
-      <div className="border-b border-[#E8DDD0]/30 pb-4">
-        <h3 className="text-lg font-black text-[#4A3728] tracking-tight">Editar Usuario</h3>
+      <div className="border-b border-[#e4f0ed]/30 pb-4">
+        <h3 className="text-lg font-black text-[#142b45] tracking-tight">Editar Usuario</h3>
         <p className="mt-1 text-xs text-neutral-400 font-medium">
           Modifica los campos que deseas actualizar
         </p>
@@ -195,13 +195,13 @@ function EditUserFormContent({
         />
       </div>
 
-      <div className="flex items-center justify-end gap-3 pt-5 border-t border-[#E8DDD0]/30">
+      <div className="flex items-center justify-end gap-3 pt-5 border-t border-[#e4f0ed]/30">
         {onCancel && (
           <button 
             type="button" 
             onClick={onCancel} 
             disabled={isSubmitting}
-            className="rounded-xl border border-[#E8DDD0] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#4A3728] bg-white/60 hover:bg-[#E8DDD0]/20 disabled:opacity-40 disabled:hover:bg-white/60 transition-all duration-200 shadow-sm"
+            className="rounded-xl border border-[#e4f0ed] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#142b45] bg-white/60 hover:bg-[#e4f0ed]/20 disabled:opacity-40 disabled:hover:bg-white/60 transition-all duration-200 shadow-sm"
           >
             Cancelar
           </button>
@@ -209,7 +209,7 @@ function EditUserFormContent({
         <button 
           type="submit" 
           disabled={isSubmitting}
-          className="rounded-xl bg-gradient-to-r from-[#3D5A1E] to-[#5C8A3C] hover:from-[#2D4A0E] hover:to-[#3D5A1E] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-[0_2px_8px_rgba(61,90,30,0.15)] hover:shadow-[0_4px_16px_rgba(61,90,30,0.25)]"
+          className="rounded-xl bg-gradient-to-r from-[#1b4f72] to-[#2e7d9e] hover:from-[#1b4f72] hover:to-[#1b4f72] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-white shadow-sm disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-[0_2px_8px_rgba(61,90,30,0.15)] hover:shadow-[0_4px_16px_rgba(61,90,30,0.25)]"
         >
           {isSubmitting ? "Guardando..." : "Guardar Cambios"}
         </button>
@@ -222,20 +222,20 @@ function EditUserFormContent({
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function UserFormFields({ register, errors, isSubmitting, showPassword, showAdminFields }: any) {
-  const inputBaseClass = "block w-full rounded-xl border bg-[#E8DDD0]/10 px-3.5 py-2.5 text-sm text-[#4A3728] placeholder-neutral-400/80 hover:bg-[#E8DDD0]/15 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D5A1E]/15 disabled:opacity-40 disabled:bg-[#E8DDD0]/5 transition-all duration-200 shadow-sm";
+  const inputBaseClass = "block w-full rounded-xl border bg-[#e4f0ed]/10 px-3.5 py-2.5 text-sm text-[#142b45] placeholder-neutral-400/80 hover:bg-[#e4f0ed]/15 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1b4f72]/15 disabled:opacity-40 disabled:bg-[#e4f0ed]/5 transition-all duration-200 shadow-sm";
 
   return (
     <>
       {/* Nombre completo */}
       <div className="space-y-1.5">
-        <label htmlFor="full_name" className="block text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+        <label htmlFor="full_name" className="block text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
           Nombre completo
         </label>
         <input 
           id="full_name" 
           type="text" 
           disabled={isSubmitting}
-          className={`${inputBaseClass} ${errors.full_name ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#E8DDD0]/80 focus:border-[#3D5A1E]/60 focus:ring-[#3D5A1E]/20"}`}
+          className={`${inputBaseClass} ${errors.full_name ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#e4f0ed]/80 focus:border-[#1b4f72]/60 focus:ring-[#1b4f72]/20"}`}
           placeholder="Nombre completo"
           {...register("full_name")} 
         />
@@ -251,14 +251,14 @@ function UserFormFields({ register, errors, isSubmitting, showPassword, showAdmi
 
       {/* Cédula */}
       <div className="space-y-1.5">
-        <label htmlFor="cedula" className="block text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+        <label htmlFor="cedula" className="block text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
           Cédula
         </label>
         <input 
           id="cedula" 
           type="text" 
           disabled={isSubmitting || !showPassword}
-          className={`${inputBaseClass} ${errors.cedula ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#E8DDD0]/80 focus:border-[#3D5A1E]/60 focus:ring-[#3D5A1E]/20"}`}
+          className={`${inputBaseClass} ${errors.cedula ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#e4f0ed]/80 focus:border-[#1b4f72]/60 focus:ring-[#1b4f72]/20"}`}
           placeholder="8-888-8888"
           {...register("cedula")} 
         />
@@ -274,14 +274,14 @@ function UserFormFields({ register, errors, isSubmitting, showPassword, showAdmi
 
       {/* Email */}
       <div className="space-y-1.5">
-        <label htmlFor="email" className="block text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+        <label htmlFor="email" className="block text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
           Correo electrónico
         </label>
         <input 
           id="email" 
           type="email" 
           disabled={isSubmitting}
-          className={`${inputBaseClass} ${errors.email ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#E8DDD0]/80 focus:border-[#3D5A1E]/60 focus:ring-[#3D5A1E]/20"}`}
+          className={`${inputBaseClass} ${errors.email ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#e4f0ed]/80 focus:border-[#1b4f72]/60 focus:ring-[#1b4f72]/20"}`}
           placeholder="correo@ejemplo.com"
           {...register("email")} 
         />
@@ -297,14 +297,14 @@ function UserFormFields({ register, errors, isSubmitting, showPassword, showAdmi
 
       {/* Teléfono */}
       <div className="space-y-1.5">
-        <label htmlFor="phone" className="block text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+        <label htmlFor="phone" className="block text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
           Teléfono <span className="text-neutral-400/80 font-normal lowercase tracking-normal font-sans ml-1">(opcional)</span>
         </label>
         <input 
           id="phone" 
           type="tel" 
           disabled={isSubmitting}
-          className={`${inputBaseClass} ${errors.phone ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#E8DDD0]/80 focus:border-[#3D5A1E]/60 focus:ring-[#3D5A1E]/20"}`}
+          className={`${inputBaseClass} ${errors.phone ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#e4f0ed]/80 focus:border-[#1b4f72]/60 focus:ring-[#1b4f72]/20"}`}
           placeholder="6666-6666"
           {...register("phone")} 
         />
@@ -322,14 +322,14 @@ function UserFormFields({ register, errors, isSubmitting, showPassword, showAdmi
       {showPassword && (
         <>
           <div className="space-y-1.5">
-            <label htmlFor="password" className="block text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+            <label htmlFor="password" className="block text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
               Contraseña
             </label>
             <input 
               id="password" 
               type="password" 
               disabled={isSubmitting}
-              className={`${inputBaseClass} ${errors.password ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#E8DDD0]/80 focus:border-[#3D5A1E]/60 focus:ring-[#3D5A1E]/20"}`}
+              className={`${inputBaseClass} ${errors.password ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#e4f0ed]/80 focus:border-[#1b4f72]/60 focus:ring-[#1b4f72]/20"}`}
               placeholder="Mínimo 8 caracteres"
               {...register("password")} 
             />
@@ -344,14 +344,14 @@ function UserFormFields({ register, errors, isSubmitting, showPassword, showAdmi
           </div>
 
           <div className="space-y-1.5">
-            <label htmlFor="confirm_password" className="block text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+            <label htmlFor="confirm_password" className="block text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
               Confirmar contraseña
             </label>
             <input 
               id="confirm_password" 
               type="password" 
               disabled={isSubmitting}
-              className={`${inputBaseClass} ${errors.confirm_password ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#E8DDD0]/80 focus:border-[#3D5A1E]/60 focus:ring-[#3D5A1E]/20"}`}
+              className={`${inputBaseClass} ${errors.confirm_password ? "border-red-400/80 focus:border-red-500 focus:ring-red-500/10" : "border-[#e4f0ed]/80 focus:border-[#1b4f72]/60 focus:ring-[#1b4f72]/20"}`}
               placeholder="Repite la contraseña"
               {...register("confirm_password")} 
             />
@@ -369,13 +369,13 @@ function UserFormFields({ register, errors, isSubmitting, showPassword, showAdmi
 
       {/* Rol */}
       <div className="space-y-1.5">
-        <label htmlFor="role" className="block text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+        <label htmlFor="role" className="block text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
           Rol
         </label>
         <select 
           id="role" 
           disabled={isSubmitting}
-          className="block w-full rounded-xl border bg-[#E8DDD0]/10 px-3.5 py-2.5 text-sm text-[#4A3728] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#3D5A1E]/15 disabled:opacity-40 border-[#E8DDD0]/80 focus:border-[#3D5A1E]/60 focus:ring-[#3D5A1E]/20 transition-all duration-200 shadow-sm"
+          className="block w-full rounded-xl border bg-[#e4f0ed]/10 px-3.5 py-2.5 text-sm text-[#142b45] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#1b4f72]/15 disabled:opacity-40 border-[#e4f0ed]/80 focus:border-[#1b4f72]/60 focus:ring-[#1b4f72]/20 transition-all duration-200 shadow-sm"
           {...register("role")}
         >
           {!showPassword && <option value="">Sin cambios</option>}
@@ -401,10 +401,10 @@ function UserFormFields({ register, errors, isSubmitting, showPassword, showAdmi
               id="is_active" 
               type="checkbox" 
               disabled={isSubmitting}
-              className="h-4.5 w-4.5 rounded-lg border-[#E8DDD0] text-[#3D5A1E] focus:ring-[#3D5A1E]/30 focus:ring-offset-0 transition-colors duration-150 cursor-pointer accent-[#3D5A1E]"
+              className="h-4.5 w-4.5 rounded-lg border-[#e4f0ed] text-[#1b4f72] focus:ring-[#1b4f72]/30 focus:ring-offset-0 transition-colors duration-150 cursor-pointer accent-[#1b4f72]"
               {...register("is_active")} 
             />
-            <label htmlFor="is_active" className="text-sm font-bold text-[#4A3728]/70 select-none cursor-pointer group-hover/check:text-[#4A3728]">
+            <label htmlFor="is_active" className="text-sm font-bold text-[#142b45]/70 select-none cursor-pointer group-hover/check:text-[#142b45]">
               Usuario activo
             </label>
           </div>
@@ -414,10 +414,10 @@ function UserFormFields({ register, errors, isSubmitting, showPassword, showAdmi
               id="is_verified" 
               type="checkbox" 
               disabled={isSubmitting}
-              className="h-4.5 w-4.5 rounded-lg border-[#E8DDD0] text-[#3D5A1E] focus:ring-[#3D5A1E]/30 focus:ring-offset-0 transition-colors duration-150 cursor-pointer accent-[#3D5A1E]"
+              className="h-4.5 w-4.5 rounded-lg border-[#e4f0ed] text-[#1b4f72] focus:ring-[#1b4f72]/30 focus:ring-offset-0 transition-colors duration-150 cursor-pointer accent-[#1b4f72]"
               {...register("is_verified")} 
             />
-            <label htmlFor="is_verified" className="text-sm font-bold text-[#4A3728]/70 select-none cursor-pointer group-hover/check:text-[#4A3728]">
+            <label htmlFor="is_verified" className="text-sm font-bold text-[#142b45]/70 select-none cursor-pointer group-hover/check:text-[#142b45]">
               Usuario verificado
             </label>
           </div>

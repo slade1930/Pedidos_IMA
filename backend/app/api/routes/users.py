@@ -1,7 +1,8 @@
 # app/api/routes/users.py
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
+from app.core.security_audit import audit_log
 from app.services.user_service import UserService
 from app.schemas.user_schema import (
     UserCreateSchema,
@@ -10,6 +11,7 @@ from app.schemas.user_schema import (
     UserAdminUpdateSchema,
 )
 from app.schemas.response_schema import ResponseSchema, PaginatedResponseSchema
+from app.schemas.auth_schema import ChangePasswordSchema
 from app.api.dependencies.auth_dependencies import (
     get_current_user,
     get_current_admin,
@@ -54,7 +56,35 @@ async def update_me(
     )
 
 
-@router.get("/", response_model=PaginatedResponseSchema[UserResponseSchema])
+@router.post("/change-password", response_model=ResponseSchema)
+async def change_password(
+    data: ChangePasswordSchema,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """FASE 1.6: cambia la contraseña exigiendo la contraseña actual."""
+    request_id = getattr(request.state, "request_id", None)
+    service = UserService(db)
+    try:
+        await service.change_password(current_user.id, data)
+    except HTTPException as exc:
+        audit_log(
+            "auth.change_password.failed",
+            request_id=request_id,
+            user_id=str(current_user.id),
+            reason=exc.detail,
+        )
+        raise
+    audit_log(
+        "auth.change_password.success",
+        request_id=request_id,
+        user_id=str(current_user.id),
+    )
+    return ResponseSchema(message="Contraseña actualizada correctamente")
+
+
+@router.get("", response_model=PaginatedResponseSchema[UserResponseSchema])
 async def get_all_users(
     skip: int = 0,
     limit: int = 10,

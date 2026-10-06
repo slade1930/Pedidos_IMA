@@ -6,12 +6,12 @@ from app.repositories.order_repository import OrderRepository
 from app.repositories.product_repository import ProductRepository
 from app.repositories.inventory_repository import InventoryRepository
 from app.repositories.user_repository import UserRepository
+from app.repositories.payment_repository import PaymentRepository
 from app.models.order_model import Order
 from app.models.order_item_model import OrderItem
+from app.models.payment_model import Payment
 from app.schemas.order_schema import OrderCreateSchema, OrderStatusUpdateSchema
-from app.core.constants import OrderStatus, PaymentStatus, SystemLimits
-from app.services.qr_service import QRService
-from app.services.notification_service import NotificationService
+from app.core.constants import OrderStatus, PaymentStatus, SystemLimits, PaymentMethod
 from typing import Optional
 import uuid
 import random
@@ -22,6 +22,15 @@ import string
 PDA_DAYS_RESTRICTION = 8
 
 
+def _as_utc(dt: datetime) -> datetime:
+    """Normaliza a timezone-aware UTC (los drivers puedn devolver naive en SQLite)."""
+    if dt is None:
+        return dt
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
 class OrderService:
 
     def __init__(self, db: AsyncSession):
@@ -30,25 +39,78 @@ class OrderService:
         self.product_repo = ProductRepository(db)
         self.inventory_repo = InventoryRepository(db)
         self.user_repo = UserRepository(db)
+        self.payment_repo = PaymentRepository(db)
 
     def _generate_order_number(self) -> str:
         suffix = "".join(random.choices(string.ascii_uppercase + string.digits, k=6))
-        return f"IMA-{suffix}"
+        return f"ITAS-{suffix}"
 
     def _generate_pickup_code(self) -> str:
         return "".join(random.choices(string.digits, k=5))
 
-    async def get_all(self, skip: int = 0, limit: int = 10) -> list[Order]:
-        return await self.order_repo.get_all(skip, limit)
+    async def get_all(
+        self,
+        skip: int = 0,
+        limit: int = 10,
+        search: str = None,
+        fair_id: uuid.UUID = None,
+        status: str = None,
+        date_from: str = None,
+        date_to: str = None,
+    ) -> list[Order]:
+        return await self.order_repo.get_all(
+            skip=skip, limit=limit,
+            search=search, fair_id=fair_id, status=status,
+            date_from=date_from, date_to=date_to,
+        )
 
-    async def get_total_count(self) -> int:
-        return await self.order_repo.get_total_count()
+    async def get_total_count(
+        self,
+        search: str = None,
+        fair_id: uuid.UUID = None,
+        status: str = None,
+        date_from: str = None,
+        date_to: str = None,
+    ) -> int:
+        return await self.order_repo.get_total_count(
+            search=search, fair_id=fair_id, status=status,
+            date_from=date_from, date_to=date_to,
+        )
 
     async def get_by_id(self, order_id: uuid.UUID) -> Optional[Order]:
         return await self.order_repo.get_by_id(order_id)
 
+    async def _get_pda_restriction(self, user) -> Optional[dict]:
+        """Devuelve la restricción PDA activa (un pedido cada 8 días) o None si puede comprar."""
+        last_order = await self.order_repo.get_last_order_by_cedula(user.cedula)
+
+        if not last_order:
+            return None
+
+        created_at_utc = _as_utc(last_order.created_at)
+        days_since_last = (datetime.now(timezone.utc) - created_at_utc).days
+        days_remaining = PDA_DAYS_RESTRICTION - days_since_last
+
+        if days_remaining <= 0:
+            return None
+
+        next_available = created_at_utc + timedelta(days=PDA_DAYS_RESTRICTION)
+        fair_name = getattr(last_order.fair, "name", "Desconocida") if last_order.fair else "Desconocida"
+
+        return {
+            "message": "Ya realizaste un pedido recientemente",
+            "last_purchase_date": created_at_utc.isoformat(),
+            "last_fair_name": fair_name,
+            "days_remaining": days_remaining,
+            "next_available_date": next_available.isoformat(),
+        }
+
+    async def get_pda_status(self, user) -> dict:
+        """Estado de elegibilidad de compra del ciudadano para el control de beneficios."""
+        restriction = await self._get_pda_restriction(user)
+        return {"can_purchase": restriction is None, "restriction": restriction}
+
     async def create(self, user_id: uuid.UUID, data: OrderCreateSchema) -> Order:
-        # ─── Obtener datos del usuario ──────────────────
         user = await self.user_repo.get_by_id(user_id)
         if not user:
             raise HTTPException(
@@ -57,32 +119,12 @@ class OrderService:
             )
 
         # ─── VALIDACIÓN PDA: Un pedido cada 8 días ───────
-        last_order = await self.order_repo.get_last_order_by_cedula(user.cedula)
+        restriction = await self._get_pda_restriction(user)
 
-        if last_order:
-            days_since_last = (datetime.now(timezone.utc) - last_order.created_at).days
-            days_remaining = PDA_DAYS_RESTRICTION - days_since_last
-
-            if days_remaining > 0:
-                next_available = last_order.created_at + timedelta(days=PDA_DAYS_RESTRICTION)
-                fair_name = getattr(last_order.fair, "name", "Desconocida") if last_order.fair else "Desconocida"
-
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail={
-                        "message": "Ya realizaste un pedido recientemente",
-                        "last_purchase_date": last_order.created_at.isoformat(),
-                        "last_fair_name": fair_name,
-                        "days_remaining": days_remaining,
-                        "next_available_date": next_available.isoformat(),
-                    },
-                )
-
-        # ─── Verificar si usuario ya tiene pedido en esta feria ──
-        if await self.order_repo.user_has_order_in_fair(user_id, data.fair_id):
+        if restriction:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Ya tienes un pedido registrado en esta feria",
+                detail=restriction,
             )
 
         # ─── Validar productos y calcular total ──────────
@@ -148,14 +190,25 @@ class OrderService:
 
         await self.db.flush()
 
-        qr_token = QRService.generate_qr_token(created_order.id)
+        # ─── Registrar el pago AUTOMÁTICAMENTE (completado al hacer pedido) ──
+        # La vista "Pagos" del admin lee la tabla payments, por lo que crear el
+        # registro aquí garantiza que toda compra del shop se refleje sin
+        # confirmación manual previa.
+        payment = Payment(
+            order_id=created_order.id,
+            method=data.payment_method,
+            status=PaymentStatus.COMPLETED,
+            amount=total,
+            currency="USD",
+            paid_at=datetime.now(timezone.utc),
+        )
+        await self.payment_repo.create(payment)
+        created_order.payment = payment
 
         await self.order_repo.update(created_order.id, {
-            "qr_token": qr_token,
             "pickup_code": pickup_code,
         })
 
-        created_order.qr_token = qr_token
         created_order.pickup_code = pickup_code
 
         return created_order
@@ -180,28 +233,21 @@ class OrderService:
 
         return updated
 
-    async def validate_qr(self, qr_code: str) -> Order:
-        order = await self.order_repo.get_by_qr(qr_code)
+    async def validate_pickup_code(self, pickup_code: str) -> Order:
+        order = await self.order_repo.get_by_pickup_code(pickup_code)
 
         if not order:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="QR no válido",
+                detail="Código no válido",
             )
 
-        if order.qr_used:
+        if order.status == OrderStatus.DELIVERED:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Este QR ya fue utilizado",
+                detail="Este código ya fue utilizado",
             )
 
-        if QRService.is_qr_expired(qr_code):
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="El QR ha expirado",
-            )
-
-        await self.order_repo.update(order.id, {"qr_used": True})
         return order
 
     async def get_by_user(self, user_id: uuid.UUID) -> list[Order]:
@@ -210,7 +256,13 @@ class OrderService:
     async def get_by_fair(self, fair_id: uuid.UUID) -> list[Order]:
         return await self.order_repo.get_by_fair(fair_id)
 
-    # 👈 NUEVO MÉTODO: Para el reporte de órdenes
-    async def get_all_for_report(self) -> list[Order]:
+    async def get_all_for_report(
+        self,
+        fair_id: uuid.UUID = None,
+        date_from: str = None,
+        date_to: str = None,
+    ) -> list[Order]:
         """Obtiene todas las órdenes con datos de usuario, items y feria para reportes"""
-        return await self.order_repo.get_all_with_users()
+        return await self.order_repo.get_all_with_users(
+            fair_id=fair_id, date_from=date_from, date_to=date_to
+        )

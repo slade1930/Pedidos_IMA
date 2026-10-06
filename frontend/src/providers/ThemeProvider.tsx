@@ -43,7 +43,7 @@ export function AppProviders({ children }: AppProvidersProps) {
         <div className="flex h-screen items-center justify-center bg-gray-50">
           <div className="flex flex-col items-center gap-4">
             <div className="h-10 w-10 animate-spin rounded-full border-4 border-indigo-600 border-t-transparent" />
-            <p className="text-sm text-gray-500">Cargando IMA System...</p>
+            <p className="text-sm text-gray-500">Cargando ITAS...</p>
           </div>
         </div>
       }

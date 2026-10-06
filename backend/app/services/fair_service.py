@@ -1,20 +1,13 @@
+# app/services/fair_service.py
 import base64
-import os
 import uuid
 from pathlib import Path
 from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
+import cloudinary.uploader  # 👈 NUEVO
 from app.repositories.fair_repository import FairRepository
 from app.models.fair_model import Fair
 from app.schemas.fair_schema import FairCreateSchema, FairUpdateSchema
-
-# ─── CONFIGURACIÓN ────────────────────────────────────────
-
-# Directorio donde se guardan las imágenes
-UPLOAD_DIR = Path("static/images/fairs")
-
-# Extensión por defecto para imágenes
-DEFAULT_IMAGE_EXTENSION = "png"
 
 
 class FairService:
@@ -30,7 +23,7 @@ class FairService:
         return await self.fair_repo.get_total_count()
 
     async def create(self, data: FairCreateSchema) -> Fair:
-        # 👈 Extraer la imagen Base64 si existe
+        # Extraer la imagen Base64 si existe
         image_base64 = data.image_base64
         image_url = None
         
@@ -59,13 +52,16 @@ class FairService:
     async def get_upcoming(self) -> list[Fair]:
         return await self.fair_repo.get_upcoming_fairs()
 
+    async def get_shop_fairs(self) -> list[Fair]:
+        return await self.fair_repo.get_shop_fairs()
+
     async def get_by_province(self, province: str) -> list[Fair]:
         return await self.fair_repo.get_by_province(province)
 
     async def update(self, fair_id: uuid.UUID, data: FairUpdateSchema) -> Fair:
         fair = await self.get_by_id(fair_id)
         
-        # 👈 Procesar nueva imagen si se envió
+        # Procesar nueva imagen si se envió
         update_data = data.model_dump(exclude_none=True)
         
         if "image_base64" in update_data:
@@ -90,53 +86,70 @@ class FairService:
     async def deactivate(self, fair_id: uuid.UUID) -> bool:
         return await self.fair_repo.soft_delete(fair_id)
 
-    # ─── MÉTODOS PRIVADOS PARA IMÁGENES ──────────────────
+    # ─── MÉTODOS PRIVADOS PARA IMÁGENES (CLOUDINARY) ────
 
     def _save_base64_image(self, base64_string: str, fair_name: str) -> str:
         """
-        Guarda una imagen Base64 en el sistema de archivos.
-        Retorna la URL relativa de la imagen.
+        Sube una imagen Base64 a Cloudinary.
+        Retorna la URL segura (HTTPS) de la imagen.
         """
+        from app.utils.validators import validate_image_base64
+
+        # Defensa en profundidad: los schemas ya validan, pero este método
+        # también puede invocarse internamente (valida tamaño, raster y MIME).
         try:
-            # Decodificar Base64
-            image_data = base64.b64decode(base64_string)
-            
-            # Crear directorio si no existe
-            UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
-            
-            # Generar nombre único para el archivo
-            safe_name = fair_name.lower().replace(" ", "-")[:50]
-            unique_id = uuid.uuid4().hex[:8]
-            filename = f"{safe_name}-{unique_id}.{DEFAULT_IMAGE_EXTENSION}"
-            filepath = UPLOAD_DIR / filename
-            
-            # Guardar archivo
-            with open(filepath, "wb") as f:
-                f.write(image_data)
-            
-            # Retornar URL relativa
-            return f"/static/images/fairs/{filename}"
-            
-        except Exception as e:
+            cleaned, mime = validate_image_base64(base64_string)
+        except ValueError as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Error al guardar la imagen: {str(e)}",
+                detail=str(e),
+            )
+
+        try:
+            # Generar nombre único
+            safe_name = fair_name.lower().replace(" ", "-")[:50]
+            unique_id = uuid.uuid4().hex[:8]
+
+            # Subir a Cloudinary
+            result = cloudinary.uploader.upload(
+                f"data:{mime};base64,{cleaned}",
+                folder="fairs",
+                public_id=f"{safe_name}-{unique_id}",
+                overwrite=True,
+                resource_type="image",
+            )
+
+            # Retornar URL segura
+            return result["secure_url"]
+
+        except HTTPException:
+            raise
+        except Exception:
+            from loguru import logger
+            logger.error("Error al subir imagen a Cloudinary")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Error al subir la imagen. Intenta de nuevo.",
             )
 
     def _delete_image(self, image_url: str) -> None:
         """
-        Elimina una imagen del sistema de archivos.
+        Elimina una imagen de Cloudinary.
         """
         try:
-            # Convertir URL relativa a ruta absoluta
-            if image_url.startswith("/"):
-                filepath = Path(image_url.lstrip("/"))
-            else:
-                filepath = Path(image_url)
-            
-            # Eliminar archivo si existe
-            if filepath.exists():
-                filepath.unlink()
+            # Verificar que sea una URL de Cloudinary
+            if "cloudinary.com" in image_url:
+                # Extraer public_id de la URL
+                # Ejemplo: https://res.cloudinary.com/cloud-name/image/upload/v123/fairs/nombre-id.png
+                parts = image_url.split("/")
+                # Buscar después de "upload/"
+                upload_index = next((i for i, p in enumerate(parts) if p == "upload"), -1)
+                if upload_index != -1:
+                    # El public_id es todo después de upload/ (sin la extensión)
+                    public_id_parts = parts[upload_index + 1:]
+                    public_id = "/".join(public_id_parts).rsplit(".", 1)[0]
+                    
+                    cloudinary.uploader.destroy(public_id)
         except Exception as e:
             # Loguear error pero no detener el flujo
             print(f"Error al eliminar imagen {image_url}: {e}")

@@ -102,13 +102,17 @@ export const LOGOUT_REDIRECT = ROUTES.PUBLIC.LOGIN;
 /**
  * Rutas que aparecen en la navegación del dashboard.
  * Cada ruta especifica los roles que pueden verla.
+ *
+ * Roles reales del sistema: "admin" | "staff" | "client" (alineados con el
+ * backend app/core/constants.py). El dashboard es solo admin/staff, los
+ * clientes son redirigidos a la tienda (ProtectedLayout).
  */
 export const NAV_ROUTES = [
   {
     label: "Dashboard",
     href: ROUTES.DASHBOARD.ROOT,
     icon: "LayoutDashboard",
-    roles: ["admin", "seller", "viewer"],
+    roles: ["admin", "staff"],
   },
   {
     label: "Usuarios",
@@ -120,37 +124,37 @@ export const NAV_ROUTES = [
     label: "Ferias",
     href: ROUTES.DASHBOARD.FAIRS.LIST,
     icon: "Store",
-    roles: ["admin", "seller", "viewer"],
+    roles: ["admin", "staff"],
   },
   {
     label: "Productos",
     href: ROUTES.DASHBOARD.PRODUCTS.LIST,
     icon: "Package",
-    roles: ["admin", "seller", "viewer"],
+    roles: ["admin", "staff"],
   },
   {
     label: "Inventario",
     href: ROUTES.DASHBOARD.INVENTORY.LIST,
     icon: "ClipboardList",
-    roles: ["admin", "seller"],
+    roles: ["admin", "staff"],
   },
   {
     label: "Órdenes",
     href: ROUTES.DASHBOARD.ORDERS.LIST,
     icon: "ShoppingCart",
-    roles: ["admin", "seller", "viewer"],
+    roles: ["admin", "staff"],
   },
   {
     label: "Pagos",
     href: ROUTES.DASHBOARD.PAYMENTS.LIST,
     icon: "CreditCard",
-    roles: ["admin", "viewer"],
+    roles: ["admin", "staff"],
   },
   {
     label: "Configuración",
     href: ROUTES.DASHBOARD.SETTINGS,
     icon: "Settings",
-    roles: ["admin", "seller", "viewer"],
+    roles: ["admin", "staff"],
   },
 ] as const;
 

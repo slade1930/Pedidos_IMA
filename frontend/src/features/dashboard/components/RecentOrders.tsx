@@ -2,14 +2,13 @@
 
 import { motion, type Variants } from "framer-motion";
 import { OrderStatusBadge } from "@/features/orders/components/OrderStatusBadge";
-import type { RecentOrdersResponse } from "@/features/dashboard/types/dashboard.types";
-import type { OrderStatus } from "@/features/orders/types/order.types";
+import type { Order } from "@/features/orders/types/order.types";
 
 // ─── PROPS ─────────────────────────────────────────────────
 
 interface RecentOrdersProps {
   /** Datos de órdenes recientes */
-  data?: RecentOrdersResponse;
+  data?: Order[];
   /** Indica si está en estado de carga */
   isLoading?: boolean;
 }
@@ -24,8 +23,10 @@ function formatPrice(price: number): string {
   }).format(price);
 }
 
-function formatRelativeTime(dateString: string): string {
+function formatRelativeTime(dateString?: string | null): string {
+  if (!dateString) return "—";
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "—";
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
@@ -101,7 +102,7 @@ export function RecentOrders({ data, isLoading = false }: RecentOrdersProps) {
         className="bg-white/80 backdrop-blur-md rounded-2xl border border-neutral-200/80 p-6 shadow-sm"
         style={{ boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.5)" }}
       >
-        <h3 className="text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest mb-5 leading-none">
+        <h3 className="text-xs font-bold text-[#142b45]/70 uppercase tracking-widest mb-5 leading-none">
           Órdenes Recientes
         </h3>
         <TableSkeleton />
@@ -110,23 +111,23 @@ export function RecentOrders({ data, isLoading = false }: RecentOrdersProps) {
   }
 
   // ─── SIN DATOS ───────────────────────────────────────
-  if (!data || !data.orders || data.orders.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div
         className="bg-white/80 backdrop-blur-md rounded-2xl border border-neutral-200/80 p-6 shadow-sm"
         style={{ boxShadow: "0 1px 3px 0 rgba(0, 0, 0, 0.02), inset 0 1px 0 rgba(255, 255, 255, 0.5)" }}
       >
-        <h3 className="text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest mb-5 leading-none">
+        <h3 className="text-xs font-bold text-[#142b45]/70 uppercase tracking-widest mb-5 leading-none">
           Órdenes Recientes
         </h3>
-        <div className="flex flex-col items-center justify-center py-10 px-4 text-center rounded-xl border border-dashed border-[#E8DDD0] bg-[#E8DDD0]/10">
-          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-[#E8DDD0]/35 text-[#4A3728]/60 mb-3">
+        <div className="flex flex-col items-center justify-center py-10 px-4 text-center rounded-xl border border-dashed border-[#e4f0ed] bg-[#e4f0ed]/10">
+          <div className="flex items-center justify-center h-10 w-10 rounded-full bg-[#e4f0ed]/35 text-[#142b45]/60 mb-3">
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
             </svg>
           </div>
-          <p className="text-sm font-semibold text-[#4A3728]/80">Sin actividad reciente</p>
-          <p className="text-xs text-[#4A3728]/50 mt-1">Las nuevas órdenes aparecerán en este lugar.</p>
+          <p className="text-sm font-semibold text-[#142b45]/80">Sin actividad reciente</p>
+          <p className="text-xs text-[#142b45]/50 mt-1">Las nuevas órdenes aparecerán en este lugar.</p>
         </div>
       </div>
     );
@@ -140,12 +141,12 @@ export function RecentOrders({ data, isLoading = false }: RecentOrdersProps) {
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-5 relative z-10">
-        <h3 className="text-xs font-bold text-[#4A3728]/70 uppercase tracking-widest leading-none">
+        <h3 className="text-xs font-bold text-[#142b45]/70 uppercase tracking-widest leading-none">
           Órdenes Recientes
         </h3>
         <a
           href="/dashboard/orders"
-          className="group flex items-center gap-1 text-[11px] font-bold text-[#4A3728]/70 hover:text-[#4A3728] tracking-wider uppercase transition-colors"
+          className="group flex items-center gap-1 text-[11px] font-bold text-[#142b45]/70 hover:text-[#142b45] tracking-wider uppercase transition-colors"
         >
           Ver todas
           <svg
@@ -178,12 +179,12 @@ export function RecentOrders({ data, isLoading = false }: RecentOrdersProps) {
           animate="show"
           className="divide-y divide-neutral-100/40"
         >
-          {data.orders.map((order) => (
+          {data.map((order) => (
             <motion.div
               key={order.id}
               variants={itemVariants}
               whileHover={{ x: 2 }}
-              className="flex items-center gap-3 py-3 hover:bg-[#E8DDD0]/15 transition-all duration-200 rounded-lg -mx-2 px-2"
+              className="flex items-center gap-3 py-3 hover:bg-[#e4f0ed]/15 transition-all duration-200 rounded-lg -mx-2 px-2"
             >
               {/* Número de orden con estilo de etiqueta fina */}
               <span className="w-20 text-xs font-mono font-semibold text-neutral-600 bg-neutral-50 border border-neutral-200/40 px-1.5 py-0.5 rounded-md truncate">
@@ -192,7 +193,7 @@ export function RecentOrders({ data, isLoading = false }: RecentOrdersProps) {
 
               {/* Nombre de cliente */}
               <span className="flex-1 text-sm font-semibold text-neutral-700 truncate">
-                {order.customer_name}
+                {order.customer_name || "Cliente"}
               </span>
 
               {/* Monto formateado */}
@@ -203,7 +204,7 @@ export function RecentOrders({ data, isLoading = false }: RecentOrdersProps) {
               {/* Estado badge */}
               <span className="w-28 pl-4 flex items-center">
                 <OrderStatusBadge
-                  status={order.status as OrderStatus}
+                  status={order.status}
                   size="sm"
                 />
               </span>

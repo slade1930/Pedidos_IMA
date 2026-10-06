@@ -1,82 +1,47 @@
 // src/features/dashboard/types/dashboard.types.ts
 
-// ─── ESTADÍSTICAS GENERALES ───────────────────────────────
+// ─── METRICAS PRINCIPALES ──────────────────────────────────
 
-/** Estadísticas generales del dashboard */
-export interface DashboardStats {
-  total_users: number;
-  total_fairs: number;
-  total_products: number;
-  total_orders: number;
+/** Métricas agregadas del dashboard (datos reales del backend) */
+export interface DashboardTotals {
   total_revenue: number;
+  month_revenue: number;
+  day_revenue: number;
+
+  prev_month_revenue: number;
+  prev_day_revenue: number;
+
+  total_clients: number;
+  total_orders: number;
+  total_payments: number;
+  total_products: number;
+  total_fairs: number;
   active_fairs: number;
+  completed_orders: number;
   pending_orders: number;
   low_stock_products: number;
 }
 
-// ─── INGRESOS ─────────────────────────────────────────────
+// ─── PUNTO DE INGRESO MENSUAL ──────────────────────────────
 
-/** Punto de datos de ingresos (para gráficos) */
-export interface RevenueDataPoint {
-  date: string;
+/** Ingresos agregados por mes */
+export interface MonthlyRevenuePoint {
+  period: string; // "2026-01"
+  label: string;  // "Ene"
   amount: number;
   orders_count: number;
 }
 
-/** Respuesta de ingresos */
-export interface RevenueStats {
-  total_revenue: number;
-  period: string;
-  data: RevenueDataPoint[];
+// ─── DATOS COMPLETOS DEL DASHBOARD ─────────────────────────
+
+/** Respuesta del endpoint GET /api/v1/dashboard/stats */
+export interface DashboardStats {
+  totals: DashboardTotals;
+  revenue_series: MonthlyRevenuePoint[];
+  orders_by_status: Record<string, number>;
+  payments_by_method: Record<string, number>;
 }
 
-// ─── ESTADÍSTICAS DE ÓRDENES ──────────────────────────────
+// ─── TIPOS DERIVADOS PARA LA UI ────────────────────────────
 
-/** Punto de datos de órdenes (para gráficos) */
-export interface OrderDataPoint {
-  date: string;
-  count: number;
-  status: string;
-}
-
-/** Respuesta de estadísticas de órdenes */
-export interface OrderStats {
-  total_orders: number;
-  by_status: Record<string, number>;
-  data: OrderDataPoint[];
-}
-
-// ─── ESTADÍSTICAS DE INVENTARIO ───────────────────────────
-
-/** Producto con stock bajo */
-export interface LowStockProduct {
-  product_id: string;
-  product_name: string;
-  stock: number;
-  min_stock: number;
-}
-
-/** Respuesta de estadísticas de inventario */
-export interface InventoryStats {
-  total_products: number;
-  low_stock_count: number;
-  out_of_stock_count: number;
-  low_stock_products: LowStockProduct[];
-}
-
-// ─── ÓRDENES RECIENTES ────────────────────────────────────
-
-/** Orden reciente (versión resumida para dashboard) */
-export interface RecentOrder {
-  id: string;
-  order_number: string;
-  customer_name: string;
-  total_amount: number;
-  status: string;
-  created_at: string;
-}
-
-/** Respuesta de órdenes recientes */
-export interface RecentOrdersResponse {
-  orders: RecentOrder[];
-}
+export type RevenuePeriod = "month" | "6m" | "12m" | "year";

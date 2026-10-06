@@ -10,17 +10,16 @@ from reportlab.platypus import (
 )
 from reportlab.platypus.flowables import HRFlowable
 from app.models.order_model import Order
-import qrcode
 
 
 class ReportService:
     
-    # Colores IMA
-    DARK_GREEN = HexColor("#1E3A1E")
-    GREEN = HexColor("#3A5F26")
-    GOLD = HexColor("#FBBF24")
-    DARK_BG = HexColor("#2D1A10")
-    LIGHT_BG = HexColor("#F5F5F0")
+    # Colores ITAS
+    DARK_GREEN = HexColor("#142b45")
+    GREEN = HexColor("#1b4f72")
+    GOLD = HexColor("#2fd4a7")
+    DARK_BG = HexColor("#0e1e33")
+    LIGHT_BG = HexColor("#eef6f4")
     WHITE = white
     BLACK = black
     GRAY = HexColor("#666666")
@@ -80,7 +79,7 @@ class ReportService:
         )
         
         # ─── TÍTULO ────────────────────────────────────
-        elements.append(Paragraph("IMA SYSTEM - REPORTE DE ÓRDENES", title_style))
+        elements.append(Paragraph("ITAS - REPORTE DE ÓRDENES", title_style))
         elements.append(Paragraph(
             f"Generado: {datetime.now(timezone.utc).strftime('%d/%m/%Y %H:%M')} UTC | Total: {len(orders)} órdenes",
             subtitle_style
@@ -190,7 +189,7 @@ class ReportService:
         elements.append(HRFlowable(width="100%", color=cls.GOLD, thickness=1))
         elements.append(Spacer(1, 0.2*cm))
         elements.append(Paragraph(
-            f"IMA System - Mercadeo Agropecuario | Reporte generado el {datetime.now().strftime('%d/%m/%Y a las %H:%M')}",
+            f"ITAS - Abasto Social | Reporte generado el {datetime.now().strftime('%d/%m/%Y a las %H:%M')}",
             subtitle_style
         ))
         

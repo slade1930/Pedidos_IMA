@@ -3,13 +3,22 @@
 // ─── APLICACIÓN ────────────────────────────────────────────
 
 /** Nombre de la aplicación */
-export const APP_NAME = "IMA System";
+export const APP_NAME = "ITAS";
 
 /** Versión actual */
 export const APP_VERSION = "1.0.0";
 
+/** Eslogan principal */
+export const APP_SLOGAN = "Tu pedido a un clic, tu retiro en minutos.";
+
+/** Descripción institucional */
+export const APP_TAGLINE =
+  "ITAS nace para modernizar el acceso a la canasta básica familiar. " +
+  "Mediante nuestra plataforma digital, los ciudadanos pueden navegar las ferias activas, " +
+  "seleccionar sus productos e insumos de primera necesidad.";
+
 /** Descripción corta */
-export const APP_DESCRIPTION = "Sistema de gestión integral IMA";
+export const APP_DESCRIPTION = "Sistema de gestión integral ITAS";
 
 // ─── API ───────────────────────────────────────────────────
 
@@ -54,12 +63,10 @@ export const TIMEZONE = "America/Panama";
 // ─── ALMACENAMIENTO LOCAL ──────────────────────────────────
 
 /** Prefijo para claves de localStorage */
-export const STORAGE_PREFIX = "ima_";
+export const STORAGE_PREFIX = "itas_";
 
 /** Claves de localStorage */
 export const STORAGE_KEYS = {
-  ACCESS_TOKEN: `${STORAGE_PREFIX}access_token`,
-  REFRESH_TOKEN: `${STORAGE_PREFIX}refresh_token`,
   CART: `${STORAGE_PREFIX}cart`,
   THEME: `${STORAGE_PREFIX}theme`,
   SIDEBAR_STATE: `${STORAGE_PREFIX}sidebar_state`,
@@ -129,13 +136,15 @@ export const BREAKPOINTS = {
  * ```ts
  * import { APP } from "@/constants/app.constants";
  * 
- * APP.NAME // "IMA System"
- * APP.STORAGE.ACCESS_TOKEN // "ima_access_token"
+ * APP.NAME // "ITAS"
+ * APP.STORAGE.ACCESS_TOKEN // "itas_access_token"
  * ```
  */
 export const APP = {
   NAME: APP_NAME,
   VERSION: APP_VERSION,
+  SLOGAN: APP_SLOGAN,
+  TAGLINE: APP_TAGLINE,
   DESCRIPTION: APP_DESCRIPTION,
   API_URL,
   API_VERSION,
