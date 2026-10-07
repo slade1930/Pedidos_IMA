@@ -365,12 +365,14 @@ export default function AuthSwitch({
             min-height: 100dvh;
           }
 
-          /* Paneles con altura fija (no proporcional al alto total) y por
-             encima del formulario para conservar sus botones activos */
+          /* Paneles con altura fija (no proporcional al alto total). Solo los
+             paneles (extremos) van por encima del formulario; el contenedor
+             SIN z-index para no bloquear los toques en la franja central. */
           .itas-as .panels-container {
             grid-template-rows: 170px minmax(0, 1fr) 170px;
-            z-index: 11;
           }
+          .itas-as .left-panel,
+          .itas-as .right-panel { z-index: 11; }
 
           /* Formulario en flujo, centrado entre los paneles */
           .itas-as .forms-container {
